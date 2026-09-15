@@ -1,0 +1,109 @@
+# Project Walkthrough — Hybrid MATLAB + Python Pipeline
+
+## Architecture Overview
+
+```
+MATLAB/Simulink (Physics)          Python (AI + Evaluation)
+┌────────────────────────┐         ┌──────────────────────────┐
+│ scada_params.m         │         │ config/parameters.py     │
+│ run_single_scenario.m  │         │  (reference impl.)       │
+│ run_all_scenarios.m    │         │                          │
+│ attacks/*.m            │         │ digital_twin/            │
+│                        │         │ engines/                 │
+│ Output: CSV files      │────────>│ models/                  │
+│ in matlab/data/        │  import │ evaluation/              │
+└────────────────────────┘         └──────────────────────────┘
+                                            │
+                                   ┌────────▼─────────┐
+                                   │  SQLite database  │
+                                   │  scada_ids.db     │
+                                   └──────────────────┘
+```
+
+---
+
+## Phase 1 Results (Python — Validated)
+
+| Item | Status |
+|---|---|
+| Unit Tests | **60/60 passed** |
+| E0 Validation | **PASSED** (MAE = 0.0071 m) |
+| Suggested tau_p | 0.0175 m (99th percentile) |
+
+![E0 Residual Distribution](C:/Users/varun/.gemini/antigravity-ide/brain/221a36a5-b1d2-4786-a560-275f77dff28b/e0_residual_distribution.png)
+
+---
+
+## MATLAB Files Created
+
+| File | Purpose |
+|---|---|
+| [`matlab/scada_params.m`](file:///c:/projects/p1/New%20folder/matlab/scada_params.m) | Frozen parameters (mirrors Python exactly) |
+| [`matlab/run_single_scenario.m`](file:///c:/projects/p1/New%20folder/matlab/run_single_scenario.m) | Core simulation: tank, pump, valve, controller, noise |
+| [`matlab/run_all_scenarios.m`](file:///c:/projects/p1/New%20folder/matlab/run_all_scenarios.m) | **Master script**: generates all 170 scenarios → CSV |
+| [`matlab/attacks/apply_fdi.m`](file:///c:/projects/p1/New%20folder/matlab/attacks/apply_fdi.m) | A1: bias, scale, intermittent FDI |
+| [`matlab/attacks/apply_replay.m`](file:///c:/projects/p1/New%20folder/matlab/attacks/apply_replay.m) | A2: historical replay with preserved source_time_s |
+| [`matlab/attacks/apply_dos.m`](file:///c:/projects/p1/New%20folder/matlab/attacks/apply_dos.m) | A3: communication blocking + fail-safe |
+| [`matlab/attacks/apply_auth_misuse.m`](file:///c:/projects/p1/New%20folder/matlab/attacks/apply_auth_misuse.m) | A4: unsafe commands via valid session |
+| [`matlab/scada_simulink_guide.m`](file:///c:/projects/p1/New%20folder/matlab/scada_simulink_guide.m) | Simulink block diagram guide + programmatic builder |
+
+## Python Bridge Files
+
+| File | Purpose |
+|---|---|
+| [`scripts/import_matlab_csv.py`](file:///c:/projects/p1/New%20folder/scripts/import_matlab_csv.py) | CSV → SQLite importer |
+| [`scripts/validate_matlab_vs_python.py`](file:///c:/projects/p1/New%20folder/scripts/validate_matlab_vs_python.py) | Cross-validation between MATLAB and Python |
+
+---
+
+## How to Run the Complete Pipeline
+
+### Step 1: Generate data in MATLAB
+
+Open MATLAB, navigate to the `matlab/` folder, and run:
+
+```matlab
+>> cd('c:\projects\p1\New folder\matlab')
+>> run_all_scenarios
+```
+
+This takes ~2-5 minutes and produces:
+- 170 CSV files in `matlab/data/` (~170,000 rows total)
+- 1 attack metadata CSV (`attack_scenarios.csv`)
+
+### Step 2: Import into SQLite (Python)
+
+```bash
+cd "c:\projects\p1\New folder"
+python scripts/import_matlab_csv.py --clear
+```
+
+This reads all CSVs and populates the SQLite database.
+
+### Step 3: Cross-validate (optional but recommended)
+
+```bash
+python scripts/validate_matlab_vs_python.py
+```
+
+Confirms MATLAB and Python produce consistent physics dynamics.
+
+### Step 4: Continue with Phase 3+ (AI engines, evaluation)
+
+The database is now populated and the Python pipeline (engines, LSTM-AE, evaluation) works identically regardless of whether data came from MATLAB or Python.
+
+---
+
+## Simulink Model (for capstone documentation)
+
+To create the Simulink visual model for your report:
+
+```matlab
+>> cd('c:\projects\p1\New folder\matlab')
+>> create_simulink_model    % Run the function from scada_simulink_guide.m
+```
+
+This creates `scada_tank_model.slx` with the basic blocks. You'll need to manually connect them and arrange the layout for your report screenshot.
+
+> [!NOTE]
+> The Simulink model is for **academic presentation**. The MATLAB script (`run_all_scenarios.m`) is the actual data generator because it can batch-process all 170 scenarios automatically.

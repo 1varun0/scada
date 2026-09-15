@@ -1,0 +1,883 @@
+# SCADA Digital Twin & Multi-Evidence AI Anomaly Detection System
+
+## Implementation & Design Plan
+
+A physics-first, multi-evidence anomaly detection framework for a single-tank water SCADA simulation, combining a Digital Twin, LSTM-Autoencoder, deterministic policy rules, and communication integrity monitoring into a hybrid fusion engine.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Physical Parameter Sheet (Section IV):** The tank dimensions, pump flow rates, valve coefficients, controller gains, and noise parameters listed below are physically plausible starting values. Please review and confirm these numbers before Phase 1 coding begins, as every subsequent dataset value depends on them.
+
+> [!IMPORTANT]
+> **Storage Backend:** This plan uses **SQLite in WAL mode** as the local storage backend. SQLite is built into Python's standard library (zero external dependencies), supports concurrent readers with a single writer via WAL mode, and is perfectly suited for this single-process simulator architecture. The database file is fully portable and self-contained.
+
+> [!WARNING]
+> **Scope Boundary:** This plan explicitly excludes simultaneous multi-vector attacks, compromised physical actuators, complete compromise of all process sensors, and multi-variable replay attacks. These are documented as future work, not as weaknesses.
+
+---
+
+## Open Questions
+
+1. **Python version preference?** The plan assumes Python 3.10+. Confirm if you have a specific version constraint.
+2. **Dashboard requirement timing:** The real-time dashboard is listed in Phase 5. Should it be prioritized earlier for demonstration purposes, or is the CLI/notebook workflow sufficient for initial development?
+3. **GPU availability:** Do you have a CUDA-capable GPU for LSTM training, or should we plan for CPU-only training with appropriately sized models?
+4. **Capstone deadline:** Is there a hard deadline that should influence phase prioritization or scope trimming?
+
+---
+
+## I. Frozen Architecture & Threat Model
+
+### System Architecture
+
+```mermaid
+graph TD
+    SIM["Process Simulator<br/>(Tank + Pump + Valve + Controller)"] --> TEL["SCADA Telemetry<br/>(SQLite: scada_telemetry)"]
+    TEL --> PE["Physics Consistency Engine<br/>(Digital Twin)"]
+    TEL --> TE["Temporal Behavior Engine<br/>(LSTM-Autoencoder)"]
+    TEL --> POL["Command/Policy Safety Engine<br/>(Deterministic Rules)"]
+    TEL --> AE["Communication Integrity Engine<br/>(Availability Monitor)"]
+    PE --> FUS["Hybrid Fusion Engine"]
+    TE --> FUS
+    POL --> FUS
+    AE --> FUS
+    FUS --> ALERT["Final Anomaly Decision"]
+    
+    ALERT --> RES["SQLite: evaluation_results"]
+    
+    subgraph "Ground Truth (Hidden)"
+        AS["SQLite: attack_scenarios"]
+    end
+    
+    subgraph "Experiment Tracking"
+        ER["SQLite: experiment_runs"]
+    end
+```
+
+### Frozen Threat Model
+
+| ID | Attack | Description | Scope Boundary |
+|---|---|---|---|
+| **A1** | False Data Injection (FDI) | Attacker modifies sensor measurements (level only). | Actuator and flow telemetry remain uncompromised. |
+| **A2** | Replay | Attacker substitutes current telemetry with previously recorded telemetry. | Single-variable replay (tank level + its original `source_time_s`). |
+| **A3** | Denial of Service (DoS) | Attacker prevents telemetry/control communication from reaching the intended component. | Communication channel only; physical process continues. |
+| **A4** | Authenticated Misuse | Attacker operates through a valid authenticated/authorized session but issues a command violating process safety constraints. | Single unsafe command; no credential theft modeled. |
+
+> [!NOTE]
+> The baseline prototype does not model simultaneous multi-vector attacks, compromised physical actuators, or complete compromise of all process sensors. These are documented as future work limitations.
+
+### Frozen Design Principles
+
+| Principle | Rule |
+|---|---|
+| Physics-First Sequence | Simulator + Twin validated (E0) before any AI code |
+| Hardware Independence | Software-only, single-tank water SCADA simulation |
+| Digital Twin Independence | Twin maintains isolated `H_twin` from prior predictions + control inputs; **never** consumes current observed sensor readings (Option B: per-scenario reinitialization) |
+| AI Training Boundary | LSTM-AE trained exclusively on normal operational data including legitimate transients + sensor noise |
+| Time-Series Split Integrity | Scenario-based splitting only; no random row splitting |
+| Storage Backend | SQLite in WAL mode — zero-dependency, portable, single-file database; ideal for single-process simulator with concurrent dashboard reads |
+
+---
+
+## II. Multi-Evidence Mathematical Framework
+
+### Engine 1: Physics Consistency (Target: A1)
+
+$$H_{twin,t+1} = H_{twin,t} + \frac{Q_{in,t} - Q_{out,t}}{A} \cdot \Delta t$$
+
+$$r_{physics,t} = H_{observed,t} - H_{twin,t}$$
+
+$$S_p = \min\left(\frac{|r_{physics,t}|}{\tau_p}, 1.0\right) \in [0, 1]$$
+
+- **Twin initialization:** $H_{twin,0} = H_{true,0}$ at scenario start (Option B — per-scenario reinitialization).
+- **Twin never reads** current `H_observed` to correct itself during a scenario run.
+- $\tau_p$ = physics threshold, derived from E0 validation (e.g., 99th percentile residual under normal conditions).
+
+### Engine 2: Temporal Behavior (Target: Subtle deviations, transients)
+
+**Baseline LSTM-AE input features (frozen):**
+```
+H_observed, Q_in, Q_out, pump_state, valve_state
+```
+
+- Rolling window of `W` timesteps → Autoencoder → Reconstruction error `e_t`
+- $S_l = \min\left(\frac{e_t}{\tau_l}, 1.0\right) \in [0, 1]$
+- $\tau_l$ = LSTM threshold, set on validation set.
+
+> [!CAUTION]
+> The following fields must **never** be LSTM inputs: `attack_type`, `ground_truth`, `attack_parameter`, `policy_violation`, `physics_residual`, `fusion_score`.
+
+### Engine 3: Command/Policy Safety (Target: A4)
+
+$$H < H_{critical} \land V_{command} > V_{safe,max} \Rightarrow S_c = 1.0$$
+
+Additional rules:
+- Pump ON command when $H > H_{max} - \epsilon$ → $S_c = 1.0$
+- Valve > 50% when $H < H_{critical}$ → $S_c = 1.0$
+- Otherwise $S_c = 0.0$
+
+(Binary engine; score is 0 or 1, already normalized.)
+
+### Engine 4: Communication Integrity (Target: A2, A3)
+
+$$DataAge_{ms} = (simulation\_time\_s - source\_time\_s) \times 1000$$
+
+- If `packet_received == false` → $S_a = 1.0$ (DoS)
+- If $DataAge_{ms} > \tau_a$ → $S_a = \min\left(\frac{DataAge_{ms}}{\tau_{a,max}}, 1.0\right)$ (Replay)
+- Otherwise $S_a = 0.0$
+
+### Engine 5: Hybrid Fusion
+
+$$S_{hybrid} = w_p \cdot S_p + w_l \cdot S_l + w_c \cdot S_c + w_a \cdot S_a$$
+
+- All component scores $S_i \in [0, 1]$ — normalization enforced at each engine.
+- Weights $w_p, w_l, w_c, w_a$ selected on validation set; $\sum w_i = 1$.
+- Final decision: $S_{hybrid} > \tau_{fusion} \Rightarrow$ Anomaly.
+- Thresholds and weights frozen after validation; **never adjusted on test set**.
+
+### Threshold Selection Protocol (Frozen)
+
+```
+Normal Scenarios (Train)     → Learn normal behavior
+Normal + Attack (Validation) → Choose τ_p, τ_l, τ_a, τ_fusion, weights
+Held-out (Test)              → ONE final evaluation, no adjustments
+```
+
+---
+
+## III. SQLite Schema Design
+
+### Database file: `scada_ids.db`
+
+SQLite database with WAL mode enabled (`PRAGMA journal_mode=WAL;`). Four tables replace the four MongoDB collections.
+
+### Table 1: `scada_telemetry`
+
+Raw process/SCADA observations. One row per timestep per scenario.
+
+| Category | Field | Type | Description |
+|---|---|---|---|
+| **Identity** | `scenario_id` | String | Entire trajectory ID (e.g., `"N_001"`, `"A1_005"`) |
+| | `sequence_id` | Integer | Incremental counter within scenario |
+| **Time** | `simulation_time_s` | Float | Deterministic simulation clock (seconds) |
+| | `source_time_s` | Float | Time the virtual sensor generated the reading (seconds) |
+| | `data_age_ms` | Integer | Derived: `(simulation_time_s - source_time_s) * 1000` |
+| **Communication** | `packet_received` | Boolean | `true` if telemetry arrived |
+| | `communication_status` | String | `"NORMAL"`, `"DEGRADED"`, `"BLOCKED"` |
+| **Operating State** | `operating_condition` | String | Context tag (e.g., `"Normal_Load"`, `"Setpoint_Change"`) |
+| | `tank_level_setpoint` | Float | Target level in meters |
+| **Physical Process** | `tank_level_observed` | Float | Observed/reported tank level H (meters) |
+| | `q_in` | Float | Volumetric inflow (m³/s) |
+| | `q_out` | Float | Volumetric outflow (m³/s) |
+| **Actuation** | `pump_command` | Integer | Requested pump status (1=ON, 0=OFF) |
+| | `pump_state` | Integer | Actual pump execution (1=ON, 0=OFF) |
+| | `valve_command` | Float | Requested valve position (0.0–100.0 %) |
+| | `valve_state` | Float | Actual valve position (0.0–100.0 %) |
+| | `control_command` | String | Structured payload (e.g., `"VALVE_SET_80"`) |
+| **Cyber/Auth** | `user_id` | String | Operator identity |
+| | `user_role` | String | Operator role |
+| | `is_authenticated` | Boolean | Identity clearance |
+| | `is_authorized` | Boolean | Command permission |
+| **Ground Truth** | `attack_type` | String | `"None"`, `"FDI"`, `"Replay"`, `"DoS"`, `"Auth_Misuse"` |
+| *(Hidden from models)* | `attack_parameter` | Float | Scale of anomaly (e.g., bias=0.05) |
+| | `ground_truth` | Integer | 0=Normal, 1=Anomaly |
+| | `replay_source_sequence_id` | Integer/null | Original sequence_id for replay; `null` otherwise |
+
+**SQL definition:**
+```sql
+CREATE TABLE scada_telemetry (
+    scenario_id TEXT NOT NULL,
+    sequence_id INTEGER NOT NULL,
+    simulation_time_s REAL NOT NULL,
+    source_time_s REAL NOT NULL,
+    data_age_ms INTEGER NOT NULL,
+    packet_received INTEGER NOT NULL,          -- 0/1 boolean
+    communication_status TEXT NOT NULL,
+    operating_condition TEXT NOT NULL,
+    tank_level_setpoint REAL NOT NULL,
+    tank_level_observed REAL NOT NULL,
+    q_in REAL NOT NULL,
+    q_out REAL NOT NULL,
+    pump_command INTEGER NOT NULL,
+    pump_state INTEGER NOT NULL,
+    valve_command REAL NOT NULL,
+    valve_state REAL NOT NULL,
+    control_command TEXT,
+    user_id TEXT,
+    user_role TEXT,
+    is_authenticated INTEGER,                  -- 0/1 boolean
+    is_authorized INTEGER,                     -- 0/1 boolean
+    attack_type TEXT NOT NULL DEFAULT 'None',
+    attack_parameter REAL,
+    ground_truth INTEGER NOT NULL DEFAULT 0,
+    replay_source_sequence_id INTEGER,
+    PRIMARY KEY (scenario_id, sequence_id)
+);
+CREATE INDEX idx_telemetry_scenario ON scada_telemetry(scenario_id);
+CREATE INDEX idx_telemetry_attack ON scada_telemetry(attack_type);
+```
+
+### Table 2: `attack_scenarios`
+
+Ground-truth attack configuration. One row per attack episode.
+
+| Field | Type | Description |
+|---|---|---|
+| `scenario_id` | String | Links to telemetry trajectory |
+| `attack_id` | String | Unique episode identifier |
+| `attack_type` | String | `"None"`, `"FDI"`, `"Replay"`, `"DoS"`, `"Auth_Misuse"` |
+| `attack_start_time_s` | Float | Simulation time attack begins |
+| `attack_end_time_s` | Float | Simulation time attack ends |
+| `attack_parameter_type` | String | `"bias"`, `"scale"`, `"intermittent"`, etc. |
+| `attack_parameter_value` | Float | Numerical value (e.g., 0.05 for bias) |
+| `random_seed` | Integer | Reproducibility seed |
+| `description` | String | Human-readable description |
+| `operating_condition` | String | Context during attack |
+| `initial_tank_level` | Float | $H_0$ at scenario start |
+
+```sql
+CREATE TABLE attack_scenarios (
+    scenario_id TEXT NOT NULL,
+    attack_id TEXT NOT NULL PRIMARY KEY,
+    attack_type TEXT NOT NULL,
+    attack_start_time_s REAL,
+    attack_end_time_s REAL,
+    attack_parameter_type TEXT,
+    attack_parameter_value REAL,
+    random_seed INTEGER NOT NULL,
+    description TEXT,
+    operating_condition TEXT,
+    initial_tank_level REAL
+);
+```
+
+### Table 3: `experiment_runs`
+
+Model configuration and training metadata. JSON-serialized fields for complex objects.
+
+| Field | Type | Description |
+|---|---|---|
+| `experiment_id` | String | Unique experiment identifier |
+| `model_version` | String | Model version tag |
+| `feature_version` | String | Feature set identifier |
+| `threshold_version` | String | Threshold set identifier |
+| `fusion_version` | String | Fusion weight set |
+| `training_scenario_ids` | Text (JSON) | JSON array of scenario IDs used for training |
+| `validation_scenario_ids` | Text (JSON) | JSON array of scenario IDs used for validation |
+| `test_scenario_ids` | Text (JSON) | JSON array of scenario IDs used for test |
+| `hyperparameters` | Text (JSON) | JSON object: LSTM architecture, window size, etc. |
+| `thresholds` | Text (JSON) | JSON object: `{tau_p, tau_l, tau_a, tau_fusion}` |
+| `fusion_weights` | Text (JSON) | JSON object: `{w_p, w_l, w_c, w_a}` |
+| `created_at` | DateTime | Timestamp |
+```sql
+CREATE TABLE experiment_runs (
+    experiment_id TEXT PRIMARY KEY,
+    model_version TEXT,
+    feature_version TEXT,
+    threshold_version TEXT,
+    fusion_version TEXT,
+    training_scenario_ids TEXT,       -- JSON array
+    validation_scenario_ids TEXT,     -- JSON array
+    test_scenario_ids TEXT,           -- JSON array
+    hyperparameters TEXT,             -- JSON object
+    thresholds TEXT,                  -- JSON object
+    fusion_weights TEXT,              -- JSON object
+    created_at TEXT NOT NULL
+);
+```
+
+### Table 4: `evaluation_results`
+
+Per-timestep predictions linked to an experiment run.
+
+| Field | Type | Description |
+|---|---|---|
+| `experiment_id` | String | Links to `experiment_runs` |
+| `scenario_id` | String | Links to telemetry |
+| `sequence_id` | Integer | Timestep within scenario |
+| `simulation_time_s` | Float | For convenience |
+| `h_twin` | Float | Digital Twin predicted level |
+| `physics_residual` | Float | $r_{physics,t}$ |
+| `S_p` | Float | Normalized physics score [0,1] |
+| `lstm_reconstruction_error` | Float | $e_t$ |
+| `S_l` | Float | Normalized LSTM score [0,1] |
+| `S_c` | Float | Policy score (0 or 1) |
+| `S_a` | Float | Availability score [0,1] |
+| `S_hybrid` | Float | Fused anomaly score |
+| `predicted_anomaly` | Integer | 0 or 1 |
+| `ground_truth` | Integer | 0 or 1 (copied for analysis convenience) |
+
+```sql
+CREATE TABLE evaluation_results (
+    experiment_id TEXT NOT NULL,
+    scenario_id TEXT NOT NULL,
+    sequence_id INTEGER NOT NULL,
+    simulation_time_s REAL NOT NULL,
+    h_twin REAL,
+    physics_residual REAL,
+    S_p REAL,
+    lstm_reconstruction_error REAL,
+    S_l REAL,
+    S_c REAL,
+    S_a REAL,
+    S_hybrid REAL,
+    predicted_anomaly INTEGER,
+    ground_truth INTEGER,
+    PRIMARY KEY (experiment_id, scenario_id, sequence_id),
+    FOREIGN KEY (experiment_id) REFERENCES experiment_runs(experiment_id),
+    FOREIGN KEY (scenario_id, sequence_id) REFERENCES scada_telemetry(scenario_id, sequence_id)
+);
+```
+
+---
+
+## IV. Physical Parameter Sheet
+
+> [!IMPORTANT]
+> These parameters define the entire physical simulation. All values must be frozen before Phase 1 coding begins.
+
+### Tank Parameters
+
+| Parameter | Symbol | Value | Unit | Rationale |
+|---|---|---|---|---|
+| Cross-sectional area | $A$ | 2.0 | m² | Cylindrical tank ≈ 1.6 m diameter |
+| Maximum height | $H_{max}$ | 2.5 | m | Typical small industrial tank |
+| Initial level | $H_0$ | 1.0 | m | 40% fill — room for transients |
+| Critical low level | $H_{crit,low}$ | 0.3 | m | Below this: pump cavitation risk |
+| Critical high level | $H_{crit,high}$ | 2.3 | m | Above this: overflow risk |
+| Overflow level | $H_{overflow}$ | 2.5 | m | Physical ceiling |
+
+### Pump Parameters
+
+| Parameter | Symbol | Value | Unit | Rationale |
+|---|---|---|---|---|
+| Maximum inflow | $Q_{in,max}$ | 0.005 | m³/s | 5 L/s ≈ 80 GPM (small industrial pump) |
+| Minimum inflow (when ON) | $Q_{in,min}$ | 0.005 | m³/s | ON/OFF pump (no variable speed) |
+| Pump response delay | $\tau_{pump}$ | 2.0 | s | Mechanical inertia |
+| Pump behavior | — | ON/OFF | — | Binary; no partial flow |
+
+### Valve Parameters
+
+| Parameter | Symbol | Value | Unit | Rationale |
+|---|---|---|---|---|
+| Valve range | — | 0–100 | % | Continuously variable |
+| Flow coefficient | $C_v$ | 0.004 | m³/s | Max outflow at 100% opening |
+| Outflow model | — | $Q_{out} = C_v \cdot (V\%/100) \cdot \sqrt{H}$ | — | Gravity-driven, valve-throttled |
+| Valve response time | $\tau_{valve}$ | 1.5 | s | Actuator slew rate |
+| Safe valve position | $V_{safe}$ | 0.0 | % | Fail-safe: fully closed |
+
+### Controller Parameters
+
+| Parameter | Symbol | Value | Unit | Rationale |
+|---|---|---|---|---|
+| Setpoint | $H_{sp}$ | 1.0 | m | Nominal operating level |
+| Control interval | $T_c$ | 1.0 | s | Matches Δt |
+| Control law | — | Hysteresis (bang-bang) | — | Simple, deterministic, reproducible |
+| Pump ON threshold | $H_{sp} - d$ | 0.8 | m | Pump turns ON below this |
+| Pump OFF threshold | $H_{sp} + d$ | 1.2 | m | Pump turns OFF above this |
+| Valve setpoint | — | Controller-determined | % | Adjusts to maintain outflow balance |
+| Hysteresis band | $d$ | 0.2 | m | Prevents rapid switching |
+
+**Fail-Safe Behavior (deterministic):**
+
+$$\text{DoS detected} \Rightarrow \text{Pump} = \text{OFF},\quad \text{Valve} = V_{safe} = 0\%$$
+
+### Simulation Parameters
+
+| Parameter | Symbol | Value | Unit | Rationale |
+|---|---|---|---|---|
+| Time step | $\Delta t$ | 1.0 | s | 1 Hz telemetry rate |
+| Scenario duration (normal) | $T_{normal}$ | 1000 | s | ~17 minutes per scenario |
+| Scenario duration (attack) | $T_{attack}$ | 1000 | s | Same length for consistency |
+| Sensor noise (level) | $\sigma_H$ | 0.005 | m | ±5mm Gaussian noise |
+| Sensor noise (flow) | $\sigma_Q$ | 0.0001 | m³/s | ±0.1 L/s |
+| Actuator delay | $\tau_{act}$ | 1 | step | 1-step command→execution lag |
+| Base random seed | $seed_0$ | 42000 | — | Per-scenario: `42000 + scenario_index` |
+
+### Stability Check
+
+At steady state ($H = H_{sp} = 1.0$ m):
+- $Q_{in} = 0.005$ m³/s (pump ON)
+- $Q_{out} = C_v \cdot V\% / 100 \cdot \sqrt{H} = 0.004 \cdot V\% / 100 \cdot 1.0$
+- Balance at $V\% = 100\%$: $Q_{out,max} = 0.004$ m³/s < $Q_{in}$ → tank fills slowly
+- Controller cycles pump to maintain level within band
+
+**Fill rate (pump ON, valve 100%):** $\frac{dH}{dt} = \frac{0.005 - 0.004}{2.0} = 0.0005$ m/s → 0.5 mm/s rise
+
+**Drain rate (pump OFF, valve 100%, H=1.0):** $\frac{dH}{dt} = \frac{-0.004}{2.0} = -0.002$ m/s → 2 mm/s drop
+
+**Time to drain from 1.2→0.8 (pump OFF):** ≈ 200 s — provides reasonable cycling dynamics.
+
+---
+
+## V. Project Structure
+
+```
+c:\projects\p1\New folder\
+├── README.md
+├── requirements.txt
+├── config/
+│   ├── __init__.py
+│   ├── parameters.py            # Frozen physical parameter sheet
+│   └── scenarios.py             # Scenario definitions & seeds
+├── simulator/
+│   ├── __init__.py
+│   ├── tank.py                  # Tank physics model
+│   ├── pump.py                  # Pump model with delay
+│   ├── valve.py                 # Valve model with Cv
+│   ├── controller.py            # Hysteresis controller + fail-safe
+│   ├── process_simulator.py     # Orchestrator: runs one scenario
+│   ├── noise.py                 # Sensor noise generator
+│   └── scenario_runner.py       # Batch scenario execution
+├── attacks/
+│   ├── __init__.py
+│   ├── base_attack.py           # Abstract attack interface
+│   ├── fdi_attack.py            # A1: bias, scale, intermittent
+│   ├── replay_attack.py         # A2: historical substitution
+│   ├── dos_attack.py            # A3: communication blocking
+│   └── auth_misuse_attack.py    # A4: unsafe command injection
+├── digital_twin/
+│   ├── __init__.py
+│   └── physics_twin.py          # Independent H_twin predictor
+├── engines/
+│   ├── __init__.py
+│   ├── physics_engine.py        # Engine 1: residual calculation
+│   ├── temporal_engine.py       # Engine 2: LSTM-AE wrapper
+│   ├── policy_engine.py         # Engine 3: rule evaluation
+│   ├── availability_engine.py   # Engine 4: comms monitoring
+│   └── fusion_engine.py         # Engine 5: weighted fusion
+├── models/
+│   ├── __init__.py
+│   ├── lstm_autoencoder.py      # PyTorch LSTM-AE architecture
+│   ├── trainer.py               # Training loop
+│   └── preprocessor.py          # Windowing, normalization
+├── storage/
+│   ├── __init__.py
+│   └── sqlite_client.py         # SQLite WAL connection & CRUD
+├── evaluation/
+│   ├── __init__.py
+│   ├── metrics.py               # Precision, Recall, F1, AUC, latency
+│   ├── ablation.py              # C1–C7 configuration runner
+│   └── reporter.py              # Generate result tables & plots
+├── dashboard/                   # Phase 5 (deferred)
+│   ├── __init__.py
+│   └── app.py
+├── notebooks/
+│   ├── 01_E0_twin_validation.ipynb
+│   ├── 02_data_exploration.ipynb
+│   ├── 03_lstm_training.ipynb
+│   ├── 04_threshold_selection.ipynb
+│   ├── 05_evaluation_results.ipynb
+│   └── 06_ablation_analysis.ipynb
+├── scripts/
+│   ├── generate_normal_data.py  # Run all normal scenarios
+│   ├── generate_attack_data.py  # Run all attack scenarios
+│   ├── run_e0_validation.py     # E0 experiment
+│   ├── run_evaluation.py        # Full pipeline evaluation
+│   └── run_ablation.py          # Ablation study
+└── tests/
+    ├── test_tank.py
+    ├── test_pump.py
+    ├── test_valve.py
+    ├── test_controller.py
+    ├── test_simulator.py
+    ├── test_twin.py
+    ├── test_attacks.py
+    ├── test_engines.py
+    └── test_fusion.py
+```
+
+---
+
+## VI. Proposed Changes — Phased Implementation
+
+### Phase 1: Physical Process Simulator & Digital Twin
+
+> **Goal:** Build, unit-test, and validate the physical simulation before any AI/ML code.
+
+---
+
+#### [NEW] `config/parameters.py`
+
+Frozen physical constants, tank/pump/valve specs, controller gains, simulation settings, and noise parameters. Single source of truth for all numerical values defined in Section IV.
+
+#### [NEW] `config/scenarios.py`
+
+Scenario definitions: IDs, types, seeds, durations, setpoint profiles, operating conditions. Deterministic mapping from `scenario_id` → full configuration including `random_seed = 42000 + index`.
+
+---
+
+#### [NEW] `simulator/tank.py`
+
+Tank physics: $H_{t+1} = H_t + \frac{Q_{in} - Q_{out}}{A} \Delta t$. Enforces $0 \leq H \leq H_{max}$ bounds. Pure function, no side effects.
+
+#### [NEW] `simulator/pump.py`
+
+ON/OFF pump with response delay ($\tau_{pump}$). Tracks `pump_command` vs `pump_state` with configurable lag.
+
+#### [NEW] `simulator/valve.py`
+
+Continuous valve (0–100%) with slew-rate limiting ($\tau_{valve}$). Outflow model: $Q_{out} = C_v \cdot (V\%/100) \cdot \sqrt{H}$.
+
+#### [NEW] `simulator/controller.py`
+
+Hysteresis (bang-bang) controller. Pump ON when $H < H_{sp} - d$, OFF when $H > H_{sp} + d$. Valve position logic. Deterministic fail-safe: `DoS → Pump=OFF, Valve=0%`.
+
+#### [NEW] `simulator/noise.py`
+
+Gaussian sensor noise: $H_{observed} = H_{true} + \mathcal{N}(0, \sigma_H)$, $Q_{observed} = Q_{true} + \mathcal{N}(0, \sigma_Q)$. Seeded RNG per scenario.
+
+#### [NEW] `simulator/process_simulator.py`
+
+Orchestrates one scenario: initializes components, steps through $T/\Delta t$ timesteps, records full telemetry documents.
+
+#### [NEW] `simulator/scenario_runner.py`
+
+Batch runner: iterates scenario definitions, calls `process_simulator`, writes to MongoDB.
+
+---
+
+#### [NEW] `digital_twin/physics_twin.py`
+
+Independent Digital Twin. Initialized at $H_{twin,0} = H_{true,0}$ per scenario. Steps forward using the same physics equation but maintains its own state. **Never reads `H_observed`.**
+
+---
+
+#### [NEW] `storage/sqlite_client.py`
+
+SQLite client wrapper. WAL mode initialization (`PRAGMA journal_mode=WAL`), table creation, bulk insert for telemetry (using `executemany` for performance), parameterized queries, connection context manager. Single `.db` file in the project `data/` directory.
+
+---
+
+#### [NEW] `tests/test_tank.py`, `test_pump.py`, `test_valve.py`, `test_controller.py`, `test_simulator.py`, `test_twin.py`
+
+Unit tests:
+- Tank: mass balance, boundary clipping, steady-state convergence
+- Pump: delay behavior, ON/OFF transitions
+- Valve: flow coefficient accuracy, slew limiting
+- Controller: hysteresis thresholds, fail-safe activation
+- Simulator: end-to-end scenario, deterministic replay with same seed
+- Twin: independence from observed values, reinitialization correctness
+
+---
+
+#### [NEW] `scripts/run_e0_validation.py` + `notebooks/01_E0_twin_validation.ipynb`
+
+**Experiment E0 (Phase 1 Gate — must pass before Phase 2):** Run 10+ normal scenarios with varied setpoints and noise. Compute:
+
+| Metric | Purpose |
+|---|---|
+| MAE | Average Twin drift |
+| RMSE | Quadratic error emphasis |
+| 95th percentile residual | Threshold candidate |
+| 99th percentile residual | Conservative threshold |
+| Max absolute residual | Worst-case drift |
+| Residual distribution plot | Visual confirmation of normality |
+
+**E0 pass criterion:** $MAE < 0.02$ m, residual distribution approximately Gaussian.
+
+---
+
+### Phase 2: Attack Generation Engine
+
+> **Goal:** Implement deterministic, reproducible attack scenarios.
+
+---
+
+#### [NEW] `attacks/base_attack.py`
+
+Abstract base class: `apply(telemetry_record, attack_config) → modified_record`. All attacks are functions over the telemetry document.
+
+#### [NEW] `attacks/fdi_attack.py`
+
+**A1 — False Data Injection:**
+- **Bias:** $H_{fake} = H_{actual} + b$, where $b \in \{0.05, 0.10, 0.20, 0.50\}$ m
+- **Scale:** $H_{fake} = \alpha \cdot H_{actual}$, where $\alpha \in \{1.05, 1.10, 1.20\}$
+- **Intermittent:** Bias applied every $n$-th step
+- **Assumption (frozen):** Flow telemetry ($Q_{in}$, $Q_{out}$) and actuator states remain uncompromised.
+
+#### [NEW] `attacks/replay_attack.py`
+
+**A2 — Replay:**
+- Captures a buffer of historical `tank_level_observed` values during normal operation.
+- During attack window: substitutes `tank_level_observed` with historical value.
+- **Preserves original `source_time_s`** from the historical record (critical: prevents erasing replay evidence).
+- Sets `replay_source_sequence_id` to the original `sequence_id`.
+- `data_age_ms` derived correctly from stale `source_time_s`.
+- **Assumption (frozen):** Only level measurement replayed; control/process variables remain current.
+
+#### [NEW] `attacks/dos_attack.py`
+
+**A3 — Denial of Service:**
+- Sets `packet_received = false`, `communication_status = "BLOCKED"`.
+- Controller executes fail-safe: `pump_command = 0`, `valve_command = 0%`.
+- Physical simulation continues (tank level changes based on gravity drain).
+- Telemetry records continue to be generated with `packet_received=0` (simulating the true physical state progressing independently while comms are blocked).
+
+#### [NEW] `attacks/auth_misuse_attack.py`
+
+**A4 — Authenticated Misuse:**
+- `is_authenticated = true`, `is_authorized = true`.
+- Issues unsafe `control_command` (e.g., `VALVE_SET_80` when $H < H_{crit,low}$).
+- **The unsafe command immediately triggers the Policy Engine, while the resulting process trajectory may subsequently generate temporal anomaly evidence from the LSTM-AE.**
+
+---
+
+#### [NEW] `scripts/generate_normal_data.py`
+
+Generate 50+ normal scenarios with varied:
+- Setpoint profiles (constant, step-change, ramp)
+- Operating conditions
+- Initial levels
+
+Target: ~50,000 normal telemetry records.
+
+#### [NEW] `scripts/generate_attack_data.py`
+
+Generate attack scenarios with deterministic configurations:
+
+```
+scenario_id: A1_005
+random_seed: 42005
+attack_start_s: 300
+attack_duration_s: 50
+attack_parameter: {type: "bias", value: 0.05}
+```
+
+Target: ~50,000 attack telemetry records across all four types.
+
+---
+
+### Phase 3: Detection Engines & LSTM-AE
+
+> **Goal:** Implement all four evidence engines and the LSTM-Autoencoder.
+
+---
+
+#### [NEW] `engines/physics_engine.py`
+
+Wraps `digital_twin/physics_twin.py`. Computes $r_{physics,t}$ and normalizes to $S_p \in [0, 1]$.
+
+#### [NEW] `engines/policy_engine.py`
+
+Deterministic rules per Section II. Evaluates current state + command against safety constraints. Returns $S_c \in \{0, 1\}$.
+
+#### [NEW] `engines/availability_engine.py`
+
+Monitors `packet_received`, `communication_status`, `data_age_ms`. Returns $S_a \in [0, 1]$.
+
+---
+
+#### [NEW] `models/lstm_autoencoder.py`
+
+PyTorch LSTM-Autoencoder:
+- Encoder: LSTM → latent representation
+- Decoder: LSTM → reconstruction
+- Input: window of `[H_observed, Q_in, Q_out, pump_state, valve_state]`
+- Loss: MSE reconstruction error
+
+#### [NEW] `models/preprocessor.py`
+
+- Per-feature min-max or z-score normalization (fit on training data only)
+- Sliding window creation (window size `W`, stride 1)
+- Scenario-aware windowing (no windows spanning scenario boundaries)
+
+#### [NEW] `models/trainer.py`
+
+- Training loop with early stopping on validation loss
+- Trained exclusively on normal scenarios
+- Saves model checkpoints with version tags
+
+#### [NEW] `engines/temporal_engine.py`
+
+Wraps trained LSTM-AE. Computes reconstruction error → normalizes to $S_l \in [0, 1]$.
+
+---
+
+#### [NEW] `engines/fusion_engine.py`
+
+$$S_{hybrid} = w_p \cdot S_p + w_l \cdot S_l + w_c \cdot S_c + w_a \cdot S_a$$
+
+- All component scores pre-normalized to [0,1]
+- Weights and threshold configurable per `experiment_runs` document
+- Returns final anomaly decision
+
+---
+
+### Phase 4: Evaluation & Ablation
+
+> **Goal:** Rigorous evaluation with proper train/validation/test split.
+
+---
+
+#### Data Split Strategy
+
+| Split | Content | Purpose |
+|---|---|---|
+| **Train** | Normal scenarios only (60%) | LSTM-AE learning |
+| **Validation** | Normal + Attack scenarios (20%) | Threshold selection, weight tuning |
+| **Test** | Normal + Attack scenarios (20%) | Final one-shot evaluation |
+
+Split by entire `scenario_id` — never by individual rows. Enforced by querying distinct `scenario_id` values and partitioning the list.
+
+---
+
+#### [NEW] `evaluation/metrics.py`
+
+| Metric | Implementation |
+|---|---|
+| Precision, Recall, F1 | Per-class and macro |
+| PR-AUC | Precision-Recall curve area |
+| ROC-AUC | Receiver Operating Characteristic area |
+| FPR | False Positive Rate |
+| False Alarms/Hour | FP count / total normal hours |
+| Detection Latency | Time from `attack_start_time_s` to first `predicted_anomaly=1` |
+| Latency stats | Median, Mean, P95, Max across all attack episodes |
+
+#### [NEW] `evaluation/ablation.py`
+
+Seven configurations:
+
+| Config | Physics | LSTM | Policy | Availability |
+|---|:---:|:---:|:---:|:---:|
+| C1 | ✓ | | | |
+| C2 | | ✓ | | |
+| C3 | ✓ | ✓ | | |
+| C4 | | | ✓ | |
+| C5 | | | | ✓ |
+| C6 | ✓ | ✓ | ✓ | |
+| C7 (Full) | ✓ | ✓ | ✓ | ✓ |
+
+Each configuration evaluated on the same test set. Results stored in `experiment_runs` + `evaluation_results` tables.
+
+#### [NEW] `evaluation/reporter.py`
+
+Generates:
+- Per-attack-type metrics tables
+- Ablation comparison table
+- Detection latency distribution plots
+- ROC and PR curves
+- Confusion matrices
+
+---
+
+### Phase 5: Dashboard & Documentation (Deferred)
+
+#### [NEW] `dashboard/app.py`
+
+Real-time visualization dashboard (Flask/Streamlit). Deferred until core pipeline is validated.
+
+#### [NEW] `data/` directory
+
+Contains the `scada_ids.db` SQLite database file. Gitignored (too large for version control); regenerated via scripts.
+
+#### [NEW] `README.md`
+
+Project overview, setup instructions, architecture diagram, parameter sheet reference, experiment reproduction guide.
+
+---
+
+## VII. Attack Generation Scenario Plan
+
+### Normal Scenarios
+
+| ID Range | Operating Condition | Setpoint Profile | Count |
+|---|---|---|---|
+| `N_001` – `N_020` | Steady state | $H_{sp} = 1.0$ m constant | 20 |
+| `N_021` – `N_035` | Setpoint change | Step from 1.0 → 1.5 m at t=400s | 15 |
+| `N_036` – `N_050` | Variable load | Ramp setpoint 0.8 → 1.4 m | 15 |
+| `N_051` – `N_060` | Recovery | Start at $H_0 = 0.5$ m, target 1.0 m | 10 |
+
+### Attack Scenarios
+
+| ID Range | Attack | Variant | Parameter | Count |
+|---|---|---|---|---|
+| `A1_001` – `A1_010` | FDI Bias | Small | $b = 0.05$ m | 10 |
+| `A1_011` – `A1_020` | FDI Bias | Medium | $b = 0.10$ m | 10 |
+| `A1_021` – `A1_030` | FDI Bias | Large | $b = 0.20$ m | 10 |
+| `A1_031` – `A1_040` | FDI Scale | | $\alpha = 1.10$ | 10 |
+| `A1_041` – `A1_045` | FDI Intermittent | | $b = 0.15$ m, every 5th step | 5 |
+| `A2_001` – `A2_015` | Replay | Various buffer lengths | 30–100 s buffer | 15 |
+| `A3_001` – `A3_015` | DoS | Various durations | 20–120 s blocking | 15 |
+| `A4_001` – `A4_015` | Auth Misuse | Unsafe valve/pump | Various unsafe commands | 15 |
+
+**Total estimate:** ~60 normal × 1000 steps + ~110 attack × 1000 steps = **~170,000 records** (within target range, adjustable).
+
+---
+
+## VIII. Verification Plan
+
+### Automated Tests
+
+```bash
+# Unit tests (Phase 1)
+python -m pytest tests/test_tank.py tests/test_pump.py tests/test_valve.py tests/test_controller.py -v
+
+# Integration tests (Phase 1)
+python -m pytest tests/test_simulator.py tests/test_twin.py -v
+
+# Attack tests (Phase 2)
+python -m pytest tests/test_attacks.py -v
+
+# Engine tests (Phase 3)
+python -m pytest tests/test_engines.py tests/test_fusion.py -v
+```
+
+### E0 Validation (Phase 1 Gate)
+
+```bash
+python scripts/run_e0_validation.py
+```
+
+**Must produce:** MAE, RMSE, percentile residuals, distribution plot. Phase 2 blocked until E0 passes.
+
+### Full Pipeline (Phase 4)
+
+```bash
+python scripts/run_evaluation.py --experiment_id EXP_001
+python scripts/run_ablation.py --experiment_id ABL_001
+```
+
+### Manual Verification
+
+- Review E0 residual plots for Gaussian distribution
+- Inspect sample attack telemetry documents in MongoDB for correctness
+- Verify `replay_source_sequence_id` is correctly populated in SQLite
+- Confirm `source_time_s` is preserved (not overwritten) during replay attacks via SQL query
+- Verify fail-safe behavior during DoS: tank drains naturally with pump OFF and valve closed
+- Review detection latency distributions for each attack type
+- Confirm SQLite WAL mode is active: `PRAGMA journal_mode;` returns `wal`
+
+---
+
+## IX. Dependencies
+
+```
+# requirements.txt
+torch>=2.0
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+matplotlib>=3.7
+seaborn>=0.12
+pandas>=2.0
+pytest>=7.0
+tqdm>=4.65
+# sqlite3 is included in Python stdlib — no external dependency needed
+```
+
+---
+
+## X. Known Limitations & Future Work
+
+| Limitation | Status |
+|---|---|
+| Single-variable FDI (level only) | Frozen scope — coordinated multi-sensor FDI is future work |
+| Single-variable replay (level only) | Frozen scope — multi-variable replay is future work |
+| Mutually exclusive attacks | Frozen scope — combined attacks (e.g., DoS+FDI) are future work |
+| No compromised actuators | Frozen scope |
+| Simple bang-bang controller | Sufficient for prototype; PID is future enhancement |
+| No state estimator for Twin | Option B (per-scenario reinit) is sufficient; Kalman filter is future work |
+| CPU-only LSTM training | GPU support via PyTorch is available if needed |

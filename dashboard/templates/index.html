@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity SCADA Digital Twin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Header -->
+        <header class="sidebar">
+            <div class="logo">
+                <div class="logo-circle"></div>
+                <h1>SCADA Twin</h1>
+            </div>
+            
+            <div class="control-group">
+                <label for="scenario-select">Scenario Inspector</label>
+                <select id="scenario-select" class="glass-select">
+                    <option value="">Loading scenarios...</option>
+                </select>
+            </div>
+
+            <div class="system-status">
+                <h3>System Status</h3>
+                <div id="status-indicator" class="status-indicator status-ok">
+                    <span class="status-dot"></span>
+                    <span id="status-text">NORMAL OPERATION</span>
+                </div>
+            </div>
+
+            <div class="metric-cards">
+                <div class="card">
+                    <div class="card-label">Avg. Latency</div>
+                    <div class="card-value">0ms</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Anomalies Detected</div>
+                    <div class="card-value" id="anomaly-count-val">0</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard">
+            <div class="top-row">
+                <div class="panel glass-panel large-chart">
+                    <div class="panel-header">
+                        <h2>Process State (H, Q_in, Q_out)</h2>
+                        <div class="legend-badges">
+                            <span class="badge blue">H (m)</span>
+                            <span class="badge green">Pump</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="processChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bottom-row">
+                <div class="panel glass-panel scores-chart">
+                    <div class="panel-header">
+                        <h2>Hybrid Anomaly Fusion</h2>
+                        <span id="ground-truth-badge" class="badge outline">Unknown</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="scoresChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="panel glass-panel alert-feed">
+                    <div class="panel-header">
+                        <h2>Event Log</h2>
+                    </div>
+                    <ul id="alert-list" class="alert-list">
+                        <li class="alert-item empty">No events recorded.</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
