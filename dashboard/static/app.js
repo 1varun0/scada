@@ -77,6 +77,10 @@ async function loadScenarios() {
             opt.textContent = s;
             scenarioSelect.appendChild(opt);
         });
+        if (scenarios.length > 0) {
+            scenarioSelect.value = scenarios[0];
+            loadTelemetry(scenarios[0]);
+        }
     } catch (e) {
         console.error("Failed to load scenarios", e);
     }
