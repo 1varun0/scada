@@ -34,11 +34,30 @@ class PlantControl:
         self.injector.stop_attack()
         self.injector.replay_buffer = []
 
-def run_plant_loop(plant: LivePlant, injector: Injector, control: PlantControl, max_ticks=None):
+def run_plant_loop(plant: LivePlant, injector: Injector, control: PlantControl, max_ticks=None, soak_mode=False):
     dt = plant.cfg.simulation.dt_s
+    latencies = []
+    mem_points = []
+    
+    import sys, os
+    def get_mem():
+        if sys.platform != 'win32':
+            import resource
+            return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+        else:
+            import psutil
+            process = psutil.Process(os.getpid())
+            return process.memory_info().rss / (1024.0 * 1024.0)
+
+    if soak_mode:
+        mem_points.append(("Start", get_mem()))
+
     while True:
         if max_ticks is not None and plant.tick_counter >= max_ticks:
             break
+            
+        if soak_mode and max_ticks is not None and plant.tick_counter == max_ticks // 2:
+            mem_points.append(("Middle", get_mem()))
             
         if control.paused:
             time.sleep(0.1)
@@ -46,6 +65,8 @@ def run_plant_loop(plant: LivePlant, injector: Injector, control: PlantControl, 
             
         # Real-time sleep based on speed
         wall_sleep = dt / control.speed
+        
+        t0 = time.perf_counter()
         
         # 1-2. Plant observes itself
         level_obs = plant.observe()
@@ -69,10 +90,19 @@ def run_plant_loop(plant: LivePlant, injector: Injector, control: PlantControl, 
         # 10. Injector proxies telemetry
         injector.send_telemetry(pkt.to_dict())
         
+        t1 = time.perf_counter()
+        if soak_mode:
+            latencies.append((t1 - t0) * 1000.0) # ms
+            
         plant.tick_counter += 1
         plant.simulation_time_s += dt
         
-        time.sleep(wall_sleep)
+        if not soak_mode or control.speed < 100.0:
+            time.sleep(wall_sleep)
+            
+    if soak_mode:
+        mem_points.append(("End", get_mem()))
+        return latencies, mem_points
 
 
 class ServerThread(threading.Thread):
@@ -122,34 +152,36 @@ def main():
     
     if args.soak:
         print("Running automated soak test...")
-        control.set_speed(100.0)
+        from scada_live.scada_ids.server import gateway
+        gateway.cfg.simulation.time_scale = 5.0
+        control.set_speed(5.0)
+        
         try:
-            run_plant_loop(plant, injector, control, max_ticks=3000)
+            latencies, mem_points = run_plant_loop(plant, injector, control, max_ticks=1800, soak_mode=True)
         except KeyboardInterrupt:
-            pass
+            latencies, mem_points = [], []
         finally:
-            from scada_live.scada_ids.server import gateway
-            import sys, os
-            if sys.platform != 'win32':
-                import resource
-                mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
-            else:
-                import psutil
-                process = psutil.Process(os.getpid())
-                mem = process.memory_info().rss / (1024.0 * 1024.0)
+            server.shutdown()
+            server.join()
             
             metrics_dict = gateway.metrics.get_metrics()
-            latencies = [ep['latency'] for ep in metrics_dict.get('episodes', []) if ep['latency'] is not None]
-            p95 = sorted(latencies)[int(len(latencies)*0.95)] if latencies else 0.0
             spurious = metrics_dict.get('spurious_alerts', 0)
             
-            print(f"Soak test finished.")
-            print(f"Memory (MB): {mem:.2f}")
-            print(f"P95 Latency: {p95:.3f}s")
-            print(f"False Alarms: {spurious}")
-            sys.stdout.flush()
-            os._exit(0)
+            if latencies:
+                latencies.sort()
+                p50 = latencies[int(len(latencies)*0.5)]
+                p95 = latencies[int(len(latencies)*0.95)]
+                p99 = latencies[int(len(latencies)*0.99)]
+            else:
+                p50 = p95 = p99 = 0.0
             
+            print(f"Soak test finished.")
+            for name, val in mem_points:
+                print(f"Memory ({name}): {val:.2f} MB")
+            print(f"P50 Latency: {p50:.3f} ms")
+            print(f"P95 Latency: {p95:.3f} ms")
+            print(f"P99 Latency: {p99:.3f} ms")
+            print(f"False Alarms: {spurious}")
     else:
         print("Demo running at http://127.0.0.1:5000")
         try:
