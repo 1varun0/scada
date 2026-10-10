@@ -14,8 +14,10 @@ def client():
             self.paused = False
             self.speed = 1.0
             class DummyInjector:
-                def start_attack(self, **kwargs): pass
-                def stop_attack(self): pass
+                def __init__(self):
+                    self.attack_active = False
+                def start_attack(self, **kwargs): self.attack_active = True
+                def stop_attack(self): self.attack_active = False
             self.injector = DummyInjector()
             class DummyPlant:
                 simulation_time_s = 0.0

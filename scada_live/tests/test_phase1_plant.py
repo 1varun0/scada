@@ -64,6 +64,7 @@ def test_liveplant_matches_process_simulator(cfg):
     batch_sim = ProcessSimulator(scenario)
     batch_records = batch_sim.run()
     
+    cfg.simulation.clamp_flow_noise = True
     live_plant = LivePlant(cfg, seed=scenario.random_seed, standalone_mode=True)
     live_records = [live_plant.step() for _ in range(100)]
     
