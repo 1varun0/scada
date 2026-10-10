@@ -22,10 +22,12 @@ class NoiseGenerator:
         seed: int,
         level_noise_std: float | None = None,
         flow_noise_std: float | None = None,
+        clamp_flow_noise: bool = True,
     ):
         self._rng = np.random.default_rng(seed)
         self._sigma_h = level_noise_std if level_noise_std is not None else PARAMS.simulation.sensor_noise_level_m
         self._sigma_q = flow_noise_std if flow_noise_std is not None else PARAMS.simulation.sensor_noise_flow_m3s
+        self._clamp_flow = clamp_flow_noise
 
     def add_level_noise(self, true_level: float) -> float:
         """Add Gaussian noise to a tank level reading.
@@ -45,7 +47,7 @@ class NoiseGenerator:
             true_flow: True flow rate in m³/s.
 
         Returns:
-            Noisy observed flow (clamped to >= 0).
+            Noisy observed flow.
         """
         noisy = true_flow + self._rng.normal(0.0, self._sigma_q)
-        return max(0.0, noisy)
+        return max(0.0, noisy) if self._clamp_flow else noisy
