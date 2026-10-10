@@ -26,7 +26,8 @@ class LivePlant:
         self.tank = Tank(initial_level_m=cfg.tank.initial_level_m, area_m2=cfg.tank.cross_section_area_m2, max_height_m=cfg.tank.max_height_m)
         self.pump = Pump(initial_state=0, q_max_m3s=cfg.pump.q_max_m3s, response_delay_s=cfg.pump.response_delay_s, dt_s=self.dt)
         self.valve = Valve(initial_position_pct=cfg.controller.default_valve_pct, flow_coefficient_m3s=cfg.valve.flow_coefficient_m3s, response_time_s=cfg.valve.response_time_s, dt_s=self.dt)
-        self.noise = NoiseGenerator(seed=seed, level_noise_std=cfg.simulation.sensor_noise_level_m, flow_noise_std=cfg.simulation.sensor_noise_flow_m3s)
+        clamp = getattr(cfg.simulation, 'clamp_flow_noise', False)
+        self.noise = NoiseGenerator(seed=seed, level_noise_std=cfg.simulation.sensor_noise_level_m, flow_noise_std=cfg.simulation.sensor_noise_flow_m3s, clamp_flow_noise=clamp)
         
         if self.standalone_mode:
             self.controller = Controller(setpoint_m=cfg.controller.setpoint_m, deadband_m=cfg.controller.deadband_m, default_valve_pct=cfg.controller.default_valve_pct)

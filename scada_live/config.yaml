@@ -32,6 +32,7 @@ simulation:
   time_scale: 1.0                   # NEW: 1x real-time, 5x for fast demos
   sensor_noise_level_m: 0.005
   sensor_noise_flow_m3s: 0.0001
+  clamp_flow_noise: false
   random_seed: 42000
 
 # ─── IDS Thresholds ──────────────────────────────────────────
