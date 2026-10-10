@@ -224,6 +224,8 @@ def start_attack():
     data = request.get_json()
     control = app.config.get('PLANT_CONTROL')
     if control:
+        if control.injector.attack_active:
+            return jsonify({'error': 'Attack already in progress'}), 409
         control.injector.start_attack(
             attack_type=data.get('type'),
             start_time=control.plant.simulation_time_s,

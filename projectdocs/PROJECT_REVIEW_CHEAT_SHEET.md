@@ -19,12 +19,12 @@ Our final evaluation on the held-out streaming data yielded the following result
 ### Event-Level vs Per-Tick Metrics
 **Event-Level Definition:** An attack is considered detected if ANY engine triggers an alarm at ANY point during the attack window.
 
-| Attack Type | Event-Level Recall | Per-Tick Recall | Per-Tick Precision | Per-Tick F1 |
-|-------------|--------------------|-----------------|--------------------|-------------|
-| **FDI**     | 100% (45/45)       | 99.7%           | 100%               | 0.999       |
-| **Replay**  | 100% (15/15)       | 100%            | 100%               | 1.000       |
-| **DoS**     | 100% (15/15)       | 100%            | 100%               | 1.000       |
-| **Auth Misuse** | 100% (15/15)   | 100%            | 100%               | 1.000       |
+| Attack Type | Event-Level Recall | Restricted Tick-F1 (Scenario Rows Only) | All-Ticks F1 (Global Dataset) |
+|-------------|--------------------|-----------------------------------------|-------------------------------|
+| **FDI**     | 100% (45/45)       | 0.999                                   | 0.471                         |
+| **Replay**  | 100% (15/15)       | 0.999                                   | 0.097                         |
+| **DoS**     | 100% (15/15)       | 0.215                                   | 0.101                         |
+| **Auth Misuse** | 100% (15/15)   | 0.218                                   | 0.141                         |
 
 - **Normal Operation False Alarms:** 0 (Zero false alarms across all normal scenarios)
 
@@ -35,10 +35,10 @@ Our final evaluation on the held-out streaming data yielded the following result
 
 ### Important Clarifications & Limitations
 
-1. **Policy v2 Evolution**: The original batch evaluation used Policy v1. The results above include Policy v2, which represents a new, offline evaluation of a rule added later. Crucially, the new valve rule was derived strictly from the **controller's engineering specification** (0-100% bound checking), not by fitting the test data.
-2. **Auth Misuse (A4) Detection**: The Policy Engine catches Auth Misuse on 73.3% of attack ticks (the remaining 26.7% are missed because the malicious valve commands fall into physically valid 0-100% ranges). However, Event-Level Recall is 100% because the LSTM reliably spikes to 1.0 strictly during the attack window.
-3. **Start-up Transients & Dataset Limitations**: While there are 0 false alarms on normal scenarios, our model *does* throw false positives before attacks (start-up flags) in scenarios starting at 0.4m or 2.1m. This exposes a dataset limitation: all normal runs start precisely at 1.0m, meaning the model has never seen normal operation from other starting levels and flags these initial states as anomalous.
-4. **Post-Attack Lingering**: The Physics twin deliberately does not reset mid-scenario. Once an attack physically diverges the plant, the twin permanently flags the lingering discrepancy. This is a feature indicating physical compromise, not a standard FPR bug.
+1. **Policy v2 Evolution**: The original batch evaluation used Policy v1. The results above include Policy v2, which introduces a strict rule derived from the controller's engineering specification: **The valve must be at its default operating position (30%) or fail-safe position (0%)**. Any other valve position immediately triggers an alarm.
+2. **Auth Misuse (A4) Detection**: The Policy Engine catches Auth Misuse on 73.3% of attack ticks. The remaining 26.7% (404 ticks) are missed because the attacker maliciously toggled the pump while leaving the valve at a legitimate position, all while the water level remained inside the safe hysteresis deadband (0.8m to 1.2m). However, Event-Level Recall is 100% because the LSTM reliably spikes to 1.0 during the attack window.
+3. **Start-up Transients & Dataset Limitations**: While there are 0 false alarms on normal scenarios, our model *does* throw false positives before attacks (start-up flags) in scenarios starting at 0.4m or 2.1m. In fact, a settled-period start-up transient occasionally exceeds the 0.95 threshold (e.g., scoring 0.96) in scenarios starting near 2.1m. This exposes a dataset limitation: all normal runs start precisely at 1.0m, meaning the model has never seen normal operation from other starting levels and flags these initial states as anomalous.
+4. **Post-Attack Lingering**: The Physics twin deliberately does not reset mid-scenario. Once an attack physically diverges the plant, the twin permanently flags the lingering discrepancy (causing 18,046 false positives post-attack). This is a feature indicating physical compromise, not a standard FPR bug.
 
 ## 4. Technical Challenges Overcome
 Be prepared to discuss these challenges that you successfully debugged and fixed during the project:

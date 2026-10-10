@@ -112,7 +112,7 @@ class StreamingIDS:
             )
             
             # 3. Policy Engine (using cmds)
-            s_c = self.policy_engine.evaluate(
+            s_c = self.policy_engine.evaluate_v2(
                 h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
             )
             
