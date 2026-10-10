@@ -66,10 +66,10 @@ def truth():
             seq=data['seq'],
             ts=float(data.get('ts', 0.0)),
             true_level=float(data['true_level']),
-            attack_active=bool(data['attack_active']),
-            attack_type=data['attack_type'],
-            overflow=bool(data['overflow']),
-            dry_run=bool(data['dry_run'])
+            attack_active=bool(data.get('attack_active', data.get('ground_truth', 0) == 1)),
+            attack_type=data.get('attack_type', 'None'),
+            overflow=bool(data.get('overflow', False)),
+            dry_run=bool(data.get('dry_run', False))
         )
     except KeyError as e:
         return jsonify({"error": f"Missing field {e}"}), 400
@@ -86,8 +86,11 @@ def stream():
         try:
             while True:
                 try:
-                    data = q.get(timeout=15)
-                    yield f"data: {json.dumps(data)}\n\n"
+                    msg = q.get(timeout=15)
+                    # Do NOT send truth events to the normal /stream
+                    if isinstance(msg, dict) and msg.get('event') == 'truth':
+                        continue
+                    yield f"data: {json.dumps(msg)}\n\n"
                 except Empty:
                     yield ": keepalive\n\n"
         except GeneratorExit:

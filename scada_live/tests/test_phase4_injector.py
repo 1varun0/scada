@@ -27,14 +27,14 @@ def test_injector_fdi():
     inj.send_telemetry({"seq": 1, "ts": 5.0, "level_m": 1.0})
     assert fake.sense_calls[-1][2] == 1.0
     assert fake.telemetry_calls[-1]["level_m"] == 1.0
-    assert not fake.truth_calls[-1]["attack_active"]
+    assert fake.truth_calls[-1]["ground_truth"] == 0
     
     # During attack
     cmd = inj.sense(2, 11.0, 1.0)
     inj.send_telemetry({"seq": 2, "ts": 11.0, "level_m": 1.0})
     assert fake.sense_calls[-1][2] == 1.2
     assert fake.telemetry_calls[-1]["level_m"] == 1.2
-    assert fake.truth_calls[-1]["attack_active"]
+    assert fake.truth_calls[-1]["ground_truth"] == 1
     assert fake.truth_calls[-1]["true_level"] == 1.0
 
 def test_injector_replay():

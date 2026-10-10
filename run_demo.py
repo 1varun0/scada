@@ -78,7 +78,7 @@ def run_plant_loop(plant: LivePlant, injector: Injector, control: PlantControl, 
 class ServerThread(threading.Thread):
     def __init__(self, app, host='127.0.0.1', port=5000):
         threading.Thread.__init__(self)
-        self.server = make_server(host, port, app)
+        self.server = make_server(host, port, app, threaded=True)
         self.ctx = app.app_context()
         self.ctx.push()
 
@@ -121,20 +121,34 @@ def main():
     gateway_app.config['PLANT_CONTROL'] = control
     
     if args.soak:
-        print("Running 30-min soak test at 5x speed...")
-        control.set_speed(5.0)
-        # 30 min wall-time at 5x speed = 150 min simulation time (9000 ticks)
-        # But we actually want a flat test to complete quickly in automated harness? 
-        # Soak test could run for a set number of ticks. Let's say 30 real minutes if manual, 
-        # but we can just run it until KeyboardInterrupt.
+        print("Running automated soak test...")
+        control.set_speed(100.0)
         try:
-            run_plant_loop(plant, injector, control)
+            run_plant_loop(plant, injector, control, max_ticks=3000)
         except KeyboardInterrupt:
             pass
         finally:
-            server.shutdown()
-            server.join()
-            print("Soak test finished.")
+            from scada_live.scada_ids.server import gateway
+            import sys, os
+            if sys.platform != 'win32':
+                import resource
+                mem = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+            else:
+                import psutil
+                process = psutil.Process(os.getpid())
+                mem = process.memory_info().rss / (1024.0 * 1024.0)
+            
+            metrics_dict = gateway.metrics.get_metrics()
+            latencies = [ep['latency'] for ep in metrics_dict.get('episodes', []) if ep['latency'] is not None]
+            p95 = sorted(latencies)[int(len(latencies)*0.95)] if latencies else 0.0
+            spurious = metrics_dict.get('spurious_alerts', 0)
+            
+            print(f"Soak test finished.")
+            print(f"Memory (MB): {mem:.2f}")
+            print(f"P95 Latency: {p95:.3f}s")
+            print(f"False Alarms: {spurious}")
+            sys.stdout.flush()
+            os._exit(0)
             
     else:
         print("Demo running at http://127.0.0.1:5000")

@@ -93,7 +93,7 @@ class Injector:
         truth = {
             'seq': pkt_dict.get('seq', 0),
             'ts': ts,
-            'attack_active': self._is_active(ts),
+            'ground_truth': 1 if self._is_active(ts) else 0,
             'attack_type': self.attack_type if self._is_active(ts) else "None",
             'true_level': pkt_dict.get('level_m') # Real level from plant
         }
