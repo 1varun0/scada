@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid IDS Defender Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/chart.js"></script>
+</head>
+<body>
+    <div id="status-banner" class="banner SAFE">
+        <div class="banner-content">
+            <span id="banner-state">SAFE</span>
+            <span id="banner-details"></span>
+        </div>
+        <div id="calibrating-badge" class="badge" style="display: none;">Calibrating (<span id="calib-ticks"></span>)</div>
+    </div>
+    
+    <div class="main-layout">
+        <!-- Left Column -->
+        <div class="column left-col">
+            <div class="card process-view">
+                <h3>Process View</h3>
+                <svg viewBox="0 0 100 150" id="tank-svg">
+                    <!-- Basic Tank -->
+                    <rect x="20" y="20" width="60" height="100" class="tank-outline" />
+                    <!-- Water Level -->
+                    <rect x="21" y="70" width="58" height="49" class="tank-fill" id="tank-level" />
+                    <!-- Critical Lines -->
+                    <line x1="15" y1="30" x2="85" y2="30" class="crit-line" />
+                    <line x1="15" y1="110" x2="85" y2="110" class="crit-line" />
+                    <!-- Pump -->
+                    <circle cx="10" cy="100" r="8" id="pump-indicator" class="pump-off" />
+                    <!-- Valve -->
+                    <rect x="85" y="100" width="10" height="10" id="valve-indicator" class="valve" />
+                    <text x="85" y="118" class="valve-text" id="valve-text">0%</text>
+                </svg>
+            </div>
+            
+            <div class="card engine-scores">
+                <h3>Engine Scores</h3>
+                <div class="engine-bar" id="bar-physics">
+                    <span class="engine-label">Physics</span>
+                    <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div><div class="threshold"></div></div>
+                </div>
+                <div class="engine-bar" id="bar-lstm">
+                    <span class="engine-label">LSTM <span id="lstm-calib" class="tiny-badge">Calibrating</span></span>
+                    <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div><div class="threshold"></div></div>
+                </div>
+                <div class="engine-bar" id="bar-policy">
+                    <span class="engine-label">Policy</span>
+                    <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div><div class="threshold"></div></div>
+                </div>
+                <div class="engine-bar" id="bar-availability">
+                    <span class="engine-label">Availability</span>
+                    <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div><div class="threshold"></div></div>
+                </div>
+                <div class="engine-bar" id="bar-hybrid">
+                    <span class="engine-label">Hybrid</span>
+                    <div class="bar-bg"><div class="bar-fill" style="width: 0%"></div><div class="threshold"></div></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Center Column -->
+        <div class="column center-col">
+            <div class="card chart-container">
+                <canvas id="levelChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="column right-col">
+            <div class="card metrics-card">
+                <h3>Metrics</h3>
+                <ul>
+                    <li>Detected: <span id="m-detected">0</span></li>
+                    <li>Missed: <span id="m-missed">0</span></li>
+                    <li>Spurious: <span id="m-spurious">0</span></li>
+                    <li>Lingering: <span id="m-lingering">0</span></li>
+                    <li>Delay: <span id="m-delay">0.0s</span></li>
+                </ul>
+            </div>
+            
+            <div class="card event-log">
+                <h3>Event Log</h3>
+                <ul id="event-list"></ul>
+            </div>
+            
+            <div id="demo-attack-panel" class="card demo-panel" style="display: none;">
+                <h3>Demo Attack</h3>
+                <select id="attack-type">
+                    <option value="FDI">FDI</option>
+                    <option value="Replay">Replay</option>
+                    <option value="DoS">DoS</option>
+                    <option value="Auth misuse">Auth misuse</option>
+                </select>
+                <button id="btn-attack-start">Start Attack</button>
+                <button id="btn-attack-stop">Stop Attack</button>
+                <div id="demo-status">Idle</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="bottom-strip">
+        <button id="btn-pause">Pause</button>
+        <button id="btn-resume">Resume</button>
+        <button id="btn-speed-1">1x Speed</button>
+        <button id="btn-speed-5">5x Speed</button>
+        <button id="btn-reset">Reset</button>
+        <button id="btn-toggle-demo">Toggle Demo</button>
+    </div>
+
+    <!-- Ack Dialog -->
+    <div id="ack-dialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog">
+            <h3>Acknowledge Alert</h3>
+            <p id="ack-details"></p>
+            <p>Recalibrating trusts current sensor readings.</p>
+            <button id="btn-ack">Acknowledge</button>
+            <button id="btn-ack-recal">Acknowledge and recalibrate</button>
+            <button id="btn-ack-cancel">Cancel</button>
+            <p id="ack-error" class="error"></p>
+        </div>
+    </div>
+    
+    <!-- Link Lost Overlay -->
+    <div id="link-lost" class="dialog-overlay" style="display: none;">
+        <div class="dialog">
+            <h3>Connection Lost</h3>
+            <p>Waiting for server...</p>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
