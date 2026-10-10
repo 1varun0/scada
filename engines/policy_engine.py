@@ -35,3 +35,22 @@ class PolicyEngine:
             
         return 0.0
 
+    def evaluate_v2(self, h_observed: float, pump_command: int, valve_command: float) -> float:
+        """
+        Evaluate stricter safety rules based on Controller hysteresis band and valve logic.
+        
+        Rules:
+        1. Pump ON when H > H_off (1.2m) + epsilon => 1.0
+        2. Pump OFF when H < H_on (0.8m) - epsilon => 1.0
+        3. Valve is not a legitimate value (default or safe_position) => 1.0
+        """
+        h_off = PARAMS.controller.pump_off_threshold_m
+        h_on = PARAMS.controller.pump_on_threshold_m
+        safe_valve_pct = getattr(PARAMS.valve, "safe_position_pct", 0.0)
+        
+        if valve_command not in [self.default_valve_pct, safe_valve_pct]:
+            return 1.0
+            
+        # Fall back to v1 rules for critical bounds
+        return self.evaluate(h_observed, pump_command, valve_command)
+
