@@ -48,8 +48,11 @@ class PolicyEngine:
         h_on = PARAMS.controller.pump_on_threshold_m
         safe_valve_pct = getattr(PARAMS.valve, "safe_position_pct", 0.0)
         
-        if valve_command not in [self.default_valve_pct, safe_valve_pct]:
-            return 1.0
+        # The controller only enters fail-safe (valve=0.0) when dos is active, and forces pump=0.
+        # Allow safe_position only if the pump is also OFF.
+        if valve_command != self.default_valve_pct:
+            if valve_command != safe_valve_pct or pump_command != 0:
+                return 1.0
             
         # Fall back to v1 rules for critical bounds
         return self.evaluate(h_observed, pump_command, valve_command)
