@@ -25,7 +25,7 @@ class GatewayCore:
         self.sse_hub = sse_hub
         self.lock = threading.RLock()
         
-        self.ids = StreamingIDS(cfg)
+        self.ids = StreamingIDS(cfg, policy_version="v2")
         self.controller = build_controller(cfg)
         
         self.current_run_id = None

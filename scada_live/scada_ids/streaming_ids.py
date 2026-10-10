@@ -20,9 +20,10 @@ from scada_live.common.packets import TelemetryPacket
 from scada_live.common.config_loader import load_config
 
 class StreamingIDS:
-    def __init__(self, cfg, device="cpu"):
+    def __init__(self, cfg, device="cpu", policy_version="v1"):
         self.cfg = cfg
         self.device = device
+        self.policy_version = policy_version
         self.current_run_id = None
         self.lock = threading.Lock()
         
@@ -111,10 +112,14 @@ class StreamingIDS:
                 simulation_time_s=pkt.ts, source_time_s=pkt.src_t, packet_received=pkt.received
             )
             
-            # 3. Policy Engine (using cmds)
-            s_c = self.policy_engine.evaluate_v2(
-                h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
-            )
+            if self.policy_version == "v2":
+                s_c = self.policy_engine.evaluate_v2(
+                    h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
+                )
+            else:
+                s_c = self.policy_engine.evaluate(
+                    h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
+                )
             
             # 4. Temporal Engine
             # Batch adds all rows to the window buffer. 
