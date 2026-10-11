@@ -30,11 +30,11 @@ The 9 held-out normal test scenarios evaluated in `data/evaluation_results.csv` 
 - `N_049` (Variable_Load, $H_0=1.0\text{ m}$): Max $S_l = 0.722$ (margin 0.228)
 - `N_055` (Recovery, $H_0=0.5\text{ m}$): Max $S_l = 0.821$ (margin 0.129)
 
-**Held-Out Normals Summary:** Max LSTM score across all 9 held-out scenarios is **0.936** (margin of **0.014** to the 0.95 anomaly threshold), yielding 0 false alarms on normal operation.
+**Held-Out Normals Summary:** Max LSTM score across all 9 held-out scenarios is **0.936** (margin of **0.014** to the 0.95 anomaly threshold), yielding 0 false alarms on normal operation. The best-scoring held-out normal (`N_006`, 0.936) is a Steady_State scenario.
 
 ### Threshold Selection Methodology
 All detection thresholds were calibrated strictly on normal baseline operational data or engineering specifications; **zero attack scenarios were used for threshold selection**:
-- **$\tau_p = 0.035\text{ m}$ (Physics):** Set to the 99th percentile ($p99$) of residual errors between the Digital Twin and the simulated process under noisy flow integration across normal scenarios (`scripts/run_e0_validation.py`). No attack data was used.
+- **$\tau_p = 0.035\text{ m}$ (Physics):** Calibrated as an upper bound strictly above the maximum residual error observed across normal scenarios under noisy flow integration (max normal residual is 0.0288 m across all 60 normals in DB; in `scripts/run_e0_validation.py`, p99 is 0.0175 m and max absolute error is 0.0193 m). Setting $\tau_p = 0.035\text{ m}$ guarantees zero false positives on normal baseline operation. No attack data was used.
 - **$\tau_l = 0.0085$ (Temporal/LSTM):** Set to the maximum reconstruction error observed on the normal validation split (`df_val` from the 51 normal training/validation scenarios) to ensure normal operating dynamics stay below threshold. No attack data was used.
 - **$\tau_a = 1500.0\text{ ms}, \tau_{a,max} = 5000.0\text{ ms}$ (Availability):** Established directly from SCADA network timing SLAs: at a 1 Hz polling rate, 1,500 ms flags a delayed/dropped packet, and 5,000 ms flags plant offline / complete communication loss. No attack data was used.
 
@@ -47,6 +47,8 @@ All detection thresholds were calibrated strictly on normal baseline operational
 | **Replay**  | 100%               | 0.999                             |
 | **DoS**     | 100%               | 0.215                             |
 | **Auth Misuse** | 100%           | 0.218                             |
+
+**Note on Evaluation Script Precision:** In `scripts/run_evaluation.py`, the printed per-attack breakdown reports precision 1.000 for each attack type. This precision is computed strictly on attack-window rows only (which contains no negative rows, making precision 1.000 by construction). When evaluated across all scenario rows (including pre- and post-attack normal ticks), the true per-scenario Tick-F1 is reported in the table above.
 
 **Pooled Metrics (9 Held-Out Normals + All 90 Attack Scenarios):**
 - Pooled Precision: 38.9%
@@ -67,8 +69,8 @@ All detection thresholds were calibrated strictly on normal baseline operational
 1. **Policy v2 Evolution**: The original batch evaluation table uses Policy v1. The results above for Policy v2 are from a separate offline evaluation. Policy v2 introduces a strict rule derived from the controller's engineering specification: **The valve must be at its default operating position (50%) or legitimately in its fail-safe position (0% with pump OFF)**. Any other valve position immediately triggers an alarm.
 2. **Auth Misuse (A4) Detection**: Policy v2 catches 100% of A4 attack ticks. The rule was refined after inspecting attack data to include the fail-safe valve exemption (valve=0 is allowed only if pump is off). Event-Level Recall is also 100% because the LSTM reliably spikes to 1.0 during the attack window.
 3. **Start-up Transients & Dataset Limitations**: While there are 0 false alarms on normal scenarios, our model *does* throw false positives before attacks (start-up flags) in scenarios starting at 0.4m or 2.1m. In fact, a settled-period start-up transient occasionally exceeds the 0.95 threshold (e.g., scoring 0.96) in scenarios starting near 2.1m. This exposes a dataset limitation: normal scenarios only start at 1.0m, 0.8m, and 0.5m. The model has never seen high starts such as 2.1m, and normal levels top out near 1.7m.
-4. **Physics FPR Artifacts (DoS and Auth Misuse)**: The 21.2% pooled FPR is overwhelmingly caused by Physics engine false alarms during A3 and A4 scenarios. However, this is largely a dataset artifact:
-   - **DoS (A3)**: Network drops cause the batch dataset to carry *stale* flows. The twin honestly integrates these stale flows while the simulated plant kept moving, creating a divergence. 
+4. **Physics FPR Artifacts (DoS and Auth Misuse)**: The 21.2% pooled FPR is overwhelmingly caused by Physics engine false alarms during A3 and A4 scenarios:
+   - **DoS (A3)**: level discontinuity relative to reported flows after the attack window; cause under investigation.
    - **Auth Misuse (A4)**: At the exact end of the attack window, the dataset generator artificially stitched the plant state back to the nominal uncompromised trajectory, causing the observed level to teleport by 0.3m in 1 second. The twin expects continuity and refuses to teleport, creating a permanent residual.
 
 ## 4. Technical Challenges Overcome
