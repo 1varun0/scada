@@ -73,7 +73,7 @@ for attack_name, kwargs in attacks:
         if fake_client.last_pkt is not None:
             p = fake_client.last_pkt
             ids_pkt = TelemetryPacket(
-                run_id="run1", ts=float(t), seq=t, src_t=p.get('src_t', float(t)), received=float(t),
+                run_id="run1", ts=float(t), seq=t, src_t=p.get('src_t', float(t)), received=True,
                 level_m=p["level_m"], q_in=p["q_in"], q_out=p["q_out"],
                 pump_cmd=p["pump_cmd"], valve_cmd=p["valve_cmd"],
                 pump_on=bool(p["pump_on"]), valve_pct=float(p["valve_pct"])

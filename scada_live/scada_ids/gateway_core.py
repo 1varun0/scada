@@ -42,6 +42,17 @@ class GatewayCore:
         self.watchdog_thread = threading.Thread(target=self._watchdog_loop, daemon=True)
         self.watchdog_thread.start()
 
+        # Prevention configuration & state
+        prev_cfg = getattr(cfg, "prevention", None)
+        self.mode = getattr(prev_cfg, "default_mode", "monitor") if prev_cfg else "monitor"
+        self.takeover_engines = getattr(prev_cfg, "takeover_engines", ["physics"]) if prev_cfg else ["physics"]
+        self.trigger_state = getattr(prev_cfg, "trigger_state", "CRITICAL") if prev_cfg else "CRITICAL"
+        self.handback_tolerance_m = getattr(prev_cfg, "handback_tolerance_m", 0.05) if prev_cfg else 0.05
+        self.auto_handback = getattr(prev_cfg, "auto_handback", False) if prev_cfg else False
+        self.twin_takeover_active = False
+        self.clean_ticks = 0
+        self.last_action_taken = "none"
+
     def _watchdog_loop(self):
         while True:
             time.sleep(self.cfg.simulation.dt_s / 2) # Check frequently
@@ -86,6 +97,22 @@ class GatewayCore:
             self.level_buffer = []
             self.current_run_id = run_id
             self.last_pkt = None
+            self.twin_takeover_active = False
+            self.clean_ticks = 0
+            self.last_action_taken = "none"
+
+    def set_mode(self, mode: str):
+        """Set gateway mode: 'monitor' or 'prevention'."""
+        with self.lock:
+            self.mode = mode
+            if mode == "monitor":
+                self.twin_takeover_active = False
+                self.last_action_taken = "none"
+
+    def set_auto_handback(self, val: bool):
+        """Enable or disable automatic handback to sensor."""
+        with self.lock:
+            self.auto_handback = bool(val)
             
     def recalibrate(self) -> dict:
         """Soft reset based on recent trusted readings. Returns status dict."""
@@ -112,7 +139,7 @@ class GatewayCore:
             return {"status": "ok"}
             
     def process_sense(self, level_m: float) -> dict:
-        """Handle /api/sense: return pump/valve commands."""
+        """Handle /api/sense: return pump/valve commands, applying twin takeover in prevention mode."""
         with self.lock:
             if not hasattr(self, 'level_buffer'):
                 self.level_buffer = []
@@ -121,10 +148,20 @@ class GatewayCore:
             if len(self.level_buffer) > 50:
                 self.level_buffer.pop(0)
                 
-            ctrl_cmds = self.controller.step(level_m)
+            if self.mode == "prevention" and self.twin_takeover_active:
+                active_level = self.ids.get_twin_estimate()
+                level_source = "twin"
+            else:
+                active_level = level_m
+                level_source = "sensor"
+                
+            ctrl_cmds = self.controller.step(active_level)
             return {
                 "pump_cmd": ctrl_cmds['pump_command'],
-                "valve_cmd": ctrl_cmds['valve_command']
+                "valve_cmd": ctrl_cmds['valve_command'],
+                "level_source": level_source,
+                "active_level": active_level,
+                "action_taken": self.last_action_taken
             }
             
     def process_telemetry(self, pkt) -> dict:
@@ -162,6 +199,34 @@ class GatewayCore:
             hybrid_score=verdict["hybrid"]
         )
         
+        # Prevention State Machine
+        is_critical = (am_state["alert_state"] == self.trigger_state)
+        engines_firing = verdict.get("engines_firing", [])
+        
+        if self.mode == "prevention":
+            if is_critical and any(e in self.takeover_engines for e in engines_firing):
+                self.twin_takeover_active = True
+                self.last_action_taken = "twin_takeover"
+                self.clean_ticks = 0
+            elif self.twin_takeover_active:
+                if not verdict["is_anomaly"]:
+                    self.clean_ticks += 1
+                    twin_est = self.ids.get_twin_estimate()
+                    if self.clean_ticks >= 5 and abs(pkt.level_m - twin_est) < self.handback_tolerance_m:
+                        if self.auto_handback:
+                            self.twin_takeover_active = False
+                            self.last_action_taken = "handback"
+                            self.alert_manager.acknowledge()
+                else:
+                    self.clean_ticks = 0
+        else:
+            self.twin_takeover_active = False
+            self.last_action_taken = "none"
+            
+        verdict["mode"] = self.mode
+        verdict["twin_takeover_active"] = self.twin_takeover_active
+        verdict["action_taken"] = self.last_action_taken
+
         # Enrich verdict
         verdict.update(am_state)
         # Assuming calibrating is True during the warm-up
@@ -214,3 +279,11 @@ class GatewayCore:
         with self.lock:
             self.alert_manager.acknowledge()
             self.metrics.record_ack(recalibrate, ts)
+
+    def step(self, pkt) -> dict:
+        """Unified in-process step for testing and simulation harnesses."""
+        with self.lock:
+            sense_res = self.process_sense(pkt.level_m)
+            verdict = self.process_telemetry(pkt)
+            verdict.update(sense_res)
+            return verdict

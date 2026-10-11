@@ -78,6 +78,7 @@ class StreamingIDS:
             w_p=0.25, w_l=0.25, w_c=0.25, w_a=0.25,
             tau_fusion=cfg.ids.tau_fusion, strategy="max_vote"
         )
+        self.nan_guard_triggers = 0
         
     def reset(self, initial_level_m: float, run_id: str):
         """Hard reset for a new scenario run."""
@@ -173,6 +174,11 @@ class StreamingIDS:
                 window_df = pd.DataFrame(list(self.telemetry_window))
                 _, s_l = self.temporal_engine.evaluate(window_df)
                 if pd.isna(s_l) or not np.isfinite(s_l):
+                    self.nan_guard_triggers += 1
+                    import logging
+                    logging.getLogger(__name__).warning(
+                        f"NaN guard triggered on tick {pkt.seq}: s_l was {s_l}, defaulted to 0.0"
+                    )
                     s_l = 0.0
                 
             # 5. Fusion
