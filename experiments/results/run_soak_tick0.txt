@@ -1,0 +1,15 @@
+=== Running 30-Minute Soak Test (1800 ticks) Counting Flags from Tick 0 ===
+Total ticks evaluated: 1800 (t=0 to 1799)
+Total flags (> 0.95) from tick 0: 12
+Tick  861: Firing=['physics'] | Phy=0.9511 LSTM=0.0864 Pol=0.0000 Av=0.0000
+Tick  910: Firing=['physics'] | Phy=0.9668 LSTM=0.0789 Pol=0.0000 Av=0.0000
+Tick 1502: Firing=['physics'] | Phy=0.9513 LSTM=0.0448 Pol=0.0000 Av=0.0000
+Tick 1521: Firing=['physics'] | Phy=1.0000 LSTM=0.0767 Pol=0.0000 Av=0.0000
+Tick 1614: Firing=['physics'] | Phy=0.9634 LSTM=0.0611 Pol=0.0000 Av=0.0000
+Tick 1650: Firing=['physics'] | Phy=1.0000 LSTM=0.0413 Pol=0.0000 Av=0.0000
+Tick 1666: Firing=['physics'] | Phy=0.9966 LSTM=0.0815 Pol=0.0000 Av=0.0000
+Tick 1704: Firing=['physics'] | Phy=0.9574 LSTM=0.1199 Pol=0.0000 Av=0.0000
+Tick 1746: Firing=['physics'] | Phy=1.0000 LSTM=0.0871 Pol=0.0000 Av=0.0000
+Tick 1747: Firing=['physics'] | Phy=0.9918 LSTM=0.0693 Pol=0.0000 Av=0.0000
+Tick 1752: Firing=['physics'] | Phy=1.0000 LSTM=0.0815 Pol=0.0000 Av=0.0000
+Tick 1790: Firing=['physics'] | Phy=0.9534 LSTM=0.1189 Pol=0.0000 Av=0.0000

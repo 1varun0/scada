@@ -146,7 +146,7 @@ def test_mode_independence(hub):
 def test_twin_control_stability(hub):
     """Force twin control from t=0 on a normal 30-min run (1800s); true level stays in bounds with 0 overflows."""
     cfg = load_config()
-    cfg.simulation.clamp_flow_noise = True
+    cfg.simulation.clamp_flow_noise = False
     
     plant = LivePlant(cfg, standalone_mode=False)
     gw = GatewayCore(cfg, hub)
@@ -154,6 +154,9 @@ def test_twin_control_stability(hub):
     gw.set_mode("prevention")
     gw.set_auto_handback(False)  # Keep twin control forced for stability test
     gw.twin_takeover_active = True  # Force continuous twin estimator control
+    
+    true_levels = []
+    twin_levels = []
     
     for t in range(1800):
         obs = plant.observe()
@@ -163,9 +166,64 @@ def test_twin_control_stability(hub):
         pkt = plant.advance(cmds["pump_cmd"], cmds["valve_cmd"])
         gw.process_telemetry(pkt)
         
+        true_levels.append(plant.tank.level)
+        twin_levels.append(gw.ids.get_twin_estimate())
+        
         # Verify plant level stays safely in operating band [0.6m, 1.4m]
         assert 0.6 <= pkt.level_m <= 1.4, f"Plant level {pkt.level_m} drifted out of bounds at t={t}"
         
+    final_diff = abs(twin_levels[-1] - true_levels[-1])
+    print(f"\ntest_twin_control_stability (clamp_flow_noise=False): Min True={min(true_levels):.4f}m, Max True={max(true_levels):.4f}m, Final |Twin-True|={final_diff:.4f}m ({final_diff*1000:.2f}mm)")
+    
     assert plant.overflow_count == 0
     assert plant.dry_run_count == 0
     assert gw.ids.nan_guard_triggers == 0
+
+def test_dos_recovery_no_false_takeover(hub):
+    """Replay A3_003 through GatewayCore in prevention mode and inspect behaviour around DoS termination."""
+    import sqlite3
+    import pandas as pd
+    
+    cfg = load_config()
+    conn = sqlite3.connect("data/scada_ids.db")
+    df = pd.read_sql_query("SELECT * FROM scada_telemetry WHERE scenario_id='A3_003' ORDER BY sequence_id", conn)
+    conn.close()
+    
+    gw = GatewayCore(cfg, hub)
+    gw.current_run_id = "A3_003"
+    gw.set_mode("prevention")
+    gw.set_auto_handback(True)
+    
+    dos_rows = df[df['packet_received'] == 0]
+    t_end = int(dos_rows['simulation_time_s'].max())
+    
+    print("\n=== test_dos_recovery_no_false_takeover: A3_003 Replay around DoS End ===")
+    print(f"{'Tick':<5} | {'Rcvd':<5} | {'Alert State':<12} | {'Engines Firing':<25} | {'Takeover':<9} | {'Action':<15} | {'|Diff|':<7}")
+    
+    post_dos_takeover_ticks = []
+    
+    for _, row in df.iterrows():
+        t = int(row['simulation_time_s'])
+        rcvd = bool(row['packet_received'] == 1)
+        pkt = TelemetryPacket(
+            run_id="A3_003", seq=int(row['sequence_id']), ts=float(row['simulation_time_s']),
+            src_t=float(row['simulation_time_s']), received=rcvd,
+            level_m=float(row['tank_level_observed']), q_in=float(row['q_in']), q_out=float(row['q_out']),
+            pump_cmd=int(row['pump_command']), valve_cmd=float(row['valve_command']),
+            pump_on=bool(row['pump_state'] == 1), valve_pct=float(row['valve_state'])
+        )
+        v = gw.process_telemetry(pkt)
+        twin_est = gw.ids.get_twin_estimate()
+        diff = abs(pkt.level_m - twin_est)
+        
+        if t_end - 5 <= t <= t_end + 15:
+            firing_str = str(v.get('engines_firing', []))
+            print(f"{t:<5d} | {str(rcvd):<5} | {v['alert_state']:<12} | {firing_str:<25} | {str(gw.twin_takeover_active):<9} | {gw.last_action_taken:<15} | {diff:<7.4f}")
+            
+        if t > t_end and gw.twin_takeover_active:
+            post_dos_takeover_ticks.append(t)
+            
+    # Under current code without DoS re-seeding rule, twin takeover falsely activates on physics evidence
+    # Report current behaviour: takeover is True due to twin falling behind during DoS
+    print(f"Post-DoS takeover active ticks (current code): {len(post_dos_takeover_ticks)} / {len(df[df['simulation_time_s'] > t_end])}")
+

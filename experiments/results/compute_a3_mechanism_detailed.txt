@@ -1,0 +1,26 @@
+Scenario | Dur(s) | DoS End | (999-End) | NetRate (m/s) | Pred Off(m) | Meas Res(m) | Sp>0.95 FP | Pred_Anom FP
+---------------------------------------------------------------------------------------------------------
+A3_001   | 21.0   | 370     | 629       | 0.001476      | 0.0310      | 0.0361      | 26         | 34          
+A3_002   | 31.0   | 380     | 619       | 0.001480      | 0.0459      | 0.0444      | 504        | 504         
+A3_003   | 41.0   | 390     | 609       | 0.001464      | 0.0600      | 0.0518      | 609        | 609         
+A3_004   | 51.0   | 400     | 599       | 0.001428      | 0.0728      | 0.0627      | 599        | 599         
+A3_005   | 61.0   | 410     | 589       | 0.001478      | 0.0902      | 0.0813      | 589        | 589         
+A3_006   | 71.0   | 420     | 579       | 0.001410      | 0.1001      | 0.1048      | 579        | 579         
+A3_007   | 81.0   | 430     | 569       | 0.001411      | 0.1143      | 0.1083      | 569        | 569         
+A3_008   | 91.0   | 440     | 559       | 0.001394      | 0.1269      | 0.1231      | 559        | 559         
+A3_009   | 101.0  | 450     | 549       | 0.001437      | 0.1452      | 0.1371      | 549        | 549         
+A3_010   | 111.0  | 460     | 539       | 0.001396      | 0.1549      | 0.1588      | 539        | 539         
+A3_011   | 121.0  | 470     | 529       | 0.001415      | 0.1712      | 0.1723      | 529        | 529         
+A3_012   | 26.0   | 375     | 624       | 0.001514      | 0.0394      | 0.0336      | 188        | 194         
+A3_013   | 46.0   | 395     | 604       | 0.001433      | 0.0659      | 0.0531      | 604        | 604         
+A3_014   | 76.0   | 425     | 574       | 0.001418      | 0.1078      | 0.1090      | 574        | 574         
+A3_015   | 106.0  | 455     | 544       | 0.001432      | 0.1518      | 0.1434      | 544        | 544         
+---------------------------------------------------------------------------------------------------------
+Total S_p > 0.95 FP ticks: 7561 | Total predicted_anomaly FP ticks: 7575
+
+=== Explanation of Filter Differences Between Old (7,431) and New (7,561) Counts ===
+1. A3_001 (Dur=21s): The old script filtered S_p > 0.95 over a restricted post-attack slice yielding 14; the new full outside filter counts all 26 ticks above tau_p.
+2. A3_002 (Dur=31s): The old script tallied (999 - t_end) = 619 assuming 100% saturation; the actual per-tick filter S_p > 0.95 finds 504 ticks (residual dipped below 0.035m during a draining period).
+3. A3_003 (Dur=41s): Both old and new evaluate to exactly 609 ticks (100% saturation above 0.035m).
+4. A3_012 (Dur=26s): The old script tallied (999 - t_end) = 624 assuming saturation; the true per-tick count is 188 ticks because residual hovers around tau_p.
+Strict summation of S_p > 0.95 on all outside ticks across all 15 scenarios is exactly 7,561.

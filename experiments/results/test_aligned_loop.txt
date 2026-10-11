@@ -1,0 +1,27 @@
+=== Running with clamped noise AND actual pump.state ===
+Tick 200: LSTM=0.0471 Phy=0.1226 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00014
+Tick 201: LSTM=0.0467 Phy=0.0519 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00003
+Tick 202: LSTM=0.0608 Phy=0.0251 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00000
+Tick 203: LSTM=0.0544 Phy=0.2335 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00002
+Tick 204: LSTM=0.0447 Phy=0.0437 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00005
+Tick 205: LSTM=0.0382 Phy=0.1941 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00004
+Tick 206: LSTM=0.0331 Phy=0.1569 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00016
+Tick 207: LSTM=0.0448 Phy=0.1403 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00000
+Tick 208: LSTM=0.0538 Phy=0.0306 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00000
+Tick 209: LSTM=0.0520 Phy=0.0941 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=0 Qin=0.00000
+Tick 210: LSTM=0.0682 Phy=0.2584 Pol=0.0000 Av=0.0000 | P_on=False P_cmd=1 Qin=0.00000
+Tick 211: LSTM=0.5917 Phy=0.2997 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00501
+Tick 212: LSTM=0.6688 Phy=0.2788 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00510
+Tick 213: LSTM=0.5692 Phy=0.1988 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00491
+Tick 214: LSTM=0.4888 Phy=0.1750 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00508
+Tick 215: LSTM=0.5052 Phy=0.3249 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00520
+Tick 216: LSTM=0.5286 Phy=0.1618 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00497
+Tick 217: LSTM=0.4488 Phy=0.3359 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00512
+Tick 218: LSTM=0.4815 Phy=0.1053 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00504
+Tick 219: LSTM=0.5435 Phy=0.2013 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00494
+Tick 220: LSTM=0.0809 Phy=0.0579 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00489
+Tick 221: LSTM=0.0982 Phy=0.3823 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00510
+Tick 222: LSTM=0.0974 Phy=0.2359 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00509
+Tick 223: LSTM=0.0971 Phy=0.1398 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00502
+Tick 224: LSTM=0.0994 Phy=0.2803 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00507
+Tick 225: LSTM=0.1017 Phy=0.2816 Pol=0.0000 Av=0.0000 | P_on=True P_cmd=1 Qin=0.00513

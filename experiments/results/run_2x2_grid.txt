@@ -1,0 +1,5 @@
+=== 2x2 Grid Evaluation: LSTM Sensitivity to Pump Alignment and Noise Clamp ===
+Mode: Physical State  | Clamp: True  | Max LSTM (t=200..230): 0.6688 | Ticks > 0.95:  0
+Mode: Physical State  | Clamp: False | Max LSTM (t=200..230): 0.6456 | Ticks > 0.95:  0
+Mode: Forced Command  | Clamp: True  | Max LSTM (t=200..230): 1.0000 | Ticks > 0.95: 10
+Mode: Forced Command  | Clamp: False | Max LSTM (t=200..230): 1.0000 | Ticks > 0.95: 10

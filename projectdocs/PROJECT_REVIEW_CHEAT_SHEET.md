@@ -30,25 +30,25 @@ The 9 held-out normal test scenarios evaluated in `data/evaluation_results.csv` 
 - `N_049` (Variable_Load, $H_0=1.0\text{ m}$): Max $S_l = 0.722$ (margin 0.228)
 - `N_055` (Recovery, $H_0=0.5\text{ m}$): Max $S_l = 0.821$ (margin 0.129)
 
-**Held-Out Normals Summary:** Max LSTM score across all 9 held-out scenarios is **0.936** (margin of **0.014** to the 0.95 anomaly threshold), yielding 0 false alarms on normal operation. The best-scoring held-out normal (`N_006`, 0.936) is a Steady_State scenario.
+**Held-Out Normals Summary:** Max LSTM score across all 9 held-out scenarios is **0.936** (margin of **0.014** to the 0.95 anomaly threshold), yielding 0 false alarms on normal operation. The best-scoring held-out normal (`N_006`, 0.936) is a Steady_State scenario. In live closed-loop operation, normal pump turn-on transients produce LSTM scores up to **0.67**, comfortably below both the 0.936 held-out normal maximum and the 0.95 detection threshold.
 
 ### Threshold Selection Methodology
 All detection thresholds were calibrated strictly on normal baseline operational data or engineering specifications; **zero attack scenarios were used for threshold selection**:
-- **$\tau_p = 0.035\text{ m}$ (Physics):** Set to $0.035\text{ m}$ in `config/parameters.py` (which is exactly $2\times$ the E0 p99 residual of $0.0175\text{ m}$; no derivation formula exists in the code or git history). Over the 9 held-out normals (9,000 ticks), the maximum batch residual is $0.0288\text{ m}$ (p99 = $0.0210\text{ m}$). Recomputed across all 60 normal scenarios in the DB (60,000 ticks) using the batch physics path, the maximum residual is $0.03488\text{ m}$ (p99 = $0.0203\text{ m}$, MAE = $0.0066\text{ m}$), with 0 ticks exceeding $0.035\text{ m}$. Setting $\tau_p = 0.035\text{ m}$ guarantees zero false positives on all 60 normal baseline scenarios. No attack data was used.
+- **$\tau_p = 0.035\text{ m}$ (Physics):** Set to $0.035\text{ m}$ in `config/parameters.py` (which is exactly $2\times$ the E0 p99 residual of $0.0175\text{ m}$; no derivation formula exists in the code or git history). Over the 9 held-out normals (9,000 ticks), the maximum batch residual is $0.0288\text{ m}$ (p99 = $0.0210\text{ m}$). Recomputed across all 60 normal scenarios in the DB (60,000 ticks) using the batch physics path, the maximum residual is **0.034884 m** vs $\tau_p = 0.035\text{ m}$ (a narrow **0.3% margin**), with 0 ticks exceeding $0.035\text{ m}$. Setting $\tau_p = 0.035\text{ m}$ guarantees zero false positives on all 60 normal baseline scenarios (~1,000 s horizons). Note that under the dataset's clamped flow noise, the twin residual crosses $\tau_p$ from about tick 861 in a 30-minute run (producing 12 physics flags between $t=861$ and $1799$), meaning the physics threshold is valid for ~1,000 s scenario runs.
 - **$\tau_l = 0.0085$ (Temporal/LSTM):** Set to the maximum reconstruction error observed on the normal validation split (`df_val` from the 51 normal training/validation scenarios) to ensure normal operating dynamics stay below threshold. No attack data was used.
 - **$\tau_a = 1500.0\text{ ms}, \tau_{a,max} = 5000.0\text{ ms}$ (Availability):** Established directly from SCADA network timing SLAs: at a 1 Hz polling rate, 1,500 ms flags a delayed/dropped packet, and 5,000 ms flags plant offline / complete communication loss. No attack data was used.
 
 ### Event-Level vs Per-Tick Metrics
 **Event-Level Definition:** An attack is considered detected if ANY engine triggers an alarm at ANY point during the attack window.
 
-| Attack Type | Event-Level Recall | Tick-F1 (per-scenario, all ticks) |
-|-------------|--------------------|-----------------------------------|
-| **FDI**     | 100%               | 0.999                             |
-| **Replay**  | 100%               | 0.999                             |
-| **DoS**     | 100%               | 0.215                             |
-| **Auth Misuse** | 100%           | 0.218                             |
+| Attack Type | Event-Level Recall | Tick-F1 (per-scenario, all ticks) | Sensitivity Tick-F1 (60s Guard Window) |
+|-------------|--------------------|-----------------------------------|---------------------------------------|
+| **FDI**     | 100%               | 0.999                             | 0.999                                 |
+| **Replay**  | 100%               | 0.999                             | 0.999                                 |
+| **DoS**     | 100%               | 0.215                             | 0.234                                 |
+| **Auth Misuse** | 100%           | 0.218                             | 0.233                                 |
 
-**Note on Evaluation Script Precision:** In `scripts/run_evaluation.py`, the printed per-attack breakdown reports precision 1.000 for each attack type. This precision is computed strictly on attack-window rows only (which contains no negative rows, making precision 1.000 by construction). When evaluated across all scenario rows (including pre- and post-attack normal ticks), the true per-scenario Tick-F1 is reported in the table above.
+**Note on Evaluation Script Precision:** In `scripts/run_evaluation.py`, the printed per-attack breakdown reports precision 1.000 for each attack type. This precision is computed strictly on attack-window rows only (which contains no negative rows, making precision 1.000 by construction). When evaluated across all scenario rows (including pre- and post-attack normal ticks), the true per-scenario Tick-F1 is reported in the table above. The 60 s guard window sensitivity column ignores false alarms during the 60 seconds immediately following attack termination.
 
 **Pooled Metrics (9 Held-Out Normals + All 90 Attack Scenarios):**
 - Pooled Precision: 38.9%
@@ -70,7 +70,7 @@ All detection thresholds were calibrated strictly on normal baseline operational
 2. **Auth Misuse (A4) Detection**: Policy v2 catches 100% of A4 attack ticks. The rule was refined after inspecting attack data to include the fail-safe valve exemption (valve=0 is allowed only if pump is off). Event-Level Recall is also 100% because the LSTM reliably spikes to 1.0 during the attack window.
 3. **Start-up Transients & Dataset Limitations**: While there are 0 false alarms on normal scenarios, our model *does* throw false positives before attacks (start-up flags) in scenarios starting at 0.4m or 2.1m. In fact, a settled-period start-up transient occasionally exceeds the 0.95 threshold (e.g., scoring 0.96) in scenarios starting near 2.1m. This exposes a dataset limitation: normal scenarios only start at 1.0m, 0.8m, and 0.5m. The model has never seen high starts such as 2.1m, and normal levels top out near 1.7m.
 4. **Physics FPR Artifacts (DoS and Auth Misuse)**: The 21.2% pooled FPR is overwhelmingly caused by Physics engine false alarms during A3 and A4 scenarios:
-   - **DoS (A3)**: after a DoS the twin, which integrates the reported zero flows, falls behind the plant by about duration x net fill rate and never re-converges (no measurement correction); note that this contradicts the dataset documentation's fail-safe description (which stated pump off and valve closed, whereas in reality the plant kept filling).
+   - **DoS (A3)**: The stored DoS windows in the dataset are internally inconsistent: during the DoS, reported level is held, flows are zeroed, and actuator states are recorded as 0 (fail-safe); after the DoS ends, the level abruptly gains about 3.5 cm in 5 seconds while reported flows imply only ~1.5 mm/s (physically impossible), jumping directly to the trajectory of an uninterrupted fill. The digital twin, which open-loop integrates the reported zero flows, falls behind by $\approx \text{duration} \times \text{net fill rate}$ and cannot follow that jump, remaining permanently offset and triggering 7,561 false positive ticks. (The old count of 7,431 differed because earlier scripts tallied $(999 - t_{end})$ on saturated scenarios while filtering partial slices for boundary scenarios A3_001, A3_002, A3_003, and A3_012; strict per-tick evaluation of $S_p > 0.95$ across all outside ticks yields exactly 7,561).
    - **Auth Misuse (A4)**: At the exact end of the attack window, the dataset generator artificially stitched the plant state back to the nominal uncompromised trajectory, causing the observed level to teleport by 0.3m in 1 second. The twin expects continuity and refuses to teleport, creating a permanent residual.
 
 ## 4. Technical Challenges Overcome

@@ -1,0 +1,18 @@
+t= 0: Phy=0.1298 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9944 Qin=0.00000 Qout=0.00219
+t= 1: Phy=0.1638 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=1.0036 Qin=0.00000 Qout=0.00212
+t= 2: Phy=0.1256 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=1.0013 Qin=0.00003 Qout=0.00200
+t= 3: Phy=0.0262 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9949 Qin=0.00004 Qout=0.00220
+t= 4: Phy=0.2562 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9858 Qin=0.00000 Qout=0.00196
+t= 5: Phy=0.0360 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9926 Qin=0.00010 Qout=0.00194
+t= 6: Phy=0.0099 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9925 Qin=0.00000 Qout=0.00205
+t= 7: Phy=0.2741 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=1.0015 Qin=0.00000 Qout=0.00200
+t= 8: Phy=0.2916 LSTM=0.0000 Pol=0.0000 Av=0.0000 | rcv=True L=0.9806 Qin=0.00000 Qout=0.00201
+t= 9: Phy=0.0095 LSTM=0.0855 Pol=0.0000 Av=0.0000 | rcv=True L=0.9903 Qin=0.00000 Qout=0.00186
+t=10: Phy=0.1215 LSTM=0.0772 Pol=0.0000 Av=0.0000 | rcv=True L=0.9848 Qin=0.00004 Qout=0.00184
+t=11: Phy=0.1710 LSTM=0.0678 Pol=0.0000 Av=0.0000 | rcv=True L=0.9940 Qin=0.00000 Qout=0.00201
+t=12: Phy=0.0161 LSTM=0.0690 Pol=0.0000 Av=0.0000 | rcv=True L=0.9876 Qin=0.00000 Qout=0.00200
+t=13: Phy=0.0444 LSTM=0.0647 Pol=0.0000 Av=0.0000 | rcv=True L=0.9844 Qin=0.00007 Qout=0.00216
+t=14: Phy=0.2170 LSTM=0.0629 Pol=0.0000 Av=0.0000 | rcv=True L=0.9774 Qin=0.00000 Qout=0.00197
+
+=== Every tick where any engine > 0.95 (0 to 399) ===
+NONE. Zero false alarms across all 400 ticks!

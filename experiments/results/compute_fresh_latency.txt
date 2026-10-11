@@ -1,0 +1,26 @@
+=== Attack Start Analysis: Active Alarms and Fresh Detection Delay ===
+A1_001 (FDI        ): t_start=300 | Pre-active in 10t before: False | Start Flags: Phy=True LSTM=False Pol=False Av=False | Fresh Delay: 0.0s
+A2_001 (Replay     ): t_start=400 | Pre-active in 10t before: False | Start Flags: Phy=True LSTM=False Pol=False Av=True | Fresh Delay: 0.0s
+A3_001 (DoS        ): t_start=350 | Pre-active in 10t before: False | Start Flags: Phy=False LSTM=True Pol=False Av=True | Fresh Delay: 0.0s
+A4_001 (Auth_Misuse): t_start=200 | Pre-active in 10t before: False | Start Flags: Phy=False LSTM=True Pol=False Av=False | Fresh Delay: 0.0s
+A4_002 (Auth_Misuse): t_start=200 | Pre-active in 10t before: False | Start Flags: Phy=False LSTM=True Pol=False Av=False | Fresh Delay: 0.0s
+A4_003 (Auth_Misuse): t_start=200 | Pre-active in 10t before: False | Start Flags: Phy=False LSTM=True Pol=False Av=False | Fresh Delay: 0.0s
+A4_004 (Auth_Misuse): t_start=200 | Pre-active in 10t before: False | Start Flags: Phy=False LSTM=True Pol=False Av=False | Fresh Delay: 0.0s
+
+=== Per Attack Type Breakdown across all 90 attacks ===
+Attack Type: FDI (N=45 scenarios)
+  Flags at t_start: Physics=45/45, LSTM=0/45, Policy(v1)=0/45, Availability=0/45
+  Pre-attack alarmed in 10t before t_start: 0/45 scenarios
+  Fresh Detection Delay: Mean=0.00s, Median=0.00s, Max=0.00s
+Attack Type: Replay (N=15 scenarios)
+  Flags at t_start: Physics=15/15, LSTM=0/15, Policy(v1)=0/15, Availability=15/15
+  Pre-attack alarmed in 10t before t_start: 0/15 scenarios
+  Fresh Detection Delay: Mean=0.00s, Median=0.00s, Max=0.00s
+Attack Type: DoS (N=15 scenarios)
+  Flags at t_start: Physics=0/15, LSTM=15/15, Policy(v1)=0/15, Availability=15/15
+  Pre-attack alarmed in 10t before t_start: 0/15 scenarios
+  Fresh Detection Delay: Mean=0.00s, Median=0.00s, Max=0.00s
+Attack Type: Auth_Misuse (N=15 scenarios)
+  Flags at t_start: Physics=0/15, LSTM=15/15, Policy(v1)=0/15, Availability=0/15
+  Pre-attack alarmed in 10t before t_start: 0/15 scenarios
+  Fresh Detection Delay: Mean=0.00s, Median=0.00s, Max=0.00s

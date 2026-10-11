@@ -1,0 +1,19 @@
+=== Batch Physics Absolute Residual Statistics ===
+All 60 Normals (60,000 ticks):
+  Max Absolute Residual: 0.034884 m
+  P99 Absolute Residual: 0.020286 m
+  P95 Absolute Residual: 0.015620 m
+  MAE:                   0.006630 m
+  Ticks > tau_p (0.035m): 0
+
+9 Held-Out Normals (9,000 ticks):
+  Max Absolute Residual: 0.028822 m
+  P99 Absolute Residual: 0.021046 m
+  MAE:                   0.006886 m
+  Ticks > tau_p (0.035m): 0
+
+51 Train/Val Normals (51,000 ticks):
+  Max Absolute Residual: 0.034884 m
+  P99 Absolute Residual: 0.020045 m
+  MAE:                   0.006585 m
+  Ticks > tau_p (0.035m): 0
