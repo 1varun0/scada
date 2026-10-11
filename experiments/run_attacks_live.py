@@ -9,6 +9,7 @@ from scada_live.attacker_wire.injector import Injector
 from scada_live.common.packets import TelemetryPacket
 
 cfg = load_config('scada_live/config.yaml')
+cfg.simulation.clamp_flow_noise = True
 
 class DummyGatewayClient:
     def __init__(self):
@@ -35,53 +36,47 @@ for attack_name, kwargs in attacks:
     fake_client = DummyGatewayClient()
     inj = Injector("http://fake", "run1", real_client=fake_client)
     
-    # Attack for 100 ticks, but declare it early so Replay can record
+    # Attack starts at t=100 for 100 ticks (up to t=200)
     inj.start_attack(attack_name, start_time=100.0, **kwargs)
-    
-    # 100 ticks normal
-    for t in range(100):
-        pkt = plant.step()
-        fake_client.last_cmd = (plant.controller.pump_command, plant.controller.valve_command)
-        cmd_p, cmd_v = inj.sense(t, float(t), pkt.level_m)
-        plant.pump.set_command(cmd_p)
-        plant.valve.set_command(cmd_v)
-        
-        inj.send_telemetry({"seq": t, "ts": float(t), "level_m": pkt.level_m, "q_in": pkt.q_in, "q_out": pkt.q_out, "pump_cmd": cmd_p, "valve_cmd": cmd_v})
-        if fake_client.last_pkt is not None:
-            ids_pkt = TelemetryPacket(
-                run_id="run1", ts=float(t), seq=t, src_t=float(t), received=float(t),
-                level_m=fake_client.last_pkt["level_m"], q_in=fake_client.last_pkt.get("q_in", pkt.q_in), 
-                q_out=fake_client.last_pkt.get("q_out", pkt.q_out),
-                pump_cmd=fake_client.last_pkt.get("pump_cmd", cmd_p), 
-                valve_cmd=fake_client.last_pkt.get("valve_cmd", cmd_v),
-                pump_on=bool(fake_client.last_pkt.get("pump_cmd", cmd_p)),
-                valve_pct=fake_client.last_pkt.get("valve_cmd", cmd_v)
-            )
-            ids.update(ids_pkt)
     
     fires = {'physics': [], 'lstm': [], 'policy': [], 'availability': []}
     
-    for t in range(100, 200):
-        pkt = plant.step()
-        fake_client.last_cmd = (plant.controller.pump_command, plant.controller.valve_command)
+    # Run full 250 ticks
+    for t in range(250):
+        if t == 200:
+            inj.stop_attack()
+            
+        # 1. Physical plant observes level
+        obs = plant.observe()
         
-        cmd_p, cmd_v = inj.sense(t, float(t), pkt.level_m)
-        if cmd_p is not None:
-            plant.pump.set_command(cmd_p)
-            plant.valve.set_command(cmd_v)
+        # 2. Controller determines nominal command based on observed level
+        ctrl_cmds = plant.controller.step(obs)
+        fake_client.last_cmd = (ctrl_cmds["pump_command"], ctrl_cmds["valve_command"])
         
+        # 3. Sense call through injector (may be spoofed, dropped, or overridden)
+        cmd_p, cmd_v = inj.sense(t, float(t), obs)
+        if cmd_p is None:
+            # Communication loss / DoS drop: plant actuators execute fail-safe
+            pump_exec = 0
+            valve_exec = 0.0
+        else:
+            pump_exec = cmd_p
+            valve_exec = cmd_v
+            
+        # 4. Plant advances physics with executed commands and returns telemetry packet
+        pkt = plant.advance(pump_exec, valve_exec)
+        
+        # 5. Send telemetry through injector (may drop or spoof)
         fake_client.last_pkt = None
-        inj.send_telemetry({"seq": t, "ts": float(t), "level_m": pkt.level_m, "q_in": pkt.q_in, "q_out": pkt.q_out, "pump_cmd": cmd_p, "valve_cmd": cmd_v})
+        inj.send_telemetry(pkt.to_dict())
         
         if fake_client.last_pkt is not None:
+            p = fake_client.last_pkt
             ids_pkt = TelemetryPacket(
-                run_id="run1", ts=float(t), seq=t, src_t=fake_client.last_pkt.get('src_t', float(t)), received=float(t),
-                level_m=fake_client.last_pkt["level_m"], q_in=fake_client.last_pkt.get("q_in", pkt.q_in), 
-                q_out=fake_client.last_pkt.get("q_out", pkt.q_out),
-                pump_cmd=fake_client.last_pkt.get("pump_cmd", cmd_p), 
-                valve_cmd=fake_client.last_pkt.get("valve_cmd", cmd_v),
-                pump_on=bool(fake_client.last_pkt.get("pump_cmd", cmd_p)),
-                valve_pct=fake_client.last_pkt.get("valve_cmd", cmd_v)
+                run_id="run1", ts=float(t), seq=t, src_t=p.get('src_t', float(t)), received=float(t),
+                level_m=p["level_m"], q_in=p["q_in"], q_out=p["q_out"],
+                pump_cmd=p["pump_cmd"], valve_cmd=p["valve_cmd"],
+                pump_on=bool(p["pump_on"]), valve_pct=float(p["valve_pct"])
             )
             res = ids.update(ids_pkt)
             if (100 <= t <= 104) or (195 <= t <= 199) or (205 <= t <= 222):
@@ -91,12 +86,16 @@ for attack_name, kwargs in attacks:
                 if res['scores'][e] > 0.95:
                     fires[e].append(t)
         else:
-            # Dropped packet (simulate DoS timeout)
+            # Dropped packet (simulate gateway watchdog synthetic packet)
+            # Carries gateway actual fail-safe commands (0, 0.0), held level, zero flows
             ids_pkt = TelemetryPacket(
                 run_id="run1", ts=float(t), seq=t, src_t=float(t), received=0.0,
-                level_m=pkt.level_m, q_in=pkt.q_in, q_out=pkt.q_out, pump_cmd=cmd_p, valve_cmd=cmd_v,
-                pump_on=bool(cmd_p), valve_pct=cmd_v
+                level_m=pkt.level_m, q_in=0.0, q_out=0.0,
+                pump_cmd=0, valve_cmd=0.0,
+                pump_on=False, valve_pct=0.0
             )
+            if attack_name == "DoS" and 100 <= t <= 104:
+                print(f"[DROP-RX {t}] ids.update() received: seq={ids_pkt.seq}, ts={ids_pkt.ts:.1f}, src_t={ids_pkt.src_t:.1f}, rcv={ids_pkt.received}, level_m={ids_pkt.level_m:.4f}, q_in={ids_pkt.q_in:.4f}, q_out={ids_pkt.q_out:.4f}, pump_cmd={ids_pkt.pump_cmd}, valve_cmd={ids_pkt.valve_cmd:.1f}, pump_on={ids_pkt.pump_on}, valve_pct={ids_pkt.valve_pct:.1f}")
             res = ids.update(ids_pkt)
             if (100 <= t <= 104) or (195 <= t <= 199) or (205 <= t <= 222):
                 v_str = f"{ids_pkt.valve_cmd:.0f}" if ids_pkt.valve_cmd is not None else "None"
@@ -105,49 +104,6 @@ for attack_name, kwargs in attacks:
                 if res['scores'][e] > 0.95:
                     fires[e].append(t)
                     
-    inj.stop_attack()
-    for t in range(200, 250):
-        pkt = plant.step()
-        fake_client.last_cmd = (plant.controller.pump_command, plant.controller.valve_command)
-        
-        cmd_p, cmd_v = inj.sense(t, float(t), pkt.level_m)
-        if cmd_p is not None:
-            plant.pump.set_command(cmd_p)
-            plant.valve.set_command(cmd_v)
-        
-        fake_client.last_pkt = None
-        inj.send_telemetry({"seq": t, "ts": float(t), "level_m": pkt.level_m, "q_in": pkt.q_in, "q_out": pkt.q_out, "pump_cmd": cmd_p, "valve_cmd": cmd_v})
-        
-        if fake_client.last_pkt is not None:
-            ids_pkt = TelemetryPacket(
-                run_id="run1", ts=float(t), seq=t, src_t=fake_client.last_pkt.get('src_t', float(t)), received=float(t),
-                level_m=fake_client.last_pkt["level_m"], q_in=fake_client.last_pkt.get("q_in", pkt.q_in), 
-                q_out=fake_client.last_pkt.get("q_out", pkt.q_out),
-                pump_cmd=fake_client.last_pkt.get("pump_cmd", cmd_p), 
-                valve_cmd=fake_client.last_pkt.get("valve_cmd", cmd_v),
-                pump_on=bool(fake_client.last_pkt.get("pump_cmd", cmd_p)),
-                valve_pct=fake_client.last_pkt.get("valve_cmd", cmd_v)
-            )
-            res = ids.update(ids_pkt)
-            if (100 <= t <= 104) or (195 <= t <= 199) or (205 <= t <= 222):
-                print(f"Tick {t:3d}: seq={ids_pkt.seq} ts={ids_pkt.ts:.1f} src_t={ids_pkt.src_t:.1f} rcv={ids_pkt.received} L={ids_pkt.level_m:.3f} Qin={ids_pkt.q_in:.4f} Qout={ids_pkt.q_out:.4f} P={ids_pkt.pump_cmd} V={ids_pkt.valve_cmd:.0f} | Scores: Phy={res['scores']['physics']:.2f} LSTM={res['scores']['lstm']:.2f} Pol={res['scores']['policy']:.2f} Av={res['scores']['availability']:.2f}")
-            for e in fires:
-                if res['scores'][e] > 0.95:
-                    fires[e].append(t)
-        else:
-            ids_pkt = TelemetryPacket(
-                run_id="run1", ts=float(t), seq=t, src_t=float(t), received=0.0,
-                level_m=pkt.level_m, q_in=pkt.q_in, q_out=pkt.q_out,
-                pump_cmd=cmd_p, valve_cmd=cmd_v,
-                pump_on=bool(cmd_p), valve_pct=cmd_v
-            )
-            res = ids.update(ids_pkt)
-            if (100 <= t <= 104) or (195 <= t <= 199) or (205 <= t <= 222):
-                print(f"Tick {t:3d}: DROP! seq={ids_pkt.seq} ts={ids_pkt.ts:.1f} src_t={ids_pkt.src_t:.1f} rcv=0.0 L={ids_pkt.level_m:.3f} Qin={ids_pkt.q_in:.4f} Qout={ids_pkt.q_out:.4f} P={ids_pkt.pump_cmd} V={ids_pkt.valve_cmd:.0f} | Scores: Phy={res['scores']['physics']:.2f} LSTM={res['scores']['lstm']:.2f} Pol={res['scores']['policy']:.2f} Av={res['scores']['availability']:.2f}")
-            for e in fires:
-                if res['scores'][e] > 0.95:
-                    fires[e].append(t)
-                
     for e in fires:
         if fires[e]:
             start = fires[e][0]
