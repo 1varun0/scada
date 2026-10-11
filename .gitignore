@@ -55,12 +55,13 @@ venv.bak/
 Thumbs.db
 
 data/*.db
-# Virtual environments and temporary outputs
+
 venv*/
 *.db
 *.db-wal
 *.db-shm
 *_output.txt
+*_out.txt
 pytest_*.txt
 pip_freeze.txt
 git_*_output.txt
