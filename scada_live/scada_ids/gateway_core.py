@@ -62,7 +62,13 @@ class GatewayCore:
                     synth_pkt = replace(self.last_pkt, 
                                         seq=self.last_pkt.seq + 1,
                                         ts=self.last_pkt.ts + self.cfg.simulation.dt_s,
-                                        received=False)
+                                        received=False,
+                                        q_in=0.0,
+                                        q_out=0.0,
+                                        pump_cmd=0,
+                                        valve_cmd=0.0,
+                                        pump_on=False,
+                                        valve_pct=0.0)
                     
                     verdict = self._enrich_and_publish(synth_pkt)
                     self.last_rx_wall = current_time

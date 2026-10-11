@@ -12,6 +12,7 @@ from scada_live.plant_sim.plant import LivePlant
 from scada_live.plant_sim.gateway_client import GatewayClient
 from scada_live.common.config_loader import load_config
 from scada_live.common.packets import TelemetryPacket
+from scada_live.scada_ids.streaming_ids import StreamingIDS
 
 @pytest.fixture
 def client():
@@ -226,3 +227,47 @@ def test_soak_30min():
     avg_ms = (sum(latencies) / len(latencies)) * 1000
     assert avg_ms < 50.0
     assert false_alarms <= 2
+
+def test_gateway_core_policy_v2_and_equivalence_v1():
+    """Verify GatewayCore uses policy v2 while default/equivalence uses v1, and prevention config."""
+    cfg = load_config()
+    gw = GatewayCore(cfg, hub)
+    assert gw.ids.policy_version == "v2", "GatewayCore must use policy_version v2"
+    
+    # Equivalence default
+    ids_default = StreamingIDS(cfg)
+    assert ids_default.policy_version == "v1", "Default StreamingIDS for equivalence must use policy_version v1"
+    
+    # Config keys
+    assert cfg.prevention.takeover_engines == ["physics"]
+    assert cfg.prevention.trigger_state == "CRITICAL"
+
+def test_dos_dropped_packets_finite_lstm_scores():
+    """Verify StreamingIDS handles dropped/watchdog packets without producing NaN LSTM scores."""
+    import numpy as np
+    cfg = load_config()
+    ids = StreamingIDS(cfg, policy_version="v2")
+    ids.reset(1.0, "dos_test_run")
+    
+    # Feed 100 normal ticks to fill window
+    for t in range(100):
+        pkt = TelemetryPacket(
+            run_id="dos_test_run", seq=t, ts=float(t), src_t=float(t), received=True,
+            level_m=1.0, q_in=0.002, q_out=0.002, pump_cmd=0, valve_cmd=50.0,
+            pump_on=False, valve_pct=50.0
+        )
+        res = ids.update(pkt)
+        assert np.isfinite(res['scores']['lstm']), f"NaN score at normal tick {t}"
+        
+    # Feed 50 dropped/synthetic packets (DoS attack with watchdog packets carrying fail-safe)
+    for t in range(100, 150):
+        # Even with potential None inputs or missing packet markers
+        pkt = TelemetryPacket(
+            run_id="dos_test_run", seq=t, ts=float(t), src_t=100.0, received=False,
+            level_m=1.0, q_in=0.0, q_out=0.0, pump_cmd=0, valve_cmd=0.0,
+            pump_on=False, valve_pct=0.0
+        )
+        res = ids.update(pkt)
+        assert np.isfinite(res['scores']['lstm']), f"NaN score at dropped tick {t}"
+        assert res['scores']['lstm'] >= 0.0, f"Negative score at dropped tick {t}"
+

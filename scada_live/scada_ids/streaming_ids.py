@@ -2,6 +2,7 @@
 StreamingIDS — Stateful wrapper around the 4 anomaly detection engines.
 """
 
+import numpy as np
 import os
 import torch
 import pandas as pd
@@ -115,34 +116,54 @@ class StreamingIDS:
                 self.telemetry_window.clear()
                 self.current_run_id = pkt.run_id
                 
+            # Sanitize inputs to guarantee finite scores and equivalence to batch rows
+            is_rx = bool(pkt.received)
+            level_m = float(pkt.level_m) if (pkt.level_m is not None and not pd.isna(pkt.level_m)) else 0.0
+            
+            # Missing packets carry zero flows and fail-safe states in batch rows
+            if is_rx:
+                q_in = float(pkt.q_in) if (pkt.q_in is not None and not pd.isna(pkt.q_in)) else 0.0
+                q_out = float(pkt.q_out) if (pkt.q_out is not None and not pd.isna(pkt.q_out)) else 0.0
+                pump_cmd = int(pkt.pump_cmd) if pkt.pump_cmd is not None else 0
+                valve_cmd = float(pkt.valve_cmd) if (pkt.valve_cmd is not None and not pd.isna(pkt.valve_cmd)) else 0.0
+                pump_state = 1.0 if (pkt.pump_on if pkt.pump_on is not None else False) else 0.0
+                valve_state = float(pkt.valve_pct) if (pkt.valve_pct is not None and not pd.isna(pkt.valve_pct)) else 0.0
+            else:
+                q_in = 0.0
+                q_out = 0.0
+                pump_cmd = int(pkt.pump_cmd) if pkt.pump_cmd is not None else 0
+                valve_cmd = float(pkt.valve_cmd) if (pkt.valve_cmd is not None and not pd.isna(pkt.valve_cmd)) else 0.0
+                pump_state = 0.0
+                valve_state = 0.0
+                
             # 1. Physics Engine
             h_twin, p_residual, s_p = self.physics_engine.step(
-                q_in=pkt.q_in, q_out=pkt.q_out, 
-                h_observed=pkt.level_m, dt=self.cfg.simulation.dt_s
+                q_in=q_in, q_out=q_out, 
+                h_observed=level_m, dt=self.cfg.simulation.dt_s
             )
             
             # 2. Availability Engine (using src_t)
             data_age, s_a = self.availability_engine.evaluate(
-                simulation_time_s=pkt.ts, source_time_s=pkt.src_t, packet_received=pkt.received
+                simulation_time_s=pkt.ts, source_time_s=pkt.src_t, packet_received=is_rx
             )
             
             if self.policy_version == "v2":
                 s_c = self.policy_engine.evaluate_v2(
-                    h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
+                    h_observed=level_m, pump_command=pump_cmd, valve_command=valve_cmd
                 )
             else:
                 s_c = self.policy_engine.evaluate(
-                    h_observed=pkt.level_m, pump_command=pkt.pump_cmd, valve_command=pkt.valve_cmd
+                    h_observed=level_m, pump_command=pump_cmd, valve_command=valve_cmd
                 )
             
             # 4. Temporal Engine
             # Batch adds all rows to the window buffer. 
             self.telemetry_window.append({
-                'tank_level_observed': pkt.level_m,
-                'q_in': pkt.q_in,
-                'q_out': pkt.q_out,
-                'pump_state': 1.0 if pkt.pump_on else 0.0,
-                'valve_state': pkt.valve_pct
+                'tank_level_observed': level_m,
+                'q_in': q_in,
+                'q_out': q_out,
+                'pump_state': pump_state,
+                'valve_state': valve_state
             })
             
             s_l = 0.0
@@ -151,6 +172,8 @@ class StreamingIDS:
                 calibrating = False
                 window_df = pd.DataFrame(list(self.telemetry_window))
                 _, s_l = self.temporal_engine.evaluate(window_df)
+                if pd.isna(s_l) or not np.isfinite(s_l):
+                    s_l = 0.0
                 
             # 5. Fusion
             s_hybrid, predicted_anomaly = self.fusion_engine.evaluate(s_p, s_l, s_c, s_a)

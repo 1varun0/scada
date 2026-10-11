@@ -66,6 +66,8 @@ lstm:
 prevention:
   default_mode: "monitor"           # "monitor" or "prevention"
   act_on: ["physics"]               # engines triggering mitigation in Phase 6a
+  takeover_engines: ["physics"]     # engines triggering digital twin takeover
+  trigger_state: "CRITICAL"         # Alert state required to trigger mitigation
   fdi_takeover: true                # feed twin level to controller
   handback_tolerance_m: 0.05        # level tolerance to return control to sensor
   auto_handback: false              # automatically hand back control when safe (true in headless test harness)
