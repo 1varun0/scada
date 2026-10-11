@@ -112,9 +112,14 @@ The control logic runs in `GatewayCore.step()`. The source for this tick's contr
 - *Limitation*: A spoof within $v_{max} \cdot G \cdot dt + 3\sigma_{sensor}$ after a gap is adopted by the twin; the command-driven shadow estimator in Phase 6c is the structural fix.
 - *Checkpoint:* Unit tests for gap-free equivalence, suppression timeout recovery, mode independence with rule ON, and batch replay of 15 A3 scenarios.
 
-**Step 3: A/B Comparison Harness**
-- Write `experiments/run_comparison.py`.
-- *Checkpoint:* Run A/B harness for 30 simulated minutes and verify output CSV proves FDI prevention.
+**Step 3: A/B Comparison Harness (Completed)**
+- Written `experiments/run_comparison.py` evaluating 10 random seeds (paired schedules) across 4 scenarios:
+  1. Dataset-style FDI (+0.15m): Control scenario (0 physical harm in both modes).
+  2. Negative FDI ramp (-1.5m, 20 min): Monitor mode overflows (779.0 ± 6.1 ticks), Prevention mode 100% eliminates overflow (0.0 ticks).
+  3. Positive FDI ramp (+1.5m): Monitor mode suffers dry-run (370.5 ± 2.5 ticks), Prevention mode 100% eliminates dry-run (0.0 ticks).
+  4. Stealthy slow ramp (-0.05 mm/s): Intervenes and bounds drift with 0 physical harm.
+- Verified 0 false takeovers across all 10 seeds on a 30-minute normal soak in Prevention mode.
+- Generated CSV (`experiments/results/ab_comparison_results.csv`), summary table (`experiments/results/ab_comparison_summary.txt`), and visualization (`experiments/results/ab_comparison_figure.png`).
 
 ## 7. Out of Scope for Phase 6a
 - `/api/command` override blocking (Auth Misuse).
