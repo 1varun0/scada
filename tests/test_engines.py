@@ -59,3 +59,26 @@ def test_availability_engine():
     assert age == 3000.0
     # Linear ramp: (3000 - 1500) / (5000 - 1500) = 1500 / 3500 = 0.42857...
     assert abs(s_a - (3000.0 - 1500.0) / (5000.0 - 1500.0)) < 1e-6
+
+def test_scaler_transform_equals_manual_minmax():
+    import os
+    import pickle
+    import numpy as np
+
+    scaler_path = "checkpoints/scaler_v1.pkl"
+    assert os.path.exists(scaler_path), f"Checkpoint {scaler_path} does not exist"
+    with open(scaler_path, "rb") as f:
+        scaler = pickle.load(f)
+
+    samples = np.array([
+        [1.0, 0.003, 0.002, 1.0, 50.0],
+        [0.5, 0.0, 0.0015, 0.0, 50.0],
+        [1.5, 0.005, 0.0025, 1.0, 50.0],
+        [2.0, 0.0, 0.0028, 0.0, 50.0],
+    ])
+
+    transformed = scaler.transform(samples)
+    manual = (samples - scaler.data_min_) * scaler.scale_
+
+    assert np.allclose(transformed, manual, atol=1e-7), "Scaler transform does not match manual min-max!"
+

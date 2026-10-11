@@ -1,0 +1,14 @@
+torch==2.5.1
+numpy==2.3.3
+scipy==1.16.3
+scikit-learn==1.7.2
+matplotlib==3.10.7
+seaborn==0.13.2
+pandas==2.3.2
+pytest==9.1.1
+tqdm==4.67.3
+tabulate==0.10.0
+flask==3.1.2
+sseclient-py==1.9.0
+pyyaml==6.0.3
+requests==2.34.2

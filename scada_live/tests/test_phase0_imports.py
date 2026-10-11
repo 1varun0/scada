@@ -57,3 +57,40 @@ def test_command_packet_roundtrip():
     cmd2 = CommandPacket.from_dict(d)
     assert cmd2.src == "scada_master"
     assert cmd2.value == "ON"
+
+def test_config_prevention_block():
+    from scada_live.common.config_loader import load_config
+    cfg = load_config()
+    assert hasattr(cfg, "prevention")
+    assert cfg.prevention.default_mode == "monitor"
+    assert cfg.prevention.act_on == ["physics"]
+    assert cfg.prevention.fdi_takeover is True
+    assert cfg.prevention.handback_tolerance_m == 0.05
+    assert cfg.prevention.auto_handback is False
+    assert cfg.ids.policy_version == "v1"
+
+def test_streaming_ids_twin_estimate_and_policy_flag():
+    from scada_live.common.config_loader import load_config
+    from scada_live.scada_ids.streaming_ids import StreamingIDS
+    from scada_live.common.packets import TelemetryPacket
+    cfg = load_config()
+    
+    # Default policy version from config
+    ids_v1 = StreamingIDS(cfg)
+    assert ids_v1.policy_version == "v1"
+    assert ids_v1.get_twin_estimate() == cfg.tank.initial_level_m
+
+    # Explicit override to v2
+    ids_v2 = StreamingIDS(cfg, policy_version="v2")
+    assert ids_v2.policy_version == "v2"
+
+    # Advance twin and check accessor
+    pkt = TelemetryPacket(
+        seq=1, run_id="test_run", ts=1.0, src_t=1.0, received=True,
+        level_m=1.0, q_in=0.005, q_out=0.002, pump_on=True, pump_cmd=1,
+        valve_pct=50.0, valve_cmd=50.0
+    )
+    ids_v1.update(pkt)
+    # Area = 2.0 m^2, dH = (0.005 - 0.002)/2.0 * 1.0 = 0.0015 m -> level = 1.0015 m
+    assert abs(ids_v1.get_twin_estimate() - 1.0015) < 1e-6
+

@@ -1,3 +1,5 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import sqlite3
 import pandas as pd
 from scada_live.scada_ids.streaming_ids import StreamingIDS, TelemetryPacket
@@ -65,12 +67,19 @@ def main():
             
     print(f"Normal Scenarios FPR (DB, includes 51 normals used for training/validation): {fps} FPs out of {total_ticks} ticks")
     
-    print("\nHeld-out normals (N_052 to N_060):")
-    for sid in [f"N_{str(i).zfill(3)}" for i in range(52, 61)]:
-        if sid in scenario_scores:
-            max_s = scenario_scores[sid]
+    # Read held-out normals dynamically from evaluation_results.csv
+    eval_csv_path = "data/evaluation_results.csv"
+    if os.path.exists(eval_csv_path):
+        df_eval = pd.read_csv(eval_csv_path)
+        held_out_ids = sorted([sid for sid in df_eval['scenario_id'].unique() if sid.startswith('N_')])
+        print(f"\nHeld-out normals from {eval_csv_path} ({len(held_out_ids)} scenarios):")
+        for sid in held_out_ids:
+            sc_cfg = get_scenario_by_id(sid)
+            op_cond = sc_cfg.operating_condition if sc_cfg else "Unknown"
+            sub_eval = df_eval[df_eval['scenario_id'] == sid]
+            max_s = sub_eval['S_l'].max()
             margin = 0.95 - max_s
-            print(f"  {sid}: max LSTM score {max_s:.3f} (margin {margin:.3f})")
+            print(f"  {sid} ({op_cond}): max LSTM score {max_s:.3f} (margin {margin:.3f})")
 
 if __name__ == "__main__":
     main()

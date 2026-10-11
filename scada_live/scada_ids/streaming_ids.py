@@ -20,12 +20,18 @@ from scada_live.common.packets import TelemetryPacket
 from scada_live.common.config_loader import load_config
 
 class StreamingIDS:
-    def __init__(self, cfg, device="cpu", policy_version="v1"):
+    def __init__(self, cfg, device="cpu", policy_version=None):
         self.cfg = cfg
         self.device = device
-        self.policy_version = policy_version
+        if policy_version is not None:
+            self.policy_version = policy_version
+        elif hasattr(cfg, "ids") and hasattr(cfg.ids, "policy_version"):
+            self.policy_version = cfg.ids.policy_version
+        else:
+            self.policy_version = "v1"
         self.current_run_id = None
         self.lock = threading.Lock()
+
         
         # 1. Physics Engine
         self.physics_engine = PhysicsEngine(tau_p=cfg.ids.tau_p)
@@ -90,7 +96,15 @@ class StreamingIDS:
             mean_level = sum(trusted_levels) / len(trusted_levels)
             self.physics_engine.reset(mean_level)
             self.telemetry_window.clear()
-        
+
+    def get_twin_estimate(self) -> float:
+        """Return the current water level estimate from the physics Digital Twin."""
+        with self.lock:
+            if self.physics_engine.twin is not None:
+                return float(self.physics_engine.twin.level)
+            return float(self.cfg.tank.initial_level_m)
+
+
     @torch.no_grad()
     def update(self, pkt: TelemetryPacket) -> dict:
         with self.lock:
