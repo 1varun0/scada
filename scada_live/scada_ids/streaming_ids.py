@@ -21,7 +21,7 @@ from scada_live.common.packets import TelemetryPacket
 from scada_live.common.config_loader import load_config
 
 class StreamingIDS:
-    def __init__(self, cfg, device="cpu", policy_version=None):
+    def __init__(self, cfg, device="cpu", policy_version=None, dos_gap_rule=None):
         self.cfg = cfg
         self.device = device
         if policy_version is not None:
@@ -30,9 +30,33 @@ class StreamingIDS:
             self.policy_version = cfg.ids.policy_version
         else:
             self.policy_version = "v1"
-        self.current_run_id = None
-        self.lock = threading.Lock()
+            
+        if dos_gap_rule is not None:
+            self.dos_gap_rule = bool(dos_gap_rule)
+        elif hasattr(cfg, "ids") and hasattr(cfg.ids, "dos_gap_rule"):
+            self.dos_gap_rule = bool(cfg.ids.dos_gap_rule)
+        else:
+            self.dos_gap_rule = False
 
+        self.current_run_id = None
+        self.lock = threading.RLock()
+
+        # Step 2b: DoS gap tracking state
+        self.gap_ticks = 0
+        self.reseed_buffer = []
+        self.is_collecting_reseed = False
+        self.reseed_gap_length = 0
+        self.suppress_physics_takeover = False
+        
+        # Physical constants for Step 2b v_max derivation
+        area = float(getattr(cfg.tank, "cross_section_area_m2", 2.0))
+        q_in_max = float(getattr(cfg.pump, "q_max_m3s", 0.005))
+        cv = float(getattr(cfg.valve, "flow_coefficient_m3s", 0.004))
+        h_max = float(getattr(cfg.tank, "max_height_m", 2.5))
+        self.v_max = max(q_in_max / area, cv * (h_max ** 0.5) / area)
+        self.sigma_sensor = float(getattr(cfg.simulation, "sensor_noise_level_m", 0.005))
+        recal_cfg = getattr(cfg, "recalibration", None)
+        self.max_std_m = float(getattr(recal_cfg, "max_std_m", 0.03)) if recal_cfg else 0.03
         
         # 1. Physics Engine
         self.physics_engine = PhysicsEngine(tau_p=cfg.ids.tau_p)
@@ -86,6 +110,11 @@ class StreamingIDS:
             self.physics_engine.reset(initial_level_m)
             self.telemetry_window.clear()
             self.current_run_id = run_id
+            self.gap_ticks = 0
+            self.reseed_buffer.clear()
+            self.is_collecting_reseed = False
+            self.reseed_gap_length = 0
+            self.suppress_physics_takeover = False
             
             # Note: AvailabilityEngine does not have internal state to reset.
             # It just evaluates (sim_t - src_t). PolicyEngine is also stateless.
@@ -116,11 +145,62 @@ class StreamingIDS:
                 self.physics_engine.reset(self.cfg.tank.initial_level_m)
                 self.telemetry_window.clear()
                 self.current_run_id = pkt.run_id
+                self.gap_ticks = 0
+                self.reseed_buffer.clear()
+                self.is_collecting_reseed = False
+                self.reseed_gap_length = 0
+                self.suppress_physics_takeover = False
                 
             # Sanitize inputs to guarantee finite scores and equivalence to batch rows
             is_rx = bool(pkt.received)
             level_m = float(pkt.level_m) if (pkt.level_m is not None and not pd.isna(pkt.level_m)) else 0.0
             
+            # Step 2b DoS gap rule evaluation
+            self.suppress_physics_takeover = False
+            if self.dos_gap_rule:
+                if not is_rx:
+                    self.gap_ticks += 1
+                    self.is_collecting_reseed = False
+                    self.reseed_buffer.clear()
+                else:
+                    if self.gap_ticks > 0:
+                        self.reseed_gap_length = self.gap_ticks
+                        self.gap_ticks = 0
+                        self.is_collecting_reseed = True
+                        self.reseed_buffer = []
+                    
+                    if self.is_collecting_reseed:
+                        if 0.0 <= level_m <= getattr(self.cfg.tank, "max_height_m", 2.5):
+                            self.reseed_buffer.append(level_m)
+                        self.suppress_physics_takeover = True
+                        
+                        if len(self.reseed_buffer) == 5:
+                            m = float(np.median(self.reseed_buffer))
+                            std_m = float(np.std(self.reseed_buffer, ddof=1)) if len(self.reseed_buffer) > 1 else 0.0
+                            h_twin = self.get_twin_estimate()
+                            G = self.reseed_gap_length
+                            dt = float(getattr(self.cfg.simulation, "dt_s", 1.0))
+                            band = self.v_max * G * dt + 3.0 * self.sigma_sensor
+                            diff = abs(m - h_twin)
+                            
+                            import logging
+                            logger = logging.getLogger(__name__)
+                            if std_m <= self.max_std_m and diff <= band:
+                                self.physics_engine.reset(m)
+                                logger.info(
+                                    f"[DoS-Gap Re-seed] Accepted: gap={G}, m={m:.4f}, twin={h_twin:.4f}, "
+                                    f"diff={diff:.4f}, band={band:.4f}, std={std_m:.4f}"
+                                )
+                            else:
+                                logger.warning(
+                                    f"[DoS-Gap Refusal] Refused: gap={G}, m={m:.4f}, twin={h_twin:.4f}, "
+                                    f"diff={diff:.4f}, band={band:.4f}, std={std_m:.4f}"
+                                )
+                                
+                            self.is_collecting_reseed = False
+                            self.reseed_buffer.clear()
+                            self.suppress_physics_takeover = False
+
             # Missing packets carry zero flows and fail-safe states in batch rows
             if is_rx:
                 q_in = float(pkt.q_in) if (pkt.q_in is not None and not pd.isna(pkt.q_in)) else 0.0
@@ -202,5 +282,6 @@ class StreamingIDS:
                 "is_anomaly": bool(predicted_anomaly),
                 "calibrating": calibrating,
                 "source_engine": source_engine,
-                "engines_firing": engines_firing
+                "engines_firing": engines_firing,
+                "suppress_physics_takeover": self.suppress_physics_takeover
             }

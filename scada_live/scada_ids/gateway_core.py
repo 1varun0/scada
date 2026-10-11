@@ -48,6 +48,7 @@ class GatewayCore:
         self.takeover_engines = getattr(prev_cfg, "takeover_engines", ["physics"]) if prev_cfg else ["physics"]
         self.trigger_state = getattr(prev_cfg, "trigger_state", "CRITICAL") if prev_cfg else "CRITICAL"
         self.handback_tolerance_m = getattr(prev_cfg, "handback_tolerance_m", 0.05) if prev_cfg else 0.05
+        self.handback_clean_ticks = getattr(prev_cfg, "handback_clean_ticks", 5) if prev_cfg else 5
         self.auto_handback = getattr(prev_cfg, "auto_handback", False) if prev_cfg else False
         self.twin_takeover_active = False
         self.clean_ticks = 0
@@ -202,9 +203,15 @@ class GatewayCore:
         # Prevention State Machine
         is_critical = (am_state["alert_state"] == self.trigger_state)
         engines_firing = verdict.get("engines_firing", [])
+        suppress_physics = verdict.get("suppress_physics_takeover", False)
+        
+        eligible_takeover_engines = [
+            e for e in engines_firing
+            if e in self.takeover_engines and not (e == "physics" and suppress_physics)
+        ]
         
         if self.mode == "prevention":
-            if is_critical and any(e in self.takeover_engines for e in engines_firing):
+            if is_critical and len(eligible_takeover_engines) > 0:
                 self.twin_takeover_active = True
                 self.last_action_taken = "twin_takeover"
                 self.clean_ticks = 0
@@ -212,7 +219,7 @@ class GatewayCore:
                 if not verdict["is_anomaly"]:
                     self.clean_ticks += 1
                     twin_est = self.ids.get_twin_estimate()
-                    if self.clean_ticks >= 5 and abs(pkt.level_m - twin_est) < self.handback_tolerance_m:
+                    if self.clean_ticks >= self.handback_clean_ticks and abs(pkt.level_m - twin_est) < self.handback_tolerance_m:
                         if self.auto_handback:
                             self.twin_takeover_active = False
                             self.last_action_taken = "handback"

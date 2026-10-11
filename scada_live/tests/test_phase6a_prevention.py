@@ -107,9 +107,11 @@ def test_handback_rules(hub):
     sense_resp = gw.process_sense(twin_level + 0.01)
     assert sense_resp["level_source"] == "sensor"
 
-def test_mode_independence(hub):
+@pytest.mark.parametrize("dos_gap_rule", [False, True])
+def test_mode_independence(hub, dos_gap_rule):
     """Verify IDS anomaly scores and verdicts are strictly identical between Monitor and Prevention modes."""
     cfg = load_config()
+    cfg.ids.dos_gap_rule = dos_gap_rule
     gw_mon = GatewayCore(cfg, hub)
     gw_mon.set_mode("monitor")
     
@@ -180,11 +182,12 @@ def test_twin_control_stability(hub):
     assert gw.ids.nan_guard_triggers == 0
 
 def test_dos_recovery_no_false_takeover(hub):
-    """Replay A3_003 through GatewayCore in prevention mode and inspect behaviour around DoS termination."""
+    """Replay A3_003 through GatewayCore in prevention mode with dos_gap_rule=True: takeover must not persist."""
     import sqlite3
     import pandas as pd
     
     cfg = load_config()
+    cfg.ids.dos_gap_rule = True
     conn = sqlite3.connect("data/scada_ids.db")
     df = pd.read_sql_query("SELECT * FROM scada_telemetry WHERE scenario_id='A3_003' ORDER BY sequence_id", conn)
     conn.close()
@@ -223,7 +226,122 @@ def test_dos_recovery_no_false_takeover(hub):
         if t > t_end and gw.twin_takeover_active:
             post_dos_takeover_ticks.append(t)
             
-    # Under current code without DoS re-seeding rule, twin takeover falsely activates on physics evidence
-    # Report current behaviour: takeover is True due to twin falling behind during DoS
-    print(f"Post-DoS takeover active ticks (current code): {len(post_dos_takeover_ticks)} / {len(df[df['simulation_time_s'] > t_end])}")
+    print(f"Post-DoS takeover active ticks (Step 2b rule ON): {len(post_dos_takeover_ticks)} / {len(df[df['simulation_time_s'] > t_end])}")
+    # With Step 2b rule ON, twin re-seeds to median level post-DoS and takeover does NOT persist
+    assert len(post_dos_takeover_ticks) == 0, f"Expected 0 post-DoS takeover ticks, got {len(post_dos_takeover_ticks)}"
+
+def test_live_dos_60s_reseed(hub):
+    """Verify live telemetry-only DoS of 60s with Step 2b rule ON vs OFF."""
+    cfg = load_config()
+    
+    def run_sim(rule_on: bool):
+        cfg.ids.dos_gap_rule = rule_on
+        gw = GatewayCore(cfg, hub)
+        gw.current_run_id = "live_dos_60s"
+        gw.set_mode("prevention")
+        gw.set_auto_handback(True)
+        plant = LivePlant(cfg, standalone_mode=True)
+        plant.run_id = "live_dos_60s"
+        
+        err_before, err_at, err_30s_post = None, None, None
+        for t in range(200):
+            obs = plant.observe()
+            ctrl = plant.controller.step(obs)
+            pkt = plant.advance(ctrl["pump_command"], ctrl["valve_command"])
+            pkt.run_id = "live_dos_60s"
+            
+            if 100 <= t < 160:
+                synth = TelemetryPacket(
+                    run_id="live_dos_60s", seq=t, ts=float(t), src_t=float(t), received=False,
+                    level_m=pkt.level_m, q_in=0.0, q_out=0.0, pump_cmd=0, valve_cmd=0.0,
+                    pump_on=False, valve_pct=0.0
+                )
+                gw.process_telemetry(synth)
+            else:
+                gw.process_telemetry(pkt)
+                
+            err = abs(pkt.level_m - gw.ids.get_twin_estimate())
+            if t == 99:
+                err_before = err
+            elif t == 159:
+                err_at = err
+            elif t == 190:
+                err_30s_post = err
+        return err_before, err_at, err_30s_post
+
+    b_off, at_off, post_off = run_sim(rule_on=False)
+    b_on, at_on, post_on = run_sim(rule_on=True)
+    
+    print(f"\nLive DoS 60s (Rule OFF): Before={b_off:.4f}m, At End={at_off:.4f}m, 30s Post={post_off:.4f}m")
+    print(f"Live DoS 60s (Rule ON ): Before={b_on:.4f}m, At End={at_on:.4f}m, 30s Post={post_on:.4f}m")
+    
+    # Before DoS, error is low for both
+    assert b_off < 0.02 and b_on < 0.02
+    # At end of DoS, twin fell behind in both
+    assert at_off > 0.035 and at_on > 0.035
+    # 30s after DoS: Rule OFF stays diverged (>0.035m); Rule ON re-seeds to near-zero (<0.015m)
+    assert post_off > 0.035
+    assert post_on < 0.015
+
+def test_dos_followed_by_fdi_step_refusal(hub):
+    """Verify DoS 30s followed by an out-of-band FDI step is REFUSED and physics keeps firing.
+    
+    Note: If the spoofed level falls within v_max * G * dt + 3 * sigma, it is adopted.
+    This rule only bounds physically impossible jumps; the command-driven shadow estimator
+    (Phase 6c) is the true structural fix.
+    """
+    cfg = load_config()
+    cfg.ids.dos_gap_rule = True
+    gw = GatewayCore(cfg, hub)
+    gw.current_run_id = "dos_fdi_test"
+    gw.set_mode("prevention")
+    gw.set_auto_handback(True)
+    plant = LivePlant(cfg, standalone_mode=True)
+    plant.run_id = "dos_fdi_test"
+    
+    G = 30
+    dt = float(cfg.simulation.dt_s)
+    sigma = float(cfg.simulation.sensor_noise_level_m)
+    v_max = max(cfg.pump.q_max_m3s / cfg.tank.cross_section_area_m2,
+                cfg.valve.flow_coefficient_m3s * (cfg.tank.max_height_m**0.5) / cfg.tank.cross_section_area_m2)
+    band = v_max * G * dt + 3.0 * sigma
+    print(f"\nTest DoS 30s + FDI Refusal: G={G}, v_max={v_max:.6f} m/s, Physical Band={band:.4f}m")
+    
+    # Apply a +0.20m FDI step exceeding the physical band (~0.1099m)
+    spoof_offset = 0.20
+    physics_firing_ticks = []
+    
+    for t in range(120):
+        obs = plant.observe()
+        ctrl = plant.controller.step(obs)
+        pkt = plant.advance(ctrl["pump_command"], ctrl["valve_command"])
+        pkt.run_id = "dos_fdi_test"
+        
+        if 50 <= t < 80:
+            synth = TelemetryPacket(
+                run_id="dos_fdi_test", seq=t, ts=float(t), src_t=float(t), received=False,
+                level_m=pkt.level_m, q_in=0.0, q_out=0.0, pump_cmd=0, valve_cmd=0.0,
+                pump_on=False, valve_pct=0.0
+            )
+            v = gw.process_telemetry(synth)
+        elif t >= 80:
+            spoofed = TelemetryPacket(
+                run_id="dos_fdi_test", seq=t, ts=float(t), src_t=float(t), received=True,
+                level_m=pkt.level_m + spoof_offset, q_in=pkt.q_in, q_out=pkt.q_out,
+                pump_cmd=pkt.pump_cmd, valve_cmd=pkt.valve_cmd,
+                pump_on=pkt.pump_on, valve_pct=pkt.valve_pct
+            )
+            v = gw.process_telemetry(spoofed)
+            if "physics" in v.get("engines_firing", []):
+                physics_firing_ticks.append(t)
+        else:
+            v = gw.process_telemetry(pkt)
+            
+    # Twin must NOT adopt the spoofed level (difference to true level remains bounded)
+    final_twin = gw.ids.get_twin_estimate()
+    final_true = plant.tank.level
+    assert abs(final_twin - final_true) < 0.05, f"Twin adopted spoofed level! Twin={final_twin}, True={final_true}"
+    # Physics must keep firing after collection window finishes
+    assert len(physics_firing_ticks) >= 30, f"Physics did not keep firing: {len(physics_firing_ticks)} ticks"
+    assert gw.twin_takeover_active, "Twin takeover should be active under FDI attack"
 
