@@ -20,12 +20,12 @@ def build_controller(cfg):
     )
 
 class GatewayCore:
-    def __init__(self, cfg, sse_hub):
+    def __init__(self, cfg, sse_hub, dos_gap_rule=True):
         self.cfg = cfg
         self.sse_hub = sse_hub
         self.lock = threading.RLock()
         
-        self.ids = StreamingIDS(cfg, policy_version="v2")
+        self.ids = StreamingIDS(cfg, policy_version="v2", dos_gap_rule=dos_gap_rule)
         self.controller = build_controller(cfg)
         
         self.current_run_id = None

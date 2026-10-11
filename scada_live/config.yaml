@@ -44,6 +44,7 @@ ids:
   tau_fusion: 0.95
   policy_version: "v1"              # "v1" default for equivalence tests, "v2" for live
   dos_gap_rule: false               # Step 2b: resync digital twin after DoS gap if physically consistent
+  gap_collect_timeout_ticks: 20     # Step 2b: max ticks to collect valid post-gap readings before timeout refusal
   lstm_window: 10                   # from DataPreprocessor.window_size
   consecutive_flag_count: 3         # N: flags before ATTACK_DETECTED
   clear_count: 5                    # M: clean ticks before NORMAL

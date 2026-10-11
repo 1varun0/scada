@@ -9,6 +9,9 @@ import pandas as pd
 from collections import deque
 import pickle
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
 
 from engines.physics_engine import PhysicsEngine
 from engines.temporal_engine import TemporalEngine
@@ -46,7 +49,10 @@ class StreamingIDS:
         self.reseed_buffer = []
         self.is_collecting_reseed = False
         self.reseed_gap_length = 0
+        self.reseed_collect_ticks = 0
         self.suppress_physics_takeover = False
+        ids_cfg = getattr(cfg, "ids", None)
+        self.gap_collect_timeout_ticks = int(getattr(ids_cfg, "gap_collect_timeout_ticks", 20)) if ids_cfg else 20
         
         # Physical constants for Step 2b v_max derivation
         area = float(getattr(cfg.tank, "cross_section_area_m2", 2.0))
@@ -114,6 +120,7 @@ class StreamingIDS:
             self.reseed_buffer.clear()
             self.is_collecting_reseed = False
             self.reseed_gap_length = 0
+            self.reseed_collect_ticks = 0
             self.suppress_physics_takeover = False
             
             # Note: AvailabilityEngine does not have internal state to reset.
@@ -149,6 +156,7 @@ class StreamingIDS:
                 self.reseed_buffer.clear()
                 self.is_collecting_reseed = False
                 self.reseed_gap_length = 0
+                self.reseed_collect_ticks = 0
                 self.suppress_physics_takeover = False
                 
             # Sanitize inputs to guarantee finite scores and equivalence to batch rows
@@ -162,14 +170,17 @@ class StreamingIDS:
                     self.gap_ticks += 1
                     self.is_collecting_reseed = False
                     self.reseed_buffer.clear()
+                    self.reseed_collect_ticks = 0
                 else:
                     if self.gap_ticks > 0:
                         self.reseed_gap_length = self.gap_ticks
                         self.gap_ticks = 0
                         self.is_collecting_reseed = True
                         self.reseed_buffer = []
+                        self.reseed_collect_ticks = 0
                     
                     if self.is_collecting_reseed:
+                        self.reseed_collect_ticks += 1
                         if 0.0 <= level_m <= getattr(self.cfg.tank, "max_height_m", 2.5):
                             self.reseed_buffer.append(level_m)
                         self.suppress_physics_takeover = True
@@ -183,8 +194,6 @@ class StreamingIDS:
                             band = self.v_max * G * dt + 3.0 * self.sigma_sensor
                             diff = abs(m - h_twin)
                             
-                            import logging
-                            logger = logging.getLogger(__name__)
                             if std_m <= self.max_std_m and diff <= band:
                                 self.physics_engine.reset(m)
                                 logger.info(
@@ -199,6 +208,16 @@ class StreamingIDS:
                                 
                             self.is_collecting_reseed = False
                             self.reseed_buffer.clear()
+                            self.reseed_collect_ticks = 0
+                            self.suppress_physics_takeover = False
+                        elif self.reseed_collect_ticks >= self.gap_collect_timeout_ticks:
+                            logger.warning(
+                                f"[DoS-Gap Timeout Refusal] Collection timed out after {self.reseed_collect_ticks} ticks "
+                                f"with {len(self.reseed_buffer)} valid samples. Refusing re-seed."
+                            )
+                            self.is_collecting_reseed = False
+                            self.reseed_buffer.clear()
+                            self.reseed_collect_ticks = 0
                             self.suppress_physics_takeover = False
 
             # Missing packets carry zero flows and fail-safe states in batch rows
@@ -255,8 +274,7 @@ class StreamingIDS:
                 _, s_l = self.temporal_engine.evaluate(window_df)
                 if pd.isna(s_l) or not np.isfinite(s_l):
                     self.nan_guard_triggers += 1
-                    import logging
-                    logging.getLogger(__name__).warning(
+                    logger.warning(
                         f"NaN guard triggered on tick {pkt.seq}: s_l was {s_l}, defaulted to 0.0"
                     )
                     s_l = 0.0

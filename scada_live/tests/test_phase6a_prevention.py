@@ -6,6 +6,7 @@ from scada_live.scada_ids.sse_hub import EventHub
 from scada_live.common.packets import TelemetryPacket
 from scada_live.plant_sim.plant import LivePlant
 from scada_live.scada_ids.streaming_ids import StreamingIDS
+import pandas as pd
 
 @pytest.fixture
 def hub():
@@ -236,7 +237,7 @@ def test_live_dos_60s_reseed(hub):
     
     def run_sim(rule_on: bool):
         cfg.ids.dos_gap_rule = rule_on
-        gw = GatewayCore(cfg, hub)
+        gw = GatewayCore(cfg, hub, dos_gap_rule=rule_on)
         gw.current_run_id = "live_dos_60s"
         gw.set_mode("prevention")
         gw.set_auto_handback(True)
@@ -344,4 +345,184 @@ def test_dos_followed_by_fdi_step_refusal(hub):
     # Physics must keep firing after collection window finishes
     assert len(physics_firing_ticks) >= 30, f"Physics did not keep firing: {len(physics_firing_ticks)} ticks"
     assert gw.twin_takeover_active, "Twin takeover should be active under FDI attack"
+
+def test_gap_suppression_timeout_recovery(hub):
+    """Verify that if post-gap telemetry is outside physical bounds ([0, h_max]),
+    the suppression window times out after cfg.ids.gap_collect_timeout_ticks (20 ticks),
+    refuses re-seed, releases suppression, and engages physics takeover which stays active."""
+    cfg = load_config()
+    cfg.ids.dos_gap_rule = True
+    gw = GatewayCore(cfg, hub)
+    gw.current_run_id = "timeout_recovery_test"
+    gw.set_mode("prevention")
+    gw.set_auto_handback(True)
+    plant = LivePlant(cfg, standalone_mode=True)
+    plant.run_id = "timeout_recovery_test"
+    
+    # 1. 50 normal ticks
+    for t in range(50):
+        obs = plant.observe()
+        ctrl = plant.controller.step(obs)
+        pkt = plant.advance(ctrl["pump_command"], ctrl["valve_command"])
+        pkt.run_id = "timeout_recovery_test"
+        gw.process_telemetry(pkt)
+        
+    assert not gw.twin_takeover_active
+    
+    # 2. 30 gap ticks (t=50..79)
+    for t in range(50, 80):
+        synth = TelemetryPacket(
+            run_id="timeout_recovery_test", seq=t, ts=float(t), src_t=float(t), received=False,
+            level_m=plant.tank.level, q_in=0.0, q_out=0.0, pump_cmd=0, valve_cmd=0.0,
+            pump_on=False, valve_pct=0.0
+        )
+        gw.process_telemetry(synth)
+        
+    # 3. 30 ticks of invalid readings (level = 9.0m, outside [0, 2.5m]) (t=80..109)
+    # Physics takeover must engage after AT MOST 20 ticks (i.e. at or before t=80+20 = 100)
+    takeover_tick_observed = None
+    for t in range(80, 110):
+        invalid_pkt = TelemetryPacket(
+            run_id="timeout_recovery_test", seq=t, ts=float(t), src_t=float(t), received=True,
+            level_m=9.0, q_in=0.0, q_out=0.0, pump_cmd=0, valve_cmd=0.0,
+            pump_on=False, valve_pct=0.0
+        )
+        gw.process_telemetry(invalid_pkt)
+        if gw.twin_takeover_active and takeover_tick_observed is None:
+            takeover_tick_observed = t - 80 # elapsed ticks since gap end
+            
+    assert takeover_tick_observed is not None, "Physics takeover never engaged during invalid readings!"
+    assert takeover_tick_observed <= 20, f"Physics takeover engaged at tick {takeover_tick_observed} > 20!"
+    assert gw.twin_takeover_active, "Takeover should be active after invalid window"
+    
+    # 4. 30 ticks of +0.20 m spoofed level (t=110..139)
+    for t in range(110, 140):
+        obs = plant.observe()
+        ctrl = plant.controller.step(obs)
+        pkt = plant.advance(ctrl["pump_command"], ctrl["valve_command"])
+        pkt.run_id = "timeout_recovery_test"
+        spoofed = TelemetryPacket(
+            run_id="timeout_recovery_test", seq=t, ts=float(t), src_t=float(t), received=True,
+            level_m=pkt.level_m + 0.20, q_in=pkt.q_in, q_out=pkt.q_out,
+            pump_cmd=pkt.pump_cmd, valve_cmd=pkt.valve_cmd,
+            pump_on=pkt.pump_on, valve_pct=pkt.valve_pct
+        )
+        gw.process_telemetry(spoofed)
+        assert gw.twin_takeover_active, f"Takeover disengaged during spoof at tick {t}!"
+
+def test_gateway_core_dos_gap_rule_explicit(hub):
+    """Verify that StreamingIDS defaults to dos_gap_rule=False, and GatewayCore passes True explicitly."""
+    cfg = load_config()
+    default_ids = StreamingIDS(cfg)
+    assert default_ids.dos_gap_rule is False
+    
+    gw = GatewayCore(cfg, hub)
+    assert gw.ids.dos_gap_rule is True
+
+def test_gap_free_equivalence_rule_on_off():
+    """Verify that on scenarios with zero packet gaps (N_001, A1_001, A2_001, A4_001),
+    StreamingIDS scores with dos_gap_rule=True vs False are identical to 1e-9."""
+    import sqlite3
+    cfg = load_config()
+    conn = sqlite3.connect("data/scada_ids.db")
+    scenarios = ["N_001", "A1_001", "A2_001", "A4_001"]
+    
+    for sid in scenarios:
+        df = pd.read_sql_query(f"SELECT * FROM scada_telemetry WHERE scenario_id='{sid}' ORDER BY sequence_id", conn)
+        ids_off = StreamingIDS(cfg, policy_version="v2", dos_gap_rule=False)
+        ids_on = StreamingIDS(cfg, policy_version="v2", dos_gap_rule=True)
+        ids_off.reset(df.iloc[0]["tank_level_observed"], sid)
+        ids_on.reset(df.iloc[0]["tank_level_observed"], sid)
+        
+        for _, row in df.iterrows():
+            t = float(row["simulation_time_s"])
+            rcvd = bool(row["packet_received"] == 1)
+            pkt = TelemetryPacket(
+                run_id=sid, seq=int(row["sequence_id"]), ts=t, src_t=t,
+                received=rcvd, level_m=float(row["tank_level_observed"]),
+                q_in=float(row["q_in"]), q_out=float(row["q_out"]),
+                pump_cmd=int(row["pump_command"]), valve_cmd=float(row["valve_command"]),
+                pump_on=bool(row["pump_state"] == 1), valve_pct=float(row["valve_state"])
+            )
+            v_off = ids_off.update(pkt)
+            v_on = ids_on.update(pkt)
+            for eng in ["physics", "lstm", "policy", "availability"]:
+                assert abs(v_off["scores"][eng] - v_on["scores"][eng]) <= 1e-9
+            assert abs(v_off["hybrid"] - v_on["hybrid"]) <= 1e-9
+    conn.close()
+
+def test_batch_replay_all_15_a3_scenarios():
+    """Batch replay of all 15 A3 scenarios through StreamingIDS with the rule ON versus OFF.
+    Post-hoc fix designed after observing the failure on this data; not part of the original evaluation.
+    """
+    import sqlite3
+    cfg = load_config()
+    conn = sqlite3.connect("data/scada_ids.db")
+    
+    total_fp_off = 0
+    total_fp_on = 0
+    
+    print("\n" + "="*80)
+    print("Batch replay of all 15 A3 scenarios through StreamingIDS with rule ON vs OFF")
+    print("Post-hoc fix designed after observing the failure on this data; not part of the original evaluation")
+    header = f"{'Scenario':<8} | {'FP Ticks (OFF)':<14} | {'FP Ticks (ON)':<14} | {'Event-Rec (OFF)':<15} | {'Event-Rec (ON)':<15}"
+    print(header)
+    print("-" * len(header))
+    
+    for i in range(1, 16):
+        sid = f"A3_{i:03d}"
+        df = pd.read_sql_query(f"SELECT * FROM scada_telemetry WHERE scenario_id='{sid}' ORDER BY sequence_id", conn)
+        dos_rows = df[df['packet_received'] == 0]
+        t_start = float(dos_rows['simulation_time_s'].min())
+        t_end = float(dos_rows['simulation_time_s'].max())
+        
+        ids_off = StreamingIDS(cfg, policy_version="v2", dos_gap_rule=False)
+        ids_on = StreamingIDS(cfg, policy_version="v2", dos_gap_rule=True)
+        ids_off.reset(df.iloc[0]['tank_level_observed'], sid)
+        ids_on.reset(df.iloc[0]['tank_level_observed'], sid)
+        
+        fp_off = 0
+        fp_on = 0
+        attack_detected_off = False
+        attack_detected_on = False
+        
+        for _, row in df.iterrows():
+            t = float(row['simulation_time_s'])
+            rcvd = bool(row['packet_received'] == 1)
+            pkt = TelemetryPacket(
+                run_id=sid, seq=int(row['sequence_id']), ts=t, src_t=t,
+                received=rcvd, level_m=float(row['tank_level_observed']),
+                q_in=float(row['q_in']), q_out=float(row['q_out']),
+                pump_cmd=int(row['pump_command']), valve_cmd=float(row['valve_command']),
+                pump_on=bool(row['pump_state'] == 1), valve_pct=float(row['valve_state'])
+            )
+            v_off = ids_off.update(pkt)
+            v_on = ids_on.update(pkt)
+            
+            is_attack_window = (t_start <= t <= t_end)
+            if is_attack_window:
+                if v_off['hybrid'] >= 0.95:
+                    attack_detected_off = True
+                if v_on['hybrid'] >= 0.95:
+                    attack_detected_on = True
+            else:
+                if v_off['scores']['physics'] >= 0.95:
+                    fp_off += 1
+                if v_on['scores']['physics'] >= 0.95:
+                    fp_on += 1
+                    
+        total_fp_off += fp_off
+        total_fp_on += fp_on
+        assert attack_detected_off is True
+        assert attack_detected_on is True
+        print(f"{sid:<8} | {fp_off:<14} | {fp_on:<14} | {'100%':<15} | {'100%':<15}")
+        
+    print("-" * len(header))
+    print(f"{'TOTAL':<8} | {total_fp_off:<14} | {total_fp_on:<14} | {'100%':<15} | {'100%':<15}")
+    print("="*80 + "\n")
+    conn.close()
+    
+    assert total_fp_off > 7000
+    assert total_fp_on < 100
+
 
