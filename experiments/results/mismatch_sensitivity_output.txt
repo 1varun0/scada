@@ -1,0 +1,40 @@
+=============================================================================================================================
+DIGITAL TWIN PARAMETER MISMATCH & SENSOR BIAS SENSITIVITY STUDY (10 SEEDS, HORIZON T = 2400 s)
+=============================================================================================================================
+Core Physical Invariant:
+  The Digital Twin integrates MEASURED flows: dh/dt = (q_in_obs - q_out_obs) / A.
+  Therefore, plant pump-flow capacity (Q_max) and valve flow coefficient (Cv) errors CANNOT affect
+  the twin's estimation, because any change in physical flow is measured by the flowmeters.
+  Only two mechanisms cause twin estimation divergence:
+    1. Tank cross-sectional area errors (A_plant != A_twin)
+    2. Flow-sensor errors (measured q_in / q_out bias, or unmeasured physical leaks)
+
+Case                                   | Scenario      | Max Excursion [0.8, 1.2]   | Left [0.3, 2.5]?   | Overflow Ticks | Dry-Run Ticks 
+---------------------------------------------------------------------------------------------------------------------------------------
+Area +5%                               | Negative_Ramp | 0.01 ± 0.03 cm (max: 0.10 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Area +5%                               | Positive_Ramp | 0.01 ± 0.03 cm (max: 0.10 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Area -5%                               | Negative_Ramp | 1.65 ± 0.23 cm (max: 2.15 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Area -5%                               | Positive_Ramp | 1.65 ± 0.23 cm (max: 2.15 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qin +5%                           | Negative_Ramp | 9.35 ± 0.42 cm (max: 9.83 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qin +5%                           | Positive_Ramp | 9.33 ± 0.42 cm (max: 9.83 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qin -5%                           | Negative_Ramp | 11.32 ± 0.45 cm (max: 12.15 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qin -5%                           | Positive_Ramp | 11.29 ± 0.46 cm (max: 12.15 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qout +5%                          | Negative_Ramp | 9.38 ± 0.46 cm (max: 10.28 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qout +5%                          | Positive_Ramp | 9.47 ± 0.57 cm (max: 10.33 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qout -5%                          | Negative_Ramp | 11.29 ± 0.43 cm (max: 11.90 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Meas Qout -5%                          | Positive_Ramp | 11.27 ± 0.43 cm (max: 11.90 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Unmeasured Leak (+2% outflow)          | Negative_Ramp | 4.59 ± 0.44 cm (max: 5.04 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Unmeasured Leak (+2% outflow)          | Positive_Ramp | 4.56 ± 0.44 cm (max: 5.04 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Plant Actuator Var (Pump +5%, Cv +10%) | Negative_Ramp | 0.58 ± 0.24 cm (max: 1.04 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+Plant Actuator Var (Pump +5%, Cv +10%) | Positive_Ramp | 0.57 ± 0.24 cm (max: 1.04 cm) | No (0/10 seeds)    | 0.0            | 0.0           
+---------------------------------------------------------------------------------------------------------------------------------------
+Summary of Mismatch Robustness:
+  - Across all 8 cases (80 runs per scenario, horizon T = 2400 s), [0.3, 2.5 m] was NEVER left (0/160 runs).
+  - Plant actuator variations (Pump +5%, Cv +10%) show negligible excursions (< 2.2 cm), confirming that
+    pump and valve errors do NOT affect the twin because it integrates measured flows.
+  - Area error (+/-5%) causes max excursion <= 2.2 cm beyond [0.8, 1.2 m].
+  - Measured flow bias (+/-5%) causes max excursion <= 12.2 cm beyond [0.8, 1.2 m].
+  - Unmeasured leak (+2% outflow) causes max excursion <= 5.1 cm beyond [0.8, 1.2 m].
+
+Saved complete sensitivity dataset to experiments/results/mismatch_sensitivity_results.csv
+

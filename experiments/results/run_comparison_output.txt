@@ -1,0 +1,213 @@
+==================================================================================================================================
+PHYSICAL DYNAMICS & LATCH ODE VERIFICATION (ALL 10 SEEDS, clamp_flow_noise=False)
+==================================================================================================================================
+Header Definitions:
+  - Dry-Run:  True tank level H_true <= 0.05 m (pump cavitation / suction loss hazard)
+  - Overflow: True tank level H_true >= 2.50 m (tank crest overflow / spillage hazard)
+  - Critical Low: H_true < 0.30 m (abnormal depletion boundary)
+  - Operational Deadband: [0.80 m, 1.20 m]
+
+Latch Definition (Strict & Non-Back-Fitted):
+  - Negative Ramp (Overflow): First tick t_latch >= t_start after which pump stays ON (state=1) continuously to t=2399.
+  - Positive Ramp (Dry-run):  First tick t_latch >= t_start after which pump stays OFF (state=0) continuously to t=2399.
+
+Analytical ODEs:
+  - Filling ODE:  dh/dt = (Q_in - Q_out)/A = (0.005 - 0.002*sqrt(h))/2.0 = 0.0025 - 0.001*sqrt(h)
+  - Draining ODE: dh/dt = -Q_out/A = -0.002*sqrt(h)/2.0 = -0.001*sqrt(h)
+
+----------------------------------------------------------------------------------------------------------------------------------
+1. NEGATIVE RAMP (OVERFLOW Threat, Target H >= 2.50 m):
+Seed  | Start  | Duration | Latch Tick | h_latch (m)  | t_ODE (s)  | Pred Ov Tick  | Obs Ov Tick  | Diff (s)
+----------------------------------------------------------------------------------------------------------------------------------
+101   | 551    | 1011     | 677        | 0.9859       | 1297.5     | 1974.5        | 1975         | +0.5    
+102   | 456    | 1243     | 666        | 1.0475       | 1256.2     | 1922.2        | 1922         | -0.2    
+103   | 463    | 1073     | 463        | 1.1742       | 1168.6     | 1631.6        | 1632         | +0.4    
+104   | 269    | 1193     | 269        | 0.9006       | 1353.3     | 1622.3        | 1623         | +0.7    
+105   | 392    | 1117     | 392        | 1.1060       | 1216.3     | 1608.3        | 1609         | +0.7    
+106   | 566    | 1295     | 705        | 0.9586       | 1315.6     | 2020.6        | 2021         | +0.4    
+107   | 262    | 1176     | 262        | 0.8848       | 1363.5     | 1625.5        | 1626         | +0.5    
+108   | 299    | 1279     | 299        | 0.9563       | 1317.1     | 1616.1        | 1616         | -0.1    
+109   | 462    | 1245     | 666        | 1.0397       | 1261.5     | 1927.5        | 1928         | +0.5    
+110   | 328    | 1227     | 328        | 0.9954       | 1291.2     | 1619.2        | 1619         | -0.2    
+----------------------------------------------------------------------------------------------------------------------------------
+
+2. POSITIVE RAMP (DRY-RUN Threat, Target H <= 0.05 m):
+Seed  | Start  | Duration | Latch Tick | h_latch (m)  | t_ODE (s)  | Pred Dry Tick | Obs Dry Tick | Diff (s)
+----------------------------------------------------------------------------------------------------------------------------------
+101   | 551    | 1011     | 551        | 1.1123       | 1662.1     | 2213.1        | 2213         | -0.1    
+102   | 456    | 1243     | 467        | 1.1905       | 1735.0     | 2202.0        | 2202         | +0.0    
+103   | 463    | 1073     | 474        | 1.1872       | 1732.0     | 2206.0        | 2206         | +0.0    
+104   | 269    | 1193     | 379        | 1.0640       | 1615.8     | 1994.8        | 1995         | +0.2    
+105   | 392    | 1117     | 429        | 1.1566       | 1703.7     | 2132.7        | 2132         | -0.7    
+106   | 566    | 1295     | 566        | 1.0969       | 1647.4     | 2213.4        | 2213         | -0.4    
+107   | 262    | 1176     | 377        | 1.0565       | 1608.5     | 1985.5        | 1985         | -0.5    
+108   | 299    | 1279     | 393        | 1.0936       | 1644.3     | 2037.3        | 2037         | -0.3    
+109   | 462    | 1245     | 466        | 1.1957       | 1739.7     | 2205.7        | 2205         | -0.7    
+110   | 328    | 1227     | 404        | 1.1050       | 1655.2     | 2059.2        | 2059         | -0.2    
+==================================================================================================================================
+
+Running Extended A/B Comparison across 10 seeds (randomized t_start in [200, 600]s, ramp in [1000, 1400]s)...
+Completed 80 simulated runs in 392.50 s (4.906 s/run).
+
+Saved complete run data to experiments/results/ab_comparison_results.csv
+
+=================================================================================================================================================
+PER-SEED DETAILED EXECUTION TABLE (MONITOR VS PREVENTION)
+=================================================================================================================================================
+Scenario      | Mode       | Seed | Start | 1stFlag | Crit   | TkOver | max_dev_from_setpoint | T_out_db | T<0.3m | OvTicks | DryTicks
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Negative_Ramp | monitor    | 101  | 551   | 574     | 576    | N/A    | 1.3000                | 1575     | 0      | 425     | 0       
+Negative_Ramp | prevention | 101  | 551   | 574     | 576    | 576    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 102  | 456   | 484     | 486    | N/A    | 1.3000                | 1676     | 0      | 478     | 0       
+Negative_Ramp | prevention | 102  | 456   | 484     | 486    | 486    | 0.0182                | 14       | 0      | 0       | 0       
+Negative_Ramp | monitor    | 103  | 463   | 480     | 484    | N/A    | 1.3000                | 1918     | 0      | 768     | 0       
+Negative_Ramp | prevention | 103  | 463   | 480     | 484    | 484    | 0.0024                | 2        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 104  | 269   | 285     | 293    | N/A    | 1.3000                | 1928     | 0      | 777     | 0       
+Negative_Ramp | prevention | 104  | 269   | 285     | 293    | 293    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 105  | 392   | 415     | 419    | N/A    | 1.3000                | 1942     | 0      | 791     | 0       
+Negative_Ramp | prevention | 105  | 392   | 415     | 419    | 419    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 106  | 566   | 597     | 600    | N/A    | 1.3000                | 1529     | 0      | 379     | 0       
+Negative_Ramp | prevention | 106  | 566   | 597     | 600    | 600    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 107  | 262   | 284     | 287    | N/A    | 1.3000                | 1924     | 0      | 774     | 0       
+Negative_Ramp | prevention | 107  | 262   | 284     | 287    | 287    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 108  | 299   | 326     | 330    | N/A    | 1.3000                | 1934     | 0      | 784     | 0       
+Negative_Ramp | prevention | 108  | 299   | 326     | 330    | 330    | 0.0000                | 0        | 0      | 0       | 0       
+Negative_Ramp | monitor    | 109  | 462   | 481     | 490    | N/A    | 1.3000                | 1667     | 0      | 472     | 0       
+Negative_Ramp | prevention | 109  | 462   | 481     | 490    | 490    | 0.0276                | 22       | 0      | 0       | 0       
+Negative_Ramp | monitor    | 110  | 328   | 354     | 358    | N/A    | 1.3000                | 1931     | 0      | 781     | 0       
+Negative_Ramp | prevention | 110  | 328   | 354     | 358    | 358    | 0.0000                | 0        | 0      | 0       | 0       
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Positive_Ramp | monitor    | 101  | 551   | 564     | 572    | N/A    | 0.7831                | 1528     | 835    | 0       | 187     
+Positive_Ramp | prevention | 101  | 551   | 564     | 572    | 572    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 102  | 456   | 480     | 482    | N/A    | 0.7845                | 1539     | 846    | 0       | 198     
+Positive_Ramp | prevention | 102  | 456   | 480     | 482    | 482    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 103  | 463   | 485     | 489    | N/A    | 0.7840                | 1535     | 842    | 0       | 194     
+Positive_Ramp | prevention | 103  | 463   | 485     | 489    | 489    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 104  | 269   | 295     | 298    | N/A    | 0.7996                | 1746     | 1053   | 0       | 405     
+Positive_Ramp | prevention | 104  | 269   | 295     | 298    | 298    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 105  | 392   | 416     | 420    | N/A    | 0.7919                | 1609     | 915    | 0       | 268     
+Positive_Ramp | prevention | 105  | 392   | 416     | 420    | 420    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 106  | 566   | 593     | 595    | N/A    | 0.7830                | 1528     | 835    | 0       | 187     
+Positive_Ramp | prevention | 106  | 566   | 593     | 595    | 595    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 107  | 262   | 289     | 293    | N/A    | 0.7997                | 1756     | 1063   | 0       | 415     
+Positive_Ramp | prevention | 107  | 262   | 289     | 293    | 293    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 108  | 299   | 324     | 328    | N/A    | 0.7982                | 1704     | 1011   | 0       | 363     
+Positive_Ramp | prevention | 108  | 299   | 324     | 328    | 328    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 109  | 462   | 487     | 494    | N/A    | 0.7840                | 1536     | 842    | 0       | 195     
+Positive_Ramp | prevention | 109  | 462   | 487     | 494    | 494    | 0.0000                | 0        | 0      | 0       | 0       
+Positive_Ramp | monitor    | 110  | 328   | 349     | 357    | N/A    | 0.7972                | 1682     | 989    | 0       | 341     
+Positive_Ramp | prevention | 110  | 328   | 349     | 357    | 357    | 0.0000                | 0        | 0      | 0       | 0       
+-------------------------------------------------------------------------------------------------------------------------------------------------
+Stealthy_Ramp | monitor    | 101  | 551   | 1075    | 1229   | N/A    | 0.0671                | 178      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 101  | 551   | 1075    | 1229   | 1229   | 0.0217                | 35       | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 102  | 456   | 924     | 992    | N/A    | 0.0702                | 213      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 102  | 456   | 924     | 992    | 992    | 0.0000                | 0        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 103  | 463   | 906     | 994    | N/A    | 0.0669                | 203      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 103  | 463   | 906     | 994    | 994    | 0.0010                | 1        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 104  | 269   | 649     | 788    | N/A    | 0.0706                | 258      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 104  | 269   | 649     | 788    | 788    | 0.0155                | 26       | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 105  | 392   | 848     | 972    | N/A    | 0.0892                | 229      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 105  | 392   | 848     | 972    | 972    | 0.0001                | 1        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 106  | 566   | 965     | 1105   | N/A    | 0.0601                | 170      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 106  | 566   | 965     | 1105   | 1105   | 0.0000                | 0        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 107  | 262   | 765     | 848    | N/A    | 0.0914                | 260      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 107  | 262   | 765     | 848    | 848    | 0.0055                | 9        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 108  | 299   | 878     | 948    | N/A    | 0.0983                | 254      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 108  | 299   | 878     | 948    | 948    | 0.0018                | 3        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 109  | 462   | 916     | 1094   | N/A    | 0.0852                | 212      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 109  | 462   | 916     | 1094   | 1094   | 0.0010                | 1        | 0      | 0       | 0       
+Stealthy_Ramp | monitor    | 110  | 328   | 888     | 934    | N/A    | 0.0872                | 242      | 0      | 0       | 0       
+Stealthy_Ramp | prevention | 110  | 328   | 888     | 934    | 934    | 0.0114                | 19       | 0      | 0       | 0       
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+===================================================================================================================
+SCENARIO (E): HAND-BACK VERIFICATION (Ramp -> Hold -> Return to 0 Bias)
+===================================================================================================================
+Explanation of Prolonged Takeover in Ramps:
+  In Negative_Ramp and Positive_Ramp, the spoof bias holds at +/-1.5m after the ramp duration.
+  Because the sensor remains permanently compromised, |h_obs - h_twin| >> tolerance (config 0.05m),
+  so hand-back CANNOT and SHOULD NOT engage. Takeover legitimately stays active to the end.
+  Below, Scenario (e) removes the bias to verify hand-back engages cleanly once sensor recovers:
+
+Seed  | Attack Window   | Takeover Tick   | Hand-back Tick  | Final Level (m)   | Post-Handback FPs 
+-------------------------------------------------------------------------------------------------------------------
+101   | [300..1200 s]   | 313             | 1194            | 1.0922            | 0                 
+102   | [300..1200 s]   | 312             | 1194            | 1.1179            | 0                 
+103   | [300..1200 s]   | 311             | 1195            | 1.0876            | 1                 
+104   | [300..1200 s]   | 311             | 1194            | 1.1243            | 0                 
+105   | [300..1200 s]   | 314             | 1193            | 1.1263            | 0                 
+106   | [300..1200 s]   | 313             | 1196            | 1.1135            | 1                 
+107   | [300..1200 s]   | 313             | 1194            | 1.0863            | 0                 
+108   | [300..1200 s]   | 312             | 1194            | 1.1059            | 0                 
+109   | [300..1200 s]   | 313             | 1196            | 1.0897            | 0                 
+110   | [300..1200 s]   | 313             | 1193            | 1.1008            | 0                 
+-------------------------------------------------------------------------------------------------------------------
+Mean Hand-back Tick: t = 1194.3 ± 1.1 s
+Mean Final Level:    h = 1.1044 m (safely inside [0.8, 1.2m] deadband)
+Total False Alarms Post Hand-back across 10 seeds: 2 (0.2/seed over 1200s)
+
+===================================================================================================================
+STEALTHY RAMP MULTI-SLOPE SWEEP: 0.01, 0.02, 0.05, 0.10 mm/s (10 SEEDS EACH)
+===================================================================================================================
+Slope        | Mean Elapsed (s)   | Mean Bias (cm)   | Mean Ratio (bias/tau_p)   | Min Ratio   | Max Ratio  
+-------------------------------------------------------------------------------------------------------------------
+0.01 mm/s    | 1523.1 ± 761.0     | 1.52 ± 0.76 cm   | 0.435 ± 0.217             | 0.160       | 0.769
+0.02 mm/s    | 929.7 ± 291.2      | 1.86 ± 0.58 cm   | 0.531 ± 0.166             | 0.377       | 0.899
+0.05 mm/s    | 476.6 ± 64.9       | 2.38 ± 0.32 cm   | 0.681 ± 0.093             | 0.543       | 0.827
+0.10 mm/s    | 256.0 ± 27.2       | 2.56 ± 0.27 cm   | 0.731 ± 0.078             | 0.623       | 0.843
+-------------------------------------------------------------------------------------------------------------------
+Physical Insight on Detection Ratio (0.16 to 0.90 across slopes and seeds):
+  Physics detection fires when total residual |h_obs - h_twin| = |bias(t) + noise(t) + e_twin(t)| > tau_p (3.5 cm).
+  Across slopes 0.01 to 0.10 mm/s and 10 seeds, the individual ratio (bias/tau_p) spans 0.16 to 0.90.
+  Slow-ramp detections are helped by sensor noise peaks (3*sigma ~ 1.5 cm) and twin integration error
+  constructively adding to the residual, causing threshold crossing well before deterministic bias reaches tau_p.
+  A constant bias below tau_p is never detected and shifts the pump cycling band by at most 3.5 cm.
+
+=============================================================================================================================
+A/B COMPARISON SUMMARY TABLE: MEAN ± STD ACROSS 10 SEEDS
+=============================================================================================================================
+Scenario        | Mode       | Max Level (m)   | Min Level (m)   | Overflow Ticks   | Dry-Run Ticks   | T < 0.3m     | Takeover Ticks 
+-----------------------------------------------------------------------------------------------------------------------------
+Control_FDI     | monitor    | 1.200 ± 0.003   | 0.654 ± 0.002   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 0.0 ± 0.0      
+Control_FDI     | prevention | 1.202 ± 0.002   | 0.799 ± 0.002   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 602.0 ± 0.0    
+-----------------------------------------------------------------------------------------------------------------------------
+Negative_Ramp   | monitor    | 2.500 ± 0.000   | 0.804 ± 0.004   | 642.9 ± 178.0    | 0.0 ± 0.0       | 0.0 ± 0.0    | 0.0 ± 0.0      
+Negative_Ramp   | prevention | 1.208 ± 0.009   | 0.797 ± 0.004   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 1967.7 ± 112.7 
+-----------------------------------------------------------------------------------------------------------------------------
+Positive_Ramp   | monitor    | 1.146 ± 0.059   | 0.009 ± 0.008   | 0.0 ± 0.0        | 275.3 ± 96.0    | 923.1 ± 96.1 | 0.0 ± 0.0      
+Positive_Ramp   | prevention | 1.204 ± 0.004   | 0.797 ± 0.004   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 1967.2 ± 110.4 
+-----------------------------------------------------------------------------------------------------------------------------
+Stealthy_Ramp   | monitor    | 1.279 ± 0.013   | 0.804 ± 0.004   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 0.0 ± 0.0      
+Stealthy_Ramp   | prevention | 1.207 ± 0.007   | 0.798 ± 0.004   | 0.0 ± 0.0        | 0.0 ± 0.0       | 0.0 ± 0.0    | 1373.8 ± 127.6 
+-----------------------------------------------------------------------------------------------------------------------------
+Summary table saved to experiments/results/ab_comparison_summary.txt
+
+Running 30-Minute (1800 s) No-Attack Normal Soak in Prevention Mode...
+30-Minute Normal Soak False Takeover Ticks across 10 seeds: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+Maximum False Takeover Ticks on Normal Soak: 0
+VERIFIED: in this simulation, 0 of 10 seeds had false takeover on normal 30-min soak.
+
+Generated comparison figure saved to experiments/results/ab_comparison_figure.png
+
+================================================================================
+PHYSICAL MITIGATION VERIFICATION REPORT
+================================================================================
+1. Scenario (a) Control FDI:
+   Physical harm in Monitor: 0 overflows, 0 dry-runs.
+   Physical harm in Prevention: 0 overflows, 0 dry-runs.
+   Verdict: Control baseline confirmed - no physical harm occurs in either mode.
+2. Scenario (b) Negative FDI Ramp (Overflow Threat):
+   Monitor Mode Overflow Ticks:    642.9 ticks (Tank exceeds 2.5m)
+   Prevention Mode Overflow Ticks: 0.0 ticks (Tank held safely <=1.22m)
+   Verdict: In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
+3. Scenario (c) Positive FDI Ramp (Dry-Run Threat):
+   Monitor Mode Dry-Run Ticks:     275.3 ticks (Tank drains to <=0.05m)
+   Prevention Mode Dry-Run Ticks:  0.0 ticks (Tank held safely >=0.78m)
+   Verdict: In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
+4. Scenario (d) Stealthy Slow Ramp:
+   Prevention Mode Physical Harm:  0.0 overflows, 0.0 dry-runs.
+   Verdict: In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
+5. Cases Where Prevention Does Not Help:
+   In-deadband pump toggles without sensor drift (where rogue commands operate within [0.8, 1.2m]).
+================================================================================
+

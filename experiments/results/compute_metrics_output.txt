@@ -1,0 +1,26 @@
+=== Per-Tick vs Event-Level Metrics per Attack Type ===
+Type         | Event-Rec  | Tick-F1 (per-scenario, all ticks)  
+FDI          | 1.000      | 0.999
+Replay       | 1.000      | 0.999
+DoS          | 1.000      | 0.215
+Auth_Misuse  | 1.000      | 0.218
+
+=== Pooled Metrics (All 99 CSV Test Scenarios) ===
+Pooled Precision: 0.389
+Pooled Recall: 0.998
+Pooled F1: 0.560
+Pooled FPR: 0.212
+
+=== Normal Scenarios FPR ===
+Normal Scenarios FPR: 0.000 (0 FPs out of 9000 ticks)
+
+=== Physics False Positives Breakdown (Pre/Post Attack) ===
+A1 Physics FPs: 0
+A2 Physics FPs: 0
+A3 Physics FPs: 7561
+A4 Physics FPs: 10485
+
+=== Policy Engine A4 Breakdown ===
+A4 attack ticks: 1515
+Policy caught: 1515
+Missed logic breakdown: {'pump_toggled_in_deadband': 0, 'other': 0}

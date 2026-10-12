@@ -1,0 +1,35 @@
+=========================================================================================================
+NO-ATTACK PREVENTION SOAK ANALYSIS: CLAMPED (DATASET) VS UNCLAMPED NOISE (10 SEEDS)
+=========================================================================================================
+
+--- Running 30-Min (Clamped / Dataset) Soak across 10 seeds ---
+Summary for 30-Min (Clamped / Dataset):
+  False Takeover Ticks: 0.5 ± 1.6 ticks (Total across seeds: 5)
+  First False Takeover: Earliest: t=1545 s, Mean: t=1545 s (1/10 seeds)
+  Per-seed takeover ticks: [0, 0, 0, 5, 0, 0, 0, 0, 0, 0]
+  Per-seed first tick:     [-1, -1, -1, 1545, -1, -1, -1, -1, -1, -1]
+
+--- Running 30-Min (Unclamped / Gaussian) Soak across 10 seeds ---
+Summary for 30-Min (Unclamped / Gaussian):
+  False Takeover Ticks: 0.0 ± 0.0 ticks (Total across seeds: 0)
+  First False Takeover: None (0/10 seeds had false takeover)
+  Per-seed takeover ticks: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  Per-seed first tick:     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+--- Running 60-Min (Clamped / Dataset) Soak across 10 seeds ---
+Summary for 60-Min (Clamped / Dataset):
+  False Takeover Ticks: 1073.9 ± 338.3 ticks (Total across seeds: 10739)
+  First False Takeover: Earliest: t=1545 s, Mean: t=2155 s (10/10 seeds)
+  Per-seed takeover ticks: [685, 1182, 1285, 1501, 1160, 1407, 1298, 450, 811, 960]
+  Per-seed first tick:     [2177, 2094, 1897, 1545, 2163, 2046, 2132, 2929, 2338, 2231]
+
+--- Running 60-Min (Unclamped / Gaussian) Soak across 10 seeds ---
+Summary for 60-Min (Unclamped / Gaussian):
+  False Takeover Ticks: 0.0 ± 0.0 ticks (Total across seeds: 0)
+  First False Takeover: None (0/10 seeds had false takeover)
+  Per-seed takeover ticks: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  Per-seed first tick:     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+
+Saved soak comparison results to experiments/results/soak_comparison_results.csv
+=========================================================================================================
+

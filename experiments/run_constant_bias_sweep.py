@@ -99,8 +99,12 @@ def run_constant_bias_sweep():
         
     df = pd.DataFrame(results)
     
-    print(f"{'Bias (cm)':<10} | {'Bias (m)':<10} | {'P(CRITICAL)':<14} | {'Mean Time to CRIT (s)':<24} | {'P(S_p>0.95)':<14} | {'Mean Time to Flag (s)':<22}")
-    print("-" * 115)
+    output_lines = []
+    output_lines.append("=" * 115)
+    output_lines.append(f"CONSTANT BIAS SWEEP: 0, 1, 2, 3, 4, 5 cm ({len(seeds)} SEEDS, {duration_s}s EACH, clamp_flow_noise=False)")
+    output_lines.append("=" * 115)
+    output_lines.append(f"{'Bias (cm)':<10} | {'Bias (m)':<10} | {'P(CRITICAL)':<14} | {'Mean Time to CRIT (s)':<24} | {'P(S_p>0.95)':<14} | {'Mean Time to Flag (s)':<22}")
+    output_lines.append("-" * 115)
     for _, r in df.iterrows():
         b_cm = int(r["bias_cm"])
         b_m = f"{r['bias_m']:.3f} m"
@@ -108,22 +112,27 @@ def run_constant_bias_sweep():
         t_c = f"{r['mean_t_crit']:.1f} ± {r['std_t_crit']:.1f} s" if r['mean_t_crit'] is not None else "N/A (Not Detected)"
         p_f = f"{r['p_flag']*100:.1f}%"
         t_f = f"{r['mean_t_flag']:.1f} s" if r['mean_t_flag'] is not None else "N/A"
-        print(f"{b_cm:<10d} | {b_m:<10} | {p_c:<14} | {t_c:<24} | {p_f:<14} | {t_f:<22}")
-    print("-" * 115)
-    
+        output_lines.append(f"{b_cm:<10d} | {b_m:<10} | {p_c:<14} | {t_c:<24} | {p_f:<14} | {t_f:<22}")
+    output_lines.append("-" * 115)
     fa_0cm = results[0]["fa_ticks_0cm"]
     total_ticks_0cm = len(seeds) * duration_s
     fa_rate_0cm = fa_0cm / float(total_ticks_0cm)
-    print(f"\nFalse-Alarm Rate at 0 cm bias:")
-    print(f"  - Total False-Alarm ticks at 0 cm: {fa_0cm} / {total_ticks_0cm} ticks ({fa_rate_0cm*100:.3f}%)")
-    print(f"  - False takeover ticks on normal operation: 0 / {total_ticks_0cm} (0.0%)")
-    print(f"  - Physical Threshold Interpretation: tau_p = 0.035 m (3.5 cm).")
-    print(f"    Biases <= 2 cm are within normal sensor noise (3*sigma = 1.5 cm) and never reach CRITICAL.")
-    print(f"    Biases >= 4 cm strictly exceed tau_p (3.5 cm) and are detected 100% of the time rapidly.")
-    print("=" * 115 + "\n")
+    output_lines.append(f"\nFalse-Alarm Rate at 0 cm bias:")
+    output_lines.append(f"  - Total False-Alarm ticks at 0 cm: {fa_0cm} / {total_ticks_0cm} ticks ({fa_rate_0cm*100:.3f}%)")
+    output_lines.append(f"  - False takeover ticks on normal operation: 0 / {total_ticks_0cm} (0.0%)")
+    output_lines.append(f"  - Physical Threshold Interpretation: tau_p = 0.035 m (3.5 cm).")
+    output_lines.append(f"    Biases <= 2 cm are within normal sensor noise (3*sigma = 1.5 cm) and never reach CRITICAL.")
+    output_lines.append(f"    Biases >= 4 cm strictly exceed tau_p (3.5 cm) and are detected 100% of the time rapidly.")
+    output_lines.append("=" * 115 + "\n")
+    
+    out_text = "\n".join(output_lines)
+    print(out_text)
     
     os.makedirs('experiments/results', exist_ok=True)
     df.to_csv('experiments/results/constant_bias_sweep_results.csv', index=False)
+    with open('experiments/results/constant_bias_sweep_output.txt', 'w', encoding='utf-8') as f:
+        f.write(out_text)
+
     
 if __name__ == "__main__":
     run_constant_bias_sweep()

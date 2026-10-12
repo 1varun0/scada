@@ -117,7 +117,7 @@ The control logic runs in `GatewayCore.step()`. The source for this tick's contr
   1. Dataset-style FDI (+0.15m): Control scenario (0 physical harm in both modes).
   2. Negative FDI ramp (-1.5m): Monitor mode overflows (642.9 ± 178.0 ticks); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode (0.0 ticks).
   3. Positive FDI ramp (+1.5m): Monitor mode suffers dry-run (275.3 ± 96.0 ticks, 923.1 ± 96.1 ticks below 0.3m); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode (0.0 ticks).
-  4. Stealthy slow ramp (-0.05 mm/s): Detection is triggered when $|\text{bias}| > \tau_p = 0.035\text{ m}$ independent of ramp rate (mean maximum undetected bias is 0.0238 m ~ 2.4 cm, largest undetected bias 0.0290 m < 3.5 cm); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
+  4. Stealthy slow ramp (-0.05 mm/s): Detection occurs across individual seeds/slopes at ratios of 0.16 to 0.90 of $\tau_p$ (mean undetected bias 1.52 to 2.56 cm across slopes 0.01 to 0.10 mm/s) because sensor noise peaks ($3\sigma = 1.5\text{ cm}$) and twin open-loop integration error constructively add to the residual. We do not claim 'largest undetected bias < 3.5 cm' as a universal bound; in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
 - Verified 0 false takeovers across all 10 seeds on a 30-minute normal soak in Prevention mode.
 - Generated CSV (`experiments/results/ab_comparison_results.csv`), summary table (`experiments/results/ab_comparison_summary.txt`), and visualization (`experiments/results/ab_comparison_figure.png`).
 
