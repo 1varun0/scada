@@ -1,5 +1,6 @@
 import json
 import time
+import os
 import hmac
 from queue import Empty
 from flask import Flask, request, jsonify, Response
@@ -140,7 +141,7 @@ def mode():
     return jsonify({"status": "mode_set"})
 
 @app.route('/api/command', methods=['POST'])
-def command():
+def handle_command():
     if not request.is_json:
         return jsonify({"error": "Bad Request", "details": "Request body must be JSON"}), 400
 
@@ -170,12 +171,19 @@ def command():
     hold_ticks_val = data.get('hold_ticks', 1)
     if isinstance(hold_ticks_val, bool) or not isinstance(hold_ticks_val, int) or hold_ticks_val <= 0:
         return jsonify({"error": "Bad Request", "details": "hold_ticks must be a positive integer"}), 400
-    hold_ticks = int(hold_ticks_val)
+    requested_hold_ticks = int(hold_ticks_val)
 
     # 2. Hold Duration Cap for Non-Authenticated Callers (Fail-Closed, hmac.compare_digest)
-    cfg_obj = app.config.get('SCADA_CONFIG', cfg)
-    api_cfg = getattr(cfg_obj, 'api', None) if cfg_obj else None
-    shared_secret = str(getattr(api_cfg, 'shared_secret', '') or '')
+    # Check untracked config sources: env var SCADA_SHARED_SECRET, app.config['SHARED_SECRET'], app.config['SCADA_CONFIG']
+    shared_secret = os.environ.get("SCADA_SHARED_SECRET", "")
+    if not shared_secret and app.config.get('SHARED_SECRET'):
+        shared_secret = str(app.config['SHARED_SECRET'])
+    if not shared_secret:
+        cfg_obj = app.config.get('SCADA_CONFIG', cfg)
+        api_cfg = getattr(cfg_obj, 'api', None) if cfg_obj else None
+        if api_cfg and getattr(api_cfg, 'shared_secret', None):
+            shared_secret = str(api_cfg.shared_secret)
+    shared_secret = shared_secret.strip()
 
     is_authenticated = False
     if shared_secret:
@@ -188,20 +196,27 @@ def command():
         )
 
     if not is_authenticated:
-        hold_ticks = min(hold_ticks, 60)
+        effective_hold_ticks = min(requested_hold_ticks, 60)
+        is_capped = (requested_hold_ticks > 60)
+    else:
+        effective_hold_ticks = requested_hold_ticks
+        is_capped = False
 
     # Metadata role attribute for telemetry logging ONLY (MUST NOT be used in validation)
     role = request.headers.get('X-Actor-Role', 'unauthenticated')
 
     # Step 1 ONLY: NO gateway override logic yet
     return jsonify({
-        "status": "accepted",
+        "status": "validated",
+        "applied": False,
         "pump_cmd": pump_cmd,
         "valve_cmd": valve_cmd,
-        "hold_ticks": hold_ticks,
+        "hold_ticks": effective_hold_ticks,
+        "capped": is_capped,
         "authenticated": is_authenticated,
         "role": role
     }), 200
+
 
 @app.route('/api/config', methods=['GET'])
 def get_config():

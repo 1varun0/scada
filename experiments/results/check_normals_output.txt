@@ -1,14 +1,73 @@
-﻿FP on N_017 tick 898: {'physics': 0.9966858267967155, 'lstm': 0.08581797181464293, 'policy': 0.0, 'availability': 0.0}
-FP on N_060 tick 443: {'physics': 0.012003512726150536, 'lstm': 0.9609071866554372, 'policy': 0.0, 'availability': 0.0}
-Normal Scenarios FPR (DB, includes 51 normals used for training/validation): 2 FPs out of 60000 ticks
+================================================================================
+STREAMING IDS EVALUATION ACROSS ALL 60 NORMAL SCENARIOS (60,000 TICKS)
+================================================================================
+Configuration & Parameters:
+  - Policy Version: v1
+  - Fusion Threshold: 0.95
+  - Consecutive Flag Count (N): 3
+  - TelemetryPacket Construction (keyword arguments only):
+      TelemetryPacket(
+          seq=int(row['sequence_id']),
+          run_id=str(row['scenario_id']),
+          ts=float(row['simulation_time_s']),
+          src_t=float(row['source_time_s']),
+          received=bool(row['packet_received']),
+          level_m=float(row['tank_level_observed']),
+          q_in=float(row['q_in']),
+          q_out=float(row['q_out']),
+          pump_on=bool(row['pump_state']),
+          pump_cmd=int(row['pump_command']),
+          valve_pct=float(row['valve_state']),
+          valve_cmd=float(row['valve_command'])
+      )
 
-Held-out normals from data/evaluation_results.csv (9 scenarios):
-  N_001 (Steady_State): max LSTM score 0.803 (margin 0.147)
-  N_006 (Steady_State): max LSTM score 0.936 (margin 0.014)
-  N_013 (Steady_State): max LSTM score 0.850 (margin 0.100)
-  N_014 (Steady_State): max LSTM score 0.815 (margin 0.135)
-  N_034 (Setpoint_Change): max LSTM score 0.762 (margin 0.188)
-  N_037 (Variable_Load): max LSTM score 0.769 (margin 0.181)
-  N_046 (Variable_Load): max LSTM score 0.792 (margin 0.158)
-  N_049 (Variable_Load): max LSTM score 0.722 (margin 0.228)
-  N_055 (Recovery): max LSTM score 0.821 (margin 0.129)
+1. Global Summary across all 60 scenarios (includes 51 training/validation normals):
+   Total Ticks: 60000
+   Alarm Ticks: 2 / 60000 (FPR = 0.000033 or 0.0033%)
+   Per-Engine Alarm Counts across 60 scenarios:
+     - Physics:      1
+     - LSTM:         1
+     - Policy:       0
+     - Availability: 0
+
+2. Held-Out Test Normals (read from data/evaluation_results.csv):
+   Scenarios (9): N_001, N_006, N_013, N_014, N_034, N_037, N_046, N_049, N_055
+   Total Ticks: 9000
+   Alarm Ticks: 0 / 9000 (FPR = 0.000000)
+   Per-Engine Alarm Counts on Held-Out Normals:
+     - Physics:      0
+     - LSTM:         0
+     - Policy:       0
+     - Availability: 0
+   Per-Scenario Max LSTM Score on Held-Out Normals:
+     - N_001 (Steady_State   ): max LSTM = 0.803 (margin to 0.95 = 0.147)
+     - N_006 (Steady_State   ): max LSTM = 0.936 (margin to 0.95 = 0.014)
+     - N_013 (Steady_State   ): max LSTM = 0.850 (margin to 0.95 = 0.100)
+     - N_014 (Steady_State   ): max LSTM = 0.815 (margin to 0.95 = 0.135)
+     - N_034 (Setpoint_Change): max LSTM = 0.762 (margin to 0.95 = 0.188)
+     - N_037 (Variable_Load  ): max LSTM = 0.769 (margin to 0.95 = 0.181)
+     - N_046 (Variable_Load  ): max LSTM = 0.792 (margin to 0.95 = 0.158)
+     - N_049 (Variable_Load  ): max LSTM = 0.722 (margin to 0.95 = 0.228)
+     - N_055 (Recovery       ): max LSTM = 0.821 (margin to 0.95 = 0.129)
+
+3. Training/Validation Normals (51 scenarios):
+   Total Ticks: 51000
+   Alarm Ticks: 2 / 51000 (FPR = 0.000039)
+   Per-Engine Alarm Counts on Train/Val Normals:
+     - Physics:      1
+     - LSTM:         1
+     - Policy:       0
+     - Availability: 0
+
+4. Details of Measured Alarm Ticks:
+   - Scenario N_017 at tick 898: Engine 'physics' fired.
+     Scores: physics=0.996686, lstm=0.085818, policy=0.0, availability=0.0
+   - Scenario N_060 at tick 443: Engine 'lstm' fired.
+     Scores: physics=0.012004, lstm=0.960907, policy=0.0, availability=0.0
+
+   Discrepancy Note on N_022 and N_048:
+     In a prior review text, N_022 and N_048 were cited in error instead of N_017 and N_060.
+     Measured peak scores confirm N_022 and N_048 have exactly 0 alarms:
+     - N_022: max physics = 0.6498, max lstm = 0.7253 (0 alarms)
+     - N_048: max physics = 0.7384, max lstm = 0.8012 (0 alarms)
+================================================================================

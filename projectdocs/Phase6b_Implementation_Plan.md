@@ -89,20 +89,28 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
 - **Tamper Location:** The tamper acts downstream of the Gateway on the wire (injector reply override middleware intercepting the plant's sense reply). The Gateway issues `pump_cmd = 0, valve_cmd = 50%`, but the wire tamper forces the reply to `pump_cmd = 1`. The plant receives $1$, executes it, and echoes `pkt.pump_cmd = 1, pkt.pump_on = True`.
 - **Mitigation Limitation:** **The Gateway cannot mitigate a bus-level override.** Because the override occurs downstream of the gateway's network boundary, software commands cannot override the forced wire state. AM-3 is strictly **detect-only**.
 - **Pump Class Delay Semantics & Historical Command Indexing:**
-  - In `simulator/pump.py`, response delay is governed by `self._delay_steps = max(1, math.ceil(response_delay_s / dt)) = 2`.
+  - In `simulator/pump.py`, response delay is governed by `self._delay_steps = max(1, math.ceil(response_delay_s / dt)) = 2` ($D = 2$).
   - When `set_command(cmd)` is invoked with a changed command, `self._command` updates and `self._steps_since_command` is reset to 0.
   - In `step()`, `self._steps_since_command` is incremented by 1, and only transitions `self._state = self._command` when `self._steps_since_command >= self._delay_steps`.
-  - Consequently, when transitioning from ON to OFF, the physical pump remains ON (`state = 1`) during the first step after `command = 0` is received.
-  - **Indexing Definition:** The Gateway maintains `gateway_issued_pump_history`:
-    - `history[-1]` is the pump command issued at the current timestep $t$.
-    - `history[-2]` is the pump command issued at timestep $t-1$.
-  - Therefore, `gateway_pump_off_for_delay = (len(history) >= 2 and history[-1] == 0 and history[-2] == 0)`.
-  - The tamper detection rule is:
+  - **Real Pump Class Tick Execution Trace for Legitimate Command $1 \to 0$:**
+
+    | Tick | Action / Event | `pump.command` | `_steps_since_command` | `pump.state` | `pump.flow` ($Q_{in}$) | Emitted `pkt.pump_cmd` | Emitted `pkt.pump_on` |
+    | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+    | $t-1$ | Settled ON | 1 | $\ge 2$ | 1 | $0.005\text{ m}^3/\text{s}$ | 1 | True |
+    | $t$ | Controller issues 0; `step()` step 1 | 0 | 1 | 1 | $0.005\text{ m}^3/\text{s}$ | 0 | True |
+    | $t+1$ | Commanded 0; `step()` step 2 ($\ge 2$) | 0 | 2 | 0 | $0.0\text{ m}^3/\text{s}$ | 0 | False |
+    | $t+2$ | Commanded 0; Settled OFF | 0 | 3 | 0 | $0.0\text{ m}^3/\text{s}$ | 0 | False |
+    | $t+3$ | Commanded 0; Settled OFF | 0 | 4 | 0 | $0.0\text{ m}^3/\text{s}$ | 0 | False |
+    | $t+4$ | Commanded 0; Settled OFF | 0 | 5 | 0 | $0.0\text{ m}^3/\text{s}$ | 0 | False |
+
+  - **Robust Tamper Detection Requirement ($D+1$ Ticks):**
+    To eliminate any transient race conditions across actuator execution and telemetry emission during legitimate turn-off transitions, the rule requires $D + 1 = 3\text{ ticks}$ of Gateway pump OFF history (`gateway_issued_pump_history[-3:] == [0, 0, 0]`):
     ```python
     is_wire_tampered = (
-        len(gateway_issued_pump_history) >= 2
+        len(gateway_issued_pump_history) >= 3
         and gateway_issued_pump_history[-1] == 0
         and gateway_issued_pump_history[-2] == 0
+        and gateway_issued_pump_history[-3] == 0
         and (
             telemetry.pump_command == 1
             or telemetry.pump_on == True
@@ -110,6 +118,7 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
         )
     )
     ```
+    At ticks $t$ and $t+1$, `gateway_issued_pump_history[-3:]` is `[1, 1, 0]` and `[1, 0, 0]`, so the rule **never evaluates to True** during legitimate shutdown. By tick $t+2$ ($D+1$ ticks), the physical pump is guaranteed to be fully settled at `state = 0`. Any telemetry indicating `pump_on == True` or `q_in > 0.001` at or after $t+2$ indicates downstream wire tampering.
 - **Return Telemetry Integrity Assumption:**
   This rule explicitly assumes that the return telemetry path from the plant to the gateway (sensor level, flow meters, actuator echo) is **NOT** tampered. The adversary tampers solely with the forward control wire from gateway to plant actuators. If the return path were also spoofed, the attack becomes a multi-point attack (addressed by the physics twin tracking unmodelled water level rise).
 - **Tests & Verification:**
@@ -442,7 +451,7 @@ When Phase 6b is approved for implementation, execution will proceed in strict o
 
 ### Step 3: Wire Tamper Hook & 4-Way Actuator Consistency
 - Place bus tamper injector strictly in downstream wire/reply layer (`attacker_wire/injector.py`), never inside `LivePlant` or `GatewayCore`.
-- Implement explicit boolean 4-way consistency check conditioned on Gateway pump OFF history for 2 ticks (`gateway_issued_pump_history[-2:] == [0, 0]`).
+- Implement explicit boolean 4-way consistency check conditioned on Gateway pump OFF history for D+1 = 3 ticks (`gateway_issued_pump_history[-3:] == [0, 0, 0]`).
 - Verify detection delay $\le 3\text{ ticks}$ and identical physical harm between Monitor and Prevention modes.
 - Verify 30-minute normal soak has 0 wire tamper alerts.
 - *Test:* `test_tamper_consistency_check.py`.

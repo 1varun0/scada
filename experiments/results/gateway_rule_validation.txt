@@ -18,7 +18,7 @@ Rule Definition:
      - Pump OFF ticks minimum margin: 0.0500 m [h - (sp-db-eps)]
      - Minimum overall margin:        0.0500 m
      - Note: 0 fires is expected by construction: the closed-loop controller hysteresis band is [sp-0.20, sp+0.20], strictly inside the rule limits [sp-0.25, sp+0.25] by epsilon=0.05m.
-   Verdict: PASSED (Expected by construction: 0, Measured: 0)
+   Verdict: REGRESSION PIN (0 by construction)
 
 2. A1 FALSE DATA INJECTION (A1_001 to A1_045: 45 scenarios, 45000 ticks total):
    Inside Ground-Truth Attack Window (8245 ticks):

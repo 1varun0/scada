@@ -1,13 +1,23 @@
 import pytest
 import json
+import os
 from types import SimpleNamespace
 from scada_live.scada_ids.server import app, cfg
 
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
+    # Ensure no residual test secret
+    app.config.pop('SHARED_SECRET', None)
+    app.config.pop('SCADA_CONFIG', None)
+    if 'SCADA_SHARED_SECRET' in os.environ:
+        del os.environ['SCADA_SHARED_SECRET']
     with app.test_client() as client:
         yield client
+    app.config.pop('SHARED_SECRET', None)
+    app.config.pop('SCADA_CONFIG', None)
+    if 'SCADA_SHARED_SECRET' in os.environ:
+        del os.environ['SCADA_SHARED_SECRET']
 
 def test_non_json_request(client):
     """Non-JSON content type must return 400."""
@@ -97,64 +107,89 @@ def test_out_of_range_values(client):
     assert resp.status_code == 400
 
 def test_valid_commands_and_default_hold(client):
-    """Valid commands accept boundary inputs and default hold_ticks to 1."""
+    """Valid commands accept boundary inputs, validate schema, and default hold_ticks to 1."""
     # Valid low boundary
     resp = client.post('/api/command', json={"pump_cmd": 0, "valve_cmd": 0.0})
     assert resp.status_code == 200
-    assert resp.json["status"] == "accepted"
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["pump_cmd"] == 0
     assert resp.json["valve_cmd"] == 0.0
     assert resp.json["hold_ticks"] == 1
+    assert resp.json["capped"] is False
     assert resp.json["authenticated"] is False
 
     # Valid high boundary
     resp2 = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 100.0})
     assert resp2.status_code == 200
+    assert resp2.json["status"] == "validated"
+    assert resp2.json["applied"] is False
     assert resp2.json["pump_cmd"] == 1
     assert resp2.json["valve_cmd"] == 100.0
     assert resp2.json["hold_ticks"] == 1
+    assert resp2.json["capped"] is False
 
 def test_unauthenticated_hold_cap(client):
-    """Unauthenticated requests must be capped to 60 ticks."""
+    """Unauthenticated requests must be capped to 60 ticks with capped=True when requested > 60."""
     # Requested hold <= 60 is preserved
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 45})
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 45
+    assert resp.json["capped"] is False
     assert resp.json["authenticated"] is False
 
     # Requested hold > 60 is capped to 60
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500})
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 60
+    assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False
 
 def test_authenticated_hold_bearer_and_api_key(client):
-    """Authenticated requests with valid secret are uncapped."""
+    """Authenticated requests with valid secret injected by tests are uncapped with capped=False."""
+    # Inject test secret via app.config
+    app.config['SHARED_SECRET'] = "phase6b_test_secret"
+
     # Bearer token
     headers_bearer = {"Authorization": "Bearer phase6b_test_secret"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers_bearer)
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 500
+    assert resp.json["capped"] is False
     assert resp.json["authenticated"] is True
 
     # X-API-Key header
     headers_api_key = {"X-API-Key": "phase6b_test_secret"}
     resp = client.post('/api/command', json={"pump_cmd": 0, "valve_cmd": 20.0, "hold_ticks": 300}, headers=headers_api_key)
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 300
+    assert resp.json["capped"] is False
     assert resp.json["authenticated"] is True
 
 def test_wrong_secret_capped(client):
     """Invalid secret fails authentication and caps hold to 60."""
+    app.config['SHARED_SECRET'] = "phase6b_test_secret"
     headers = {"Authorization": "Bearer wrong_secret"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 60
+    assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False
 
 def test_missing_config_secret_fails_closed(client):
     """If shared_secret is missing or empty in configuration, fail closed (cap all callers)."""
-    # Override config with no api secret
+    # No secret set in config or env
+    app.config.pop('SHARED_SECRET', None)
     test_cfg = SimpleNamespace(api=SimpleNamespace(shared_secret=""))
     app.config['SCADA_CONFIG'] = test_cfg
 
@@ -162,7 +197,10 @@ def test_missing_config_secret_fails_closed(client):
         headers = {"Authorization": "Bearer phase6b_test_secret"}
         resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
         assert resp.status_code == 200
+        assert resp.json["status"] == "validated"
+        assert resp.json["applied"] is False
         assert resp.json["hold_ticks"] == 60
+        assert resp.json["capped"] is True
         assert resp.json["authenticated"] is False
     finally:
         app.config.pop('SCADA_CONFIG', None)
@@ -172,6 +210,9 @@ def test_actor_role_does_not_bypass_cap(client):
     headers = {"X-Actor-Role": "admin"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
     assert resp.status_code == 200
+    assert resp.json["status"] == "validated"
+    assert resp.json["applied"] is False
     assert resp.json["hold_ticks"] == 60
+    assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False
     assert resp.json["role"] == "admin"

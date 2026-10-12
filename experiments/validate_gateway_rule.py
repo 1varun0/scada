@@ -105,7 +105,7 @@ def main():
                 min_margin_off = margin
 
     expected_n_fires = 0
-    verdict_n = "PASSED (Expected by construction: 0, Measured: 0)" if n_fires == expected_n_fires else "FAILED"
+    verdict_n = "REGRESSION PIN (0 by construction)" if n_fires == expected_n_fires else "FAILED"
     if n_fires != expected_n_fires: all_verdicts_passed = False
 
     lines.append(f"1. NORMAL SCENARIOS (N_001 to N_060: {n_scen_count} scenarios, {total_n_ticks} ticks total):")

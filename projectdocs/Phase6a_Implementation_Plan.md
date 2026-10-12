@@ -20,7 +20,7 @@ Pooled F1: 0.560
 Pooled FPR: 0.212
 
 === Normal Scenarios FPR ===
-Normal Scenarios FPR (DB): 0.000 (0 FPs out of 60,000 ticks)
+Normal Scenarios FPR (DB): 0.000033 (2 FPs out of 60,000 ticks across all 60 scenarios; includes 51 training/validation normals. Held-out test normals have 0 FPs out of 9,000 ticks)
 ```
 
 ### 1.2 Physics False Positives Breakdown

@@ -66,7 +66,7 @@ All detection thresholds were calibrated strictly on normal baseline operational
   - F1 Score: **98.2%**
   - FPR: **1.08%** (406 FPs out of 37,550 negative ticks)
 
-**Normal Scenarios FPR (DB):** 0.000 (0 FPs out of 60,000 ticks)
+**Normal Scenarios FPR (DB):** 0.000033 (2 FPs out of 60,000 ticks across all 60 scenarios; includes 51 training/validation normals. Held-out test normals N_001, N_006, N_013, N_014, N_034, N_037, N_046, N_049, N_055 have 0 FPs out of 9,000 ticks).
 
 ### Per-Attack Engine Attribution
 - **FDI**: Caught by Physics Digital Twin.
