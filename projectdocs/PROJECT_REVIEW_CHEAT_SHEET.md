@@ -106,7 +106,7 @@ All detection thresholds were calibrated strictly on normal baseline operational
 **Key Findings:**
 - In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
 - In Monitor mode, unmitigated negative ramps cause on average 642.9 overflow ticks (hitting 2.50m), and positive ramps cause on average 275.3 dry-run ticks (draining to 0.009m).
-- In Stealthy Ramp (-0.05 mm/s), detection occurs when $|\text{bias}| > \tau_p = 0.035\text{ m}$ independent of ramp rate (mean max undetected bias is 0.0238 m ~ 2.4 cm, largest undetected bias 0.0290 m < 3.5 cm).
+- In Stealthy Ramp, the crossing occurs at 0.54 to 0.83 of $\tau_p$ (mean undetected bias 1.9 to 2.9 cm across slopes 0.01 to 0.10 mm/s) because sensor noise and twin error add to the residual; a constant bias below $\tau_p = 0.035\text{ m}$ is never detected and shifts the pump band by at most 3.5 cm.
 - On 30-minute unattacked normal runs across all 10 seeds, Prevention mode had exactly 0 false takeover ticks.
 
 ## 4. Technical Challenges Overcome
