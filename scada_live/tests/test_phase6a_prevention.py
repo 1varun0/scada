@@ -525,4 +525,36 @@ def test_batch_replay_all_15_a3_scenarios():
     assert total_fp_off > 7000
     assert total_fp_on < 100
 
+def test_harness_simulation_determinism_in_memory():
+    """Verify that two independent simulation runs with identical seed produce bit-for-bit identical outputs."""
+    cfg = load_config()
+    cfg.simulation.clamp_flow_noise = False
+    cfg.ids.dos_gap_rule = True
+
+    def run_sim(seed: int, steps: int = 150):
+        plant = LivePlant(cfg, standalone_mode=False, seed=seed)
+        gw = GatewayCore(cfg, EventHub(), dos_gap_rule=True)
+        gw.set_mode("prevention")
+        history = []
+        for t in range(steps):
+            obs = plant.observe()
+            spoof = -0.001 * t if t >= 50 else 0.0
+            cmds = gw.process_sense(obs + spoof)
+            pkt = plant.advance(cmds["pump_cmd"], cmds["valve_cmd"])
+            pkt.level_m = obs + spoof
+            v = gw.process_telemetry(pkt)
+            history.append((plant.tank.level, v["hybrid"], v.get("alert_state"), gw.twin_takeover_active))
+        return history
+
+    run_a = run_sim(101, steps=150)
+    run_b = run_sim(101, steps=150)
+
+    assert len(run_a) == len(run_b) == 150
+    for i, (step_a, step_b) in enumerate(zip(run_a, run_b)):
+        assert abs(step_a[0] - step_b[0]) <= 1e-12, f"Level mismatch at tick {i}: {step_a[0]} vs {step_b[0]}"
+        assert abs(step_a[1] - step_b[1]) <= 1e-12, f"Hybrid score mismatch at tick {i}: {step_a[1]} vs {step_b[1]}"
+        assert step_a[2] == step_b[2], f"Alert state mismatch at tick {i}"
+        assert step_a[3] == step_b[3], f"Takeover mismatch at tick {i}"
+
+
 

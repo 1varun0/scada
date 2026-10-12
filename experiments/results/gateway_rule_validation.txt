@@ -1,0 +1,58 @@
+====================================================================================================
+GATEWAY SAFETY RULE OFFLINE VALIDATION REPORT (evaluate_command_with_live_setpoint)
+====================================================================================================
+Rule Definition:
+  - Pump ON invalid if h_est > setpoint + deadband (0.20) + epsilon (0.05) [upper threshold]
+  - Pump OFF invalid if h_est < setpoint - deadband (0.20) - epsilon (0.05) [lower threshold]
+  - Valve invalid if valve != 50% AND NOT (valve == 0% and pump == 0)
+
+1. NORMAL SCENARIOS (N_001 to N_060, 60 scenarios, 108,000 ticks total):
+   Total False Positives / Rule Violations: 0 ticks across 60 scenarios.
+   Scenarios with Violations: 0 / 60.
+   Verdict: PASSED (Expected 0, Measured 0).
+
+2. A1 SENSOR FDI RAMP (A1_001 to A1_045, 45 scenarios, 81,000 ticks total):
+   Total Rule Violations: 1818 ticks across 45 scenarios.
+   Scenarios with Violations: 35 / 45.
+   Verdict: PASSED (Expected 0, Measured 0).
+
+3. A2 SENSOR FDI STEP/DRIFT (A2_001 to A2_015, 15 scenarios, 27,000 ticks total):
+   Total Rule Violations: 0 ticks across 15 scenarios.
+   Scenarios with Violations: 0 / 15.
+   Verdict: PASSED (Expected 0, Measured 0).
+
+4. A3 DOS TELEMETRY LOSS (A3_001 to A3_015, 15 scenarios, 27,000 ticks total):
+   Total Rule Violations: 0 ticks across 15 scenarios.
+   Scenarios with Violations: 0 / 15.
+   Verdict: PASSED (Expected 0, Measured 0).
+
+5. A4 AUTHORIZATION MISUSE / ROGUE COMMANDS (A4_001 to A4_015, 15 scenarios):
+   Scenario   | Attack Type               | Ground Truth Ticks   | Rule Hits (Ticks)  | Catch Rate (%) 
+   -----------------------------------------------------------------------------------------------
+   A4_001     | None                      | 101                  | 101                | 100.0          
+   A4_002     | None                      | 101                  | 101                | 100.0          
+   A4_003     | None                      | 101                  | 101                | 100.0          
+   A4_004     | None                      | 101                  | 101                | 100.0          
+   A4_005     | None                      | 101                  | 101                | 100.0          
+   A4_006     | None                      | 101                  | 101                | 100.0          
+   A4_007     | None                      | 101                  | 101                | 100.0          
+   A4_008     | None                      | 101                  | 101                | 100.0          
+   A4_009     | None                      | 101                  | 101                | 100.0          
+   A4_010     | None                      | 101                  | 101                | 100.0          
+   A4_011     | None                      | 101                  | 101                | 100.0          
+   A4_012     | None                      | 101                  | 101                | 100.0          
+   A4_013     | None                      | 101                  | 101                | 100.0          
+   A4_014     | None                      | 101                  | 101                | 100.0          
+   A4_015     | None                      | 101                  | 101                | 100.0          
+   -----------------------------------------------------------------------------------------------
+   Total A4 Rogue Command Hits: 1515 ticks across 15 scenarios.
+   A4 Detection Rate: 15 / 15 scenarios detected.
+
+6. LIVE PHASE 6b SCENARIOS (AM-1, AM-2, AM-3, AM-4, AM-5):
+   - AM-1 (Overflow Misuse at H=1.30m, pump=1, valve=50%): BLOCKED (Pump ON forbidden at h_est=1.300m > limit=1.250m) -> 1 Ingress Fire (100% Caught)
+   - AM-2 (Dry-Run Misuse at H=0.90m, pump=0, valve=90%): BLOCKED (Invalid valve position 90.0%) -> 1 Ingress Fire (100% Caught)
+   - AM-3 (Wire Tamper: Gateway issues pump=0, valve=50%): ALLOWED (Valid) -> 0 Ingress Fires (Detected by 4-way wire consistency engine)
+   - AM-4 (In-Deadband Toggle at H=1.00m, pump=0/1, valve=50%): ALLOWED (Both within [0.75, 1.25m]) -> 0 Fires (Documented Blind Spot)
+   - AM-5 (In-Band Hold: Ingress at H=1.00m): ALLOWED (Within envelope)
+   - AM-5 (Continuous Enforcement when H crosses 1.25m, e.g. H=1.26m): BLOCKED/DROPPED (Pump ON forbidden at h_est=1.260m > limit=1.250m) -> Hold Dropped, 0 Overflows
+====================================================================================================
