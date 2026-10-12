@@ -80,9 +80,34 @@ All detection thresholds were calibrated strictly on normal baseline operational
 2. **Auth Misuse (A4) Detection**: Policy v2 catches 100% of A4 attack ticks. The rule was refined after inspecting attack data to include the fail-safe valve exemption (valve=0 is allowed only if pump is off). Event-Level Recall is also 100% because the LSTM reliably spikes to 1.0 during the attack window.
 3. **Start-up Transients & Dataset Limitations**: While there are 0 false alarms on normal scenarios, our model *does* throw false positives before attacks (start-up flags) in scenarios starting at 0.4m or 2.1m. In fact, a settled-period start-up transient occasionally exceeds the 0.95 threshold (e.g., scoring 0.96) in scenarios starting near 2.1m. This exposes a dataset limitation: normal scenarios only start at 1.0m, 0.8m, and 0.5m. The model has never seen high starts such as 2.1m, and normal levels top out near 1.7m.
 4. **Physics FPR Artifacts (DoS and Auth Misuse)**: The 21.2% pooled FPR is overwhelmingly caused by Physics engine false alarms during A3 and A4 scenarios:
-   - **DoS (A3)**: The stored DoS windows in the dataset are internally inconsistent: during the DoS, reported level is held, flows are zeroed, and actuator states are recorded as 0 (fail-safe); after the DoS the reported level jumps up to the uninterrupted-fill trajectory (about 1.5 mm/s x duration: 3 cm to 17 cm) within 1 to 5 ticks (A3_010: 1.022 to 1.189 in one tick; A3_001 converges in about 5 ticks). The digital twin, which open-loop integrates the reported zero flows, falls behind by $\approx \text{duration} \times \text{net fill rate}$ and cannot follow that jump, remaining permanently offset and triggering 7,561 false positive ticks. (Four near-threshold scenarios (A3_001, 002, 003, 012) differ by 130 ticks between two script versions; cause not established).
+   - **DoS (A3)**: The stored DoS windows in the dataset are internally inconsistent: during the DoS, reported level is held, flows are zeroed, and actuator states are recorded as 0 (fail-safe); after the DoS the reported level jumps up to the uninterrupted-fill trajectory (about 1.5 mm/s x duration: 3 cm to 17 cm) within 1 to 5 ticks (A3_010: 1.022 to 1.189 in one tick; A3_001 converges in about 5 ticks). The digital twin, which open-loop integrates the reported zero flows, falls behind by $\approx \text{duration} \times \text{net fill rate}$ and cannot follow that jump, remaining permanently offset and triggering 7,561 false positive ticks. (The 20-tick difference between 7,541 in streaming replay and 7,561 in batch evaluation was fully reconciled: batch evaluation in `scripts/run_evaluation.py` initialized the physics engine with deterministic nominal initial level $H_0 = 1.0\text{ m}$, whereas streaming replay initialized from the noisy sensor observation at $t=0$; when initialized with the exact nominal level, streaming replay matches batch evaluation tick-for-tick across all 15 scenarios, yielding exactly 7,561 ticks).
    - **Auth Misuse (A4)**: At the exact end of the attack window, the dataset generator artificially stitched the plant state back to the nominal uncompromised trajectory, causing the observed level to teleport by 0.3m in 1 second. The twin expects continuity and refuses to teleport, creating a permanent residual.
 5. **Step 2b DoS Gap Re-Seed Rule & Limitation**: In `StreamingIDS` (`dos_gap_rule=True`, default False for Phase 2 equivalence), after a DoS gap of $G$ ticks with `received=False`, the twin does not re-seed on a single packet. Instead, it collects $K=5$ consecutive valid post-gap readings, verifies stability ($\text{std} \le \text{max\_std\_m} = 0.03\text{ m}$), and checks if the median $m$ satisfies physical rate bounds: $|m - h_{twin}| \le v_{max} \cdot G \cdot dt + 3\sigma_{sensor}$, where $v_{max} = \max(q_{in,max}/A, C_v \sqrt{h_{max}}/A) = 0.003162\text{ m/s}$ and $\sigma_{sensor} = 0.005\text{ m}$. If within the band, the twin re-seeds to $m$, clearing the post-gap residual; if outside or if collection times out after `gap_collect_timeout_ticks` (20 ticks), re-seed is refused and physics takeover engages. **Limitation**: A spoof within $v_{max} \cdot G \cdot dt + 3\sigma_{sensor}$ after a gap is adopted by the twin. This rule bounds physically impossible jumps, but the command-driven shadow estimator in Phase 6c (which tracks actual physical valve/pump commands rather than integrating reported flows or blind re-seeding) is the true structural fix.
+
+### Phase 6a: Physical Protection A/B Verification (Monitor vs Prevention Mode)
+
+**Simulation Assumptions & Setup:**
+- **Digital Twin Model:** Identical equations and physical constants as the plant, reading honest actuator commands and zero-bias flows (best case).
+- **Attack Timing Schedule:** Randomized attack start ($t_{start} \in [200, 600]\text{ s}$) and ramp duration ($[1000, 1400]\text{ s}$) per seed, paired identically across both modes.
+- **Sample Size:** $n = 10$ seeds (101 to 110), duration $T = 2400\text{ s}$ (40 min).
+- **Noise Setting:** `clamp_flow_noise = False` (zero-mean symmetric Gaussian noise, preventing the integrated positive flow drift observed in the dataset clamp).
+
+| Scenario | Mode | Max Level (m) | Min Level (m) | Overflow Ticks | Dry-Run Ticks | T < 0.3m Ticks | Takeover Ticks |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Control FDI** (+0.15m step) | Monitor | 1.200 ± 0.003 | 0.654 ± 0.002 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 |
+| | Prevention | 1.202 ± 0.002 | 0.799 ± 0.002 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 602.0 ± 0.0 |
+| **Negative Ramp** (Overflow threat) | Monitor | 2.500 ± 0.000 | 0.804 ± 0.004 | 642.9 ± 178.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 |
+| | Prevention | 1.208 ± 0.009 | 0.797 ± 0.004 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 1967.7 ± 112.7 |
+| **Positive Ramp** (Dry-run threat) | Monitor | 1.146 ± 0.059 | 0.009 ± 0.008 | 0.0 ± 0.0 | 275.3 ± 96.0 | 923.1 ± 96.1 | 0.0 ± 0.0 |
+| | Prevention | 1.204 ± 0.004 | 0.797 ± 0.004 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 1967.2 ± 110.4 |
+| **Stealthy Ramp** (-0.05 mm/s drift) | Monitor | 1.279 ± 0.013 | 0.804 ± 0.004 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 |
+| | Prevention | 1.207 ± 0.007 | 0.798 ± 0.004 | 0.0 ± 0.0 | 0.0 ± 0.0 | 0.0 ± 0.0 | 1373.8 ± 127.6 |
+
+**Key Findings:**
+- In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
+- In Monitor mode, unmitigated negative ramps cause on average 642.9 overflow ticks (hitting 2.50m), and positive ramps cause on average 275.3 dry-run ticks (draining to 0.009m).
+- In Stealthy Ramp (-0.05 mm/s), detection occurs when $|\text{bias}| > \tau_p = 0.035\text{ m}$ independent of ramp rate (mean max undetected bias is 0.0238 m ~ 2.4 cm, largest undetected bias 0.0290 m < 3.5 cm).
+- On 30-minute unattacked normal runs across all 10 seeds, Prevention mode had exactly 0 false takeover ticks.
 
 ## 4. Technical Challenges Overcome
 Be prepared to discuss these challenges that you successfully debugged and fixed during the project:

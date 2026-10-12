@@ -1,0 +1,45 @@
+==============================================================================================================
+RECONCILIATION: 7,541 (STREAMING REPLAY, RULE OFF) VS 7,561 (BATCH EVALUATION) PHYSICS FP TICKS
+==============================================================================================================
+Scenario | Batch Eval (7561)  | Stream (Noisy Init: 7541)  | Diff (Batch - Noisy)  | Stream (Exact Init) 
+--------------------------------------------------------------------------------------------------------------
+A3_001   | 26                 | 1                          | 25                    | 26                  
+A3_002   | 504                | 448                        | 56                    | 504                 
+A3_003   | 609                | 609                        | 0                     | 609                 
+A3_004   | 599                | 599                        | 0                     | 599                 
+A3_005   | 589                | 589                        | 0                     | 589                 
+A3_006   | 579                | 579                        | 0                     | 579                 
+A3_007   | 569                | 569                        | 0                     | 569                 
+A3_008   | 559                | 559                        | 0                     | 559                 
+A3_009   | 549                | 549                        | 0                     | 549                 
+A3_010   | 539                | 539                        | 0                     | 539                 
+A3_011   | 529                | 529                        | 0                     | 529                 
+A3_012   | 188                | 245                        | -57                   | 188                 
+A3_013   | 604                | 604                        | 0                     | 604                 
+A3_014   | 574                | 574                        | 0                     | 574                 
+A3_015   | 544                | 548                        | -4                    | 544                 
+--------------------------------------------------------------------------------------------------------------
+Total    | 7561               | 7541                       | 20                    | 7561                
+==============================================================================================================
+
+Detailed Discrepancy Breakdown for Non-Zero Diffs:
+Scenario A3_001 (Batch: 544, Noisy Stream Diff = 25):
+  - Ticks in Batch but NOT Noisy Stream (25 ticks): [375.0, 382.0, 383.0, 385.0, 399.0, 402.0, 403.0, 417.0, 436.0, 468.0]... (first 10)
+Scenario A3_002 (Batch: 544, Noisy Stream Diff = 56):
+  - Ticks in Batch but NOT Noisy Stream (56 ticks): [410.0, 459.0, 513.0, 522.0, 546.0, 549.0, 550.0, 551.0, 581.0, 596.0]... (first 10)
+Scenario A3_012 (Batch: 544, Noisy Stream Diff = -57):
+  - Ticks in Noisy Stream but NOT Batch (57 ticks): [376, 409, 410, 413, 414, 419, 421, 458, 461, 475]... (first 10)
+Scenario A3_015 (Batch: 544, Noisy Stream Diff = -4):
+  - Ticks in Noisy Stream but NOT Batch (4 ticks): [209, 271, 288, 309]... (first 10)
+
+Root Cause Mechanism:
+1. In scripts/run_evaluation.py (line 125): 'FIX #3: Use deterministic initial level, not noisy observed value.'
+   Batch evaluation initialized the PhysicsEngine with exact nominal initial level H_0 = 1.0000 m.
+2. In the streaming replay script, ids.reset(df.iloc[0]['tank_level_observed']) initialized the Digital Twin
+   with the noisy sensor observation at t=0 (e.g. 0.998 m or 1.004 m).
+3. In scenarios A3_001, A3_002, A3_012, and A3_015, the physics residual oscillates right around the tau_p = 0.035 m
+   detection boundary. A microscopic 2-4 mm initial condition shift causes marginal residual crossings to toggle,
+   producing slight shifts (+25 in A3_001, +56 in A3_002, -57 in A3_012, -4 in A3_015) summing to exactly 20 ticks.
+4. When StreamingIDS is initialized with the exact scenario initial level (matching batch evaluation),
+   the per-scenario counts and the total match 100% tick-for-tick across all 15 scenarios (exactly 7,561 ticks).
+

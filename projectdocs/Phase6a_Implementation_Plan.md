@@ -113,11 +113,11 @@ The control logic runs in `GatewayCore.step()`. The source for this tick's contr
 - *Checkpoint:* Unit tests for gap-free equivalence, suppression timeout recovery, mode independence with rule ON, and batch replay of 15 A3 scenarios.
 
 **Step 3: A/B Comparison Harness (Completed)**
-- Written `experiments/run_comparison.py` evaluating 10 random seeds (paired schedules) across 4 scenarios:
+- Written `experiments/run_comparison.py` evaluating 10 random seeds with randomized timing ($t_{start} \in [200, 600]\text{ s}$, ramp in $[1000, 1400]\text{ s}$) across 4 scenarios:
   1. Dataset-style FDI (+0.15m): Control scenario (0 physical harm in both modes).
-  2. Negative FDI ramp (-1.5m, 20 min): Monitor mode overflows (779.0 ± 6.1 ticks), Prevention mode 100% eliminates overflow (0.0 ticks).
-  3. Positive FDI ramp (+1.5m): Monitor mode suffers dry-run (370.5 ± 2.5 ticks), Prevention mode 100% eliminates dry-run (0.0 ticks).
-  4. Stealthy slow ramp (-0.05 mm/s): Intervenes and bounds drift with 0 physical harm.
+  2. Negative FDI ramp (-1.5m): Monitor mode overflows (642.9 ± 178.0 ticks); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode (0.0 ticks).
+  3. Positive FDI ramp (+1.5m): Monitor mode suffers dry-run (275.3 ± 96.0 ticks, 923.1 ± 96.1 ticks below 0.3m); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode (0.0 ticks).
+  4. Stealthy slow ramp (-0.05 mm/s): Detection is triggered when $|\text{bias}| > \tau_p = 0.035\text{ m}$ independent of ramp rate (mean maximum undetected bias is 0.0238 m ~ 2.4 cm, largest undetected bias 0.0290 m < 3.5 cm); in this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
 - Verified 0 false takeovers across all 10 seeds on a 30-minute normal soak in Prevention mode.
 - Generated CSV (`experiments/results/ab_comparison_results.csv`), summary table (`experiments/results/ab_comparison_summary.txt`), and visualization (`experiments/results/ab_comparison_figure.png`).
 
