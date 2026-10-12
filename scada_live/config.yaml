@@ -107,3 +107,7 @@ recalibration:
 persistence:
   db_path: data/live_run.db
 
+api:
+  shared_secret: "phase6b_test_secret"
+
+

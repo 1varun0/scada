@@ -10,7 +10,6 @@ def main():
     df = pd.read_sql_query("SELECT * FROM scada_telemetry WHERE scenario_id LIKE 'N_%' ORDER BY scenario_id, sequence_id", conn)
     
     cfg = load_config("c:/projects/p1/New folder/scada_live/config.yaml")
-    cfg.ids.policy_version = "v2"
     
     fps = 0
     total_ticks = 0
@@ -21,31 +20,29 @@ def main():
     from config.scenarios import get_scenario_by_id
 
     for sid, group in df.groupby('scenario_id'):
-        ids = StreamingIDS(cfg, policy_version="v2")
+        ids = StreamingIDS(cfg)
         scenario_cfg = get_scenario_by_id(sid)
         if scenario_cfg:
             initial_level = scenario_cfg.initial_level_m
         else:
-            # Clean start levels for normals are 1.0, 0.8, 0.5. 
-            # We can round the first observed value to the nearest 0.1 to strip the noise.
             obs = group.iloc[0]['tank_level_observed']
             initial_level = round(obs * 10) / 10.0
-        ids.physics_engine.reset(initial_level)
+        ids.reset(initial_level, sid)
         
         for _, row in group.iterrows():
             pkt = TelemetryPacket(
-                run_id=row['scenario_id'],
-                ts=float(row['sequence_id']),
                 seq=int(row['sequence_id']),
-                src_t=float(row['sequence_id']),
-                received=float(row['sequence_id']) if row['packet_received'] else 0.0,
-                level_m=row['tank_level_observed'],
-                q_in=row['q_in'],
-                q_out=row['q_out'],
+                run_id=str(row['scenario_id']),
+                ts=float(row['simulation_time_s']),
+                src_t=float(row['source_time_s']),
+                received=bool(row['packet_received']),
+                level_m=float(row['tank_level_observed']),
+                q_in=float(row['q_in']),
+                q_out=float(row['q_out']),
+                pump_on=bool(row['pump_state']),
                 pump_cmd=int(row['pump_command']),
-                valve_cmd=float(row['valve_command']),
-                pump_on=bool(row['pump_command']),
-                valve_pct=float(row['valve_command'])
+                valve_pct=float(row['valve_state']),
+                valve_cmd=float(row['valve_command'])
             )
             res = ids.update(pkt)
             is_anomaly = (res['scores']['physics'] > 0.95 or 
@@ -54,6 +51,7 @@ def main():
                           res['scores']['availability'] > 0.95)
             if is_anomaly:
                 fps += 1
+                print(f"FP on {sid} tick {row['sequence_id']}: {res['scores']}")
             total_ticks += 1
             
             sid = row['scenario_id']

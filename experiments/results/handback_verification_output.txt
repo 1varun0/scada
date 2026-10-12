@@ -1,0 +1,25 @@
+===================================================================================================================
+SCENARIO (E): HAND-BACK VERIFICATION (Ramp -> Hold -> Return to 0 Bias)
+===================================================================================================================
+Explanation of Prolonged Takeover in Ramps:
+  In Negative_Ramp and Positive_Ramp, the spoof bias holds at +/-1.5m after the ramp duration.
+  Because the sensor remains permanently compromised, |h_obs - h_twin| >> tolerance (config 0.05m),
+  so hand-back CANNOT and SHOULD NOT engage. Takeover legitimately stays active to the end.
+  Below, Scenario (e) removes the bias to verify hand-back engages cleanly once sensor recovers:
+
+Seed  | Attack Window   | Takeover Tick   | Hand-back Tick  | Final Level (m)   | Post-Handback FPs 
+-------------------------------------------------------------------------------------------------------------------
+101   | [300..1200 s]   | 313             | 1194            | 1.0922            | 0                 
+102   | [300..1200 s]   | 312             | 1194            | 1.1179            | 0                 
+103   | [300..1200 s]   | 311             | 1195            | 1.0876            | 1                 
+104   | [300..1200 s]   | 311             | 1194            | 1.1243            | 0                 
+105   | [300..1200 s]   | 314             | 1193            | 1.1263            | 0                 
+106   | [300..1200 s]   | 313             | 1196            | 1.1135            | 1                 
+107   | [300..1200 s]   | 313             | 1194            | 1.0863            | 0                 
+108   | [300..1200 s]   | 312             | 1194            | 1.1059            | 0                 
+109   | [300..1200 s]   | 313             | 1196            | 1.0897            | 0                 
+110   | [300..1200 s]   | 313             | 1193            | 1.1008            | 0                 
+-------------------------------------------------------------------------------------------------------------------
+Mean Hand-back Tick: t = 1194.3 ± 1.1 s
+Mean Final Level:    h = 1.1044 m (safely inside [0.8, 1.2m] deadband)
+Total False Alarms Post Hand-back across 10 seeds: 2 (0.2/seed over 1200s)

@@ -88,16 +88,37 @@ def main():
         op_breakdown[op_cond] = (op_scens, op_ticks, op_hits)
         n_fires += op_hits
 
+    min_margin_on = float("inf")
+    min_margin_off = float("inf")
+    for _, r in df_n.iterrows():
+        p = int(r["pump_command"]) if r["packet_received"] == 1 else 0
+        sp = float(r["tank_level_setpoint"])
+        h = float(r["tank_level_observed"])
+        # Rule limits: upper = sp + 0.20 + 0.05, lower = sp - 0.20 - 0.05
+        if p == 1:
+            margin = (sp + 0.20 + 0.05) - h
+            if margin < min_margin_on:
+                min_margin_on = margin
+        else:
+            margin = h - (sp - 0.20 - 0.05)
+            if margin < min_margin_off:
+                min_margin_off = margin
+
     expected_n_fires = 0
-    verdict_n = "PASSED" if n_fires == expected_n_fires else "FAILED"
-    if verdict_n == "FAILED": all_verdicts_passed = False
+    verdict_n = "PASSED (Expected by construction: 0, Measured: 0)" if n_fires == expected_n_fires else "FAILED"
+    if n_fires != expected_n_fires: all_verdicts_passed = False
 
     lines.append(f"1. NORMAL SCENARIOS (N_001 to N_060: {n_scen_count} scenarios, {total_n_ticks} ticks total):")
     lines.append("   Breakdown by Operating Condition:")
     for op_cond, (op_scens, op_ticks, op_hits) in sorted(op_breakdown.items()):
         lines.append(f"     - {op_cond:<18}: {op_scens:2d} scenarios, {op_ticks:5d} ticks, {op_hits} rule violations")
     lines.append(f"   Total False Positives / Rule Violations: {n_fires} ticks across {n_scen_count} scenarios.")
-    lines.append(f"   Verdict: {verdict_n} (Expected: {expected_n_fires}, Measured: {n_fires})\n")
+    lines.append(f"   Threshold Margins on Normals:")
+    lines.append(f"     - Pump ON ticks minimum margin:  {min_margin_on:.4f} m [(sp+db+eps) - h]")
+    lines.append(f"     - Pump OFF ticks minimum margin: {min_margin_off:.4f} m [h - (sp-db-eps)]")
+    lines.append(f"     - Minimum overall margin:        {min(min_margin_on, min_margin_off):.4f} m")
+    lines.append("     - Note: 0 fires is expected by construction: the closed-loop controller hysteresis band is [sp-0.20, sp+0.20], strictly inside the rule limits [sp-0.25, sp+0.25] by epsilon=0.05m.")
+    lines.append(f"   Verdict: {verdict_n}\n")
 
     # 2. A1 FDI Scenarios (Bias, Scale, Intermittent)
     df_a1 = pd.read_sql_query(
@@ -131,13 +152,13 @@ def main():
 
     expected_a1_inside = 1818
     expected_a1_outside = 0
-    verdict_a1 = "PASSED" if (a1_hits_inside == expected_a1_inside and a1_hits_outside == expected_a1_outside) else "FAILED"
+    verdict_a1 = "REGRESSION PIN" if (a1_hits_inside == expected_a1_inside and a1_hits_outside == expected_a1_outside) else "FAILED"
     if verdict_a1 == "FAILED": all_verdicts_passed = False
 
     lines.append(f"2. A1 FALSE DATA INJECTION (A1_001 to A1_045: {a1_scen_count} scenarios, {total_a1_ticks} ticks total):")
     lines.append(f"   Inside Ground-Truth Attack Window ({a1_gt_ticks} ticks):")
     lines.append(f"     - Rule Violations: {a1_hits_inside} ticks across {len(a1_scens_hit_inside)} scenarios.")
-    lines.append(f"     - Physical Rationale: Dataset artifact. In MATLAB, apply_fdi was called post-hoc after the normal closed-loop")
+    lines.append(f"     - Physical Rationale: Dataset finding / post-hoc overlay artifact. In MATLAB, apply_fdi was called post-hoc after the normal closed-loop")
     lines.append(f"       simulation. When normal control had pump=1 filling toward 1.20m, the post-hoc bias overlay shifted H_obs")
     lines.append(f"       above 1.25m while recorded pump_command remained 1 (the recorded controller never reacted to spoofed level).")
     lines.append(f"   Outside Ground-Truth Attack Window ({a1_out_ticks} ticks):")
@@ -301,7 +322,7 @@ def main():
     lines.append("  Therefore, the recorded controller never saw the spoofed level. In live closed-loop operation (Phase 6a/6b),")
     lines.append("  the controller immediately shuts off the pump when observed level crosses 1.20m.")
     lines.append("=" * 115)
-    lines.append(f"\nOVERALL VALIDATION SUITE RESULT: {'ALL TESTS PASSED' if all_verdicts_passed else 'TESTS FAILED'}\n")
+    lines.append(f"\nOVERALL VALIDATION SUITE RESULT: {'ALL TESTS PASSED / REGRESSION PINS VERIFIED' if all_verdicts_passed else 'TESTS FAILED'}\n")
 
     output_str = "\n".join(lines)
     print(output_str)

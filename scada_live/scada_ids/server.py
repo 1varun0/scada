@@ -1,5 +1,6 @@
 import json
 import time
+import hmac
 from queue import Empty
 from flask import Flask, request, jsonify, Response
 from scada_live.common.config_loader import load_config
@@ -140,7 +141,67 @@ def mode():
 
 @app.route('/api/command', methods=['POST'])
 def command():
-    return jsonify({"error": "Not implemented"}), 501
+    if not request.is_json:
+        return jsonify({"error": "Bad Request", "details": "Request body must be JSON"}), 400
+
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Bad Request", "details": "Invalid JSON format"}), 400
+
+    # 1. Schema & Field Type Validation
+    if 'pump_cmd' not in data or 'valve_cmd' not in data:
+        return jsonify({"error": "Bad Request", "details": "Missing required fields 'pump_cmd' or 'valve_cmd'"}), 400
+
+    pump_cmd_val = data['pump_cmd']
+    valve_cmd_val = data['valve_cmd']
+
+    # Reject boolean for pump_cmd and ensure it is integer 0 or 1
+    if isinstance(pump_cmd_val, bool) or not isinstance(pump_cmd_val, int) or pump_cmd_val not in (0, 1):
+        return jsonify({"error": "Bad Request", "details": "pump_cmd must be 0 or 1"}), 400
+    pump_cmd = int(pump_cmd_val)
+
+    # Reject boolean for valve_cmd and ensure it is numeric between 0.0 and 100.0
+    if isinstance(valve_cmd_val, bool) or not isinstance(valve_cmd_val, (int, float)):
+        return jsonify({"error": "Bad Request", "details": "valve_cmd must be numeric between 0.0 and 100.0"}), 400
+    valve_cmd = float(valve_cmd_val)
+    if not (0.0 <= valve_cmd <= 100.0):
+        return jsonify({"error": "Bad Request", "details": "valve_cmd must be between 0.0 and 100.0"}), 400
+
+    hold_ticks_val = data.get('hold_ticks', 1)
+    if isinstance(hold_ticks_val, bool) or not isinstance(hold_ticks_val, int) or hold_ticks_val <= 0:
+        return jsonify({"error": "Bad Request", "details": "hold_ticks must be a positive integer"}), 400
+    hold_ticks = int(hold_ticks_val)
+
+    # 2. Hold Duration Cap for Non-Authenticated Callers (Fail-Closed, hmac.compare_digest)
+    cfg_obj = app.config.get('SCADA_CONFIG', cfg)
+    api_cfg = getattr(cfg_obj, 'api', None) if cfg_obj else None
+    shared_secret = str(getattr(api_cfg, 'shared_secret', '') or '')
+
+    is_authenticated = False
+    if shared_secret:
+        auth_header = request.headers.get('Authorization', '')
+        bearer_token = auth_header[7:].strip() if auth_header.startswith("Bearer ") else ""
+        api_key = request.headers.get('X-API-Key', '').strip()
+        is_authenticated = (
+            (bool(bearer_token) and hmac.compare_digest(bearer_token, shared_secret))
+            or (bool(api_key) and hmac.compare_digest(api_key, shared_secret))
+        )
+
+    if not is_authenticated:
+        hold_ticks = min(hold_ticks, 60)
+
+    # Metadata role attribute for telemetry logging ONLY (MUST NOT be used in validation)
+    role = request.headers.get('X-Actor-Role', 'unauthenticated')
+
+    # Step 1 ONLY: NO gateway override logic yet
+    return jsonify({
+        "status": "accepted",
+        "pump_cmd": pump_cmd,
+        "valve_cmd": valve_cmd,
+        "hold_ticks": hold_ticks,
+        "authenticated": is_authenticated,
+        "role": role
+    }), 200
 
 @app.route('/api/config', methods=['GET'])
 def get_config():

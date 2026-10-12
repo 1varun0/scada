@@ -62,7 +62,9 @@ venv*/
 *.db-shm
 *_output.txt
 *_out.txt
-!experiments/results/*.txt
+!experiments/results/*
+!experiments/results/**
+
 pytest_*.txt
 pip_freeze.txt
 git_*_output.txt

@@ -14,10 +14,10 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
    - **"Channel" Ingress Misuse (AM-1, AM-2):** Malicious commands arrive at the Gateway ingress API (`POST /api/command`). The Gateway evaluates them against process safety constraints via a dedicated gateway-side function (`evaluate_command_with_live_setpoint`) and **blocks** them before plant dispatch in Prevention mode.
      - **AM-1 (High-Level Pump Latch):** Starts at $H = 1.30\text{ m}$ (above the $1.25\text{ m}$ boundary $[1.0 + 0.20 + 0.05]$) with `pump_cmd = 1, valve_cmd = 50%`. The plant reaches $1.30\text{ m}$ either via scenario initial condition configuration ($H_0 = 1.30\text{ m}$) or an unmitigated transient filling step above $1.20\text{ m}$. Ingress filter blocks it immediately ($1.30\text{ m} > 1.25\text{ m}$).
      - **AM-2 (Low-Level Drainage):** Starts at $H \approx 0.90\text{ m}$ with `pump_cmd = 0, valve_cmd = 90%`. Ingress filter blocks it immediately (valve $90\% \ne 50\%$ and $\ne 0\%$).
-   - **"Wire / Fieldbus Tamper" (AM-3):** Commands are altered downstream on the physical wire/fieldbus (injector reply override). The Gateway **cannot prevent or mitigate a bus-level override** because downstream plant hardware executes the wire signal directly; AM-3 is strictly **DETECT-ONLY**. Success is defined by detection delay ($\le 3\text{ ticks}$) and attribution, with identical physical harm across both Monitor and Prevention modes.
-   - **"In-Deadband Toggle" (AM-4):** An attacker toggles the pump within the operational deadband ($0.8\text{ m} \le H \le 1.2\text{ m}$, e.g. at $1.0\text{ m}$). This represents a documented blind spot for policy and physics engines. Evaluated empirically without unverified claims.
-   - **"In-Band Malicious Hold - Filling" (AM-5):** Attacker issues a superficially valid command at nominal level ($H \approx 1.0\text{ m}$, `pump_cmd = 1`, `hold_ticks = 1500`). Ingress filtering allows it initially because $H = 1.0\text{ m}$ is within the valid deadband envelope. From $1.0\text{ m}$, analytical time to tank crest ($2.50\text{ m}$) is $\approx 1288\text{ s}$ ($t = [-2000u - 5000\ln(2.5-u)]_{1.0}^{\sqrt{2.5}}$); a hold of 1200 s does not overflow, so a hold of $\ge 1500\text{ s}$ is used. In Monitor mode, overflow occurs at $t \approx 1288\text{ s}$ producing $\approx 210$ overflow ticks. In Prevention mode, **Continuous Enforcement** re-evaluates the hold on every simulation tick against the live level estimate $h_{est}$ and drops the hold when level crosses $H > 1.25\text{ m}$ ($setpoint + deadband + \epsilon$), de-energizing the pump and preventing tank overflow (0 overflow ticks).
-   - **"In-Band Malicious Hold - Draining" (AM-6):** Attacker issues `pump_cmd = 0, valve_cmd = 50%, hold_ticks = 1800` at nominal level ($H \approx 1.0\text{ m}$). Ingress filtering allows it initially because $H = 1.0\text{ m} \ge 0.75\text{ m}$. Analytical gravity drain time from $1.0\text{ m}$ to pump cavitation/dry-run ($0.05\text{ m}$) under valve 50% is $t = 2000(1.0 - \sqrt{0.05}) \approx 1553\text{ s}$. In Monitor mode, dry-run begins at $t \approx 1553\text{ s}$, producing $\approx 247$ dry-run ticks. In Prevention mode, Continuous Enforcement drops the hold when $h_{est} < 0.75\text{ m}$ ($t \approx 280\text{ s}$), reverting to autonomous controller which energizes pump, preventing dry-run (0 dry-run ticks).
+   - **"Wire / Fieldbus Tamper" (AM-3):** Commands are altered downstream on the physical wire/fieldbus (injector reply override). The Gateway **cannot prevent or mitigate a bus-level override** because downstream plant hardware executes the wire signal directly; AM-3 is strictly **DETECT-ONLY**. Success is defined by detection delay ($\le 3\text{ ticks}$) and attribution, with identical physical harm across both Monitor and Prevention modes    - **"In-Deadband Toggle" (AM-4):** An attacker toggles the pump within the operational deadband ($0.8\text{ m} \le H \le 1.2\text{ m}$, e.g. at $1.0\text{ m}$). This represents a documented blind spot for policy and physics engines. Evaluated empirically without unverified claims.
+    - **"In-Band Malicious Hold - Filling" (AM-5):** Attacker issues a superficially valid command at nominal level ($H \approx 1.0\text{ m}$, `pump_cmd = 1`, `hold_ticks = 1500`). The authenticated A/B attacker uses the cryptographic shared secret (A4 threat model: rogue authenticated insider), bypassing the 60-tick hold cap; therefore, **Continuous Enforcement is the vital defense**. Ingress filtering allows it initially because $H = 1.0\text{ m}$ is within the valid envelope. At $1.0\text{ m}$, net fill rate is $\frac{0.005 - 0.002\sqrt{1.0}}{2.0} = 0.0015\text{ m/s} = 1.5\text{ mm/s}$. Analytical time to reach the upper boundary $1.25\text{ m}$ ($setpoint + deadband + \epsilon$) is $t \approx 174\text{ s}$ ($\int_{1.0}^{1.25} \frac{dh}{0.0025 - 0.001\sqrt{h}} \approx 173.8\text{ s}$). Time to tank crest ($2.50\text{ m}$) is $\approx 1288\text{ s}$. In Monitor mode, overflow occurs at $t \approx 1288\text{ s}$ producing $\approx 210$ overflow ticks. In Prevention mode, Continuous Enforcement re-evaluates the hold on every simulation tick against the live level estimate $h_{est}$ and drops the hold when level crosses $H > 1.25\text{ m}$ ($t \approx 174\text{ s}$), de-energizing the pump and preventing tank overflow (0 overflow ticks).
+    - **"In-Band Malicious Hold - Draining" (AM-6):** Authenticated attacker (A4 threat model using secret) issues `pump_cmd = 0, valve_cmd = 50%, hold_ticks = 1800` at nominal level ($H \approx 1.0\text{ m}$). Ingress filtering allows it initially because $H = 1.0\text{ m} \ge 0.75\text{ m}$. Initial drain rate at $1.0\text{ m}$ is $-0.001\sqrt{1.0} = -1.0\text{ mm/s}$. Analytical gravity drain time to reach the lower boundary $0.75\text{ m}$ is $t = 2000(1.0 - \sqrt{0.75}) \approx 268\text{ s}$ ($267.95\text{ s}$). Drain time to dry-run ($0.05\text{ m}$) is $t = 2000(1.0 - \sqrt{0.05}) \approx 1553\text{ s}$. In Monitor mode, dry-run begins at $t \approx 1553\text{ s}$, producing $\approx 247$ dry-run ticks. In Prevention mode, Continuous Enforcement drops the hold when $h_{est} < 0.75\text{ m}$ ($t \approx 268\text{ s}$), reverting to autonomous controller which energizes pump, preventing dry-run (0 dry-run ticks).
+    - **"Unauthenticated Hold Cap" (AM-7):** Unauthenticated caller attempts a long hold (`pump_cmd = 1, hold_ticks = 1500`) without the shared secret. Ingress validation caps hold duration at $\min(1500, 60) = 60\text{ ticks}$. The hold expires after $60\text{ s}$ (well before reaching $1.25\text{ m}$ at $174\text{ s}$ or overflow at $1288\text{ s}$), safely resuming autonomous control with 0 overflows.
 2. **Monitor vs Prevention Event Invariance:**
    - In Monitor mode, GatewayCore evaluates the exact same safety rules at the exact same ticks.
    - When an ingress command violates the safety envelope, GatewayCore raises a `would_block` event to `EventHub` with the exact violation reason, records it in metrics (`commands_would_block_total`), logs it, and passes the command to the plant without blocking.
@@ -29,13 +29,16 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
    - AM-2: Starts at $0.90\text{ m}$, valve $90\%$. Hold duration $1200\text{ s}$. Analytical drain time to dry-run ($0.05\text{ m}$) is $\approx 806\text{ s}$. Monitor mode: $\ge 1$ dry-run event in $\ge 9/10$ seeds ($\approx 390$ dry-run ticks). Prevention mode: exactly 0 dry-run ticks.
    - AM-3: Wire tamper forcing pump ON. Monitor and Prevention modes suffer identical overflow harm. Mismatch detected in $\le 3\text{ ticks}$.
    - AM-4: In-deadband toggles at $1.0\text{ m}$. Empirically record engine scores; documented blind spot.
-   - AM-5: Starts at $1.0\text{ m}$, pump ON held for $1500\text{ s}$. Fill time to $2.50\text{ m}$ is $\approx 1288\text{ s}$. Monitor mode: $\ge 1$ overflow event in $\ge 9/10$ seeds ($\approx 210$ overflow ticks). Prevention mode: exactly 0 overflow ticks.
-   - AM-6: Starts at $1.0\text{ m}$, pump OFF held for $1800\text{ s}$. Drain time to $0.05\text{ m}$ is $\approx 1553\text{ s}$. Monitor mode: $\ge 1$ dry-run event in $\ge 9/10$ seeds ($\approx 247$ dry-run ticks). Prevention mode: exactly 0 dry-run ticks.
+   - AM-5: Fills at $1.5\text{ mm/s}$ at $1.0\text{ m}$, crosses $1.25\text{ m}$ at $\approx 174\text{ s}$. Pump ON held for $1500\text{ s}$. Fill time to $2.50\text{ m}$ is $\approx 1288\text{ s}$. Monitor mode: $\ge 1$ overflow event in $\ge 9/10$ seeds ($\approx 210$ overflow ticks). Prevention mode: exactly 0 overflow ticks.
+   - AM-6: Crosses $0.75\text{ m}$ at $\approx 268\text{ s}$. Pump OFF held for $1800\text{ s}$. Drain time to $0.05\text{ m}$ is $\approx 1553\text{ s}$. Monitor mode: $\ge 1$ dry-run event in $\ge 9/10$ seeds ($\approx 247$ dry-run ticks). Prevention mode: exactly 0 dry-run ticks.
+   - AM-7: Unauthenticated caller capped at 60 ticks. Hold expires at $60\text{ s}$ without reaching $1.25\text{ m}$; exactly 0 overflow ticks.
 4. **Recorded Architectural Decisions:**
    - **Flask Framework & Existing Hub:** Server implementation uses existing Flask framework in `scada_ids/server.py` and `EventHub`/`MetricsCollector`. No FastAPI/Starlette or external Prometheus client.
-   - **Uniform 60-Tick Hold Cap for Unauthenticated Callers:** The hold duration cap of max 60 ticks must NOT depend on unverified client-provided headers (`X-Actor-Role`). Instead, it applies to ALL callers uniformly unless authenticated with a cryptographic shared secret from config (`cfg.api.shared_secret` passed via `Authorization: Bearer <secret>` or `X-API-Key`). If the secret is missing or invalid, `hold_ticks = min(hold_ticks, 60)`.
+   - **Shared Secret from Config & Fail-Closed Authentication:** Shared secret is loaded from `cfg.api.shared_secret`. If the secret is missing, empty, or unconfigured, the system **fails closed** (caps all callers at 60 ticks). Secret verification uses constant-time `hmac.compare_digest` against `Authorization: Bearer <secret>` or `X-API-Key: <secret>`.
+   - **Role Header Must NOT Be Used in Validation:** Client-supplied `X-Actor-Role` is unverified metadata for telemetry logging only. Validation logic must never use `role` to grant privileges or bypass safety checks.
+   - **Explicit Exceptions Instead of Assert:** Gateway validation and controller attribute checks raise explicit `AttributeError` or `ValueError` rather than `assert`, preventing silent failure when running with Python optimizations (`-O`).
+   - **Gateway Has No Direct Plant Reference:** GatewayCore communicates with the plant over network messages and has no direct Python object reference to `plant` or `plant.pump`. Controller state resynchronization on hold drop/expiration uses the plant's echoed actuator state from the latest telemetry packet (`latest_telemetry.pump_on`).
    - **HTTP Route Error Handling:** Invalid JSON, missing required fields (`pump_cmd`, `valve_cmd`), invalid types, or out-of-envelope parameters return HTTP 400 Bad Request, NOT HTTP 500.
-   - **Strict Controller Attribute Assertion:** `evaluate_command_with_live_setpoint` inspects and asserts that Controller attributes (`setpoint`, `_deadband`, `_default_valve_pct`) exist without silent fallback defaults (`1.0`, `0.20`, etc.).
    - **Tamper Hook Location:** The bus-level tamper hook lives strictly in the injector/wire layer (`attacker_wire/injector.py`), never inside `LivePlant` core or `GatewayCore`.
 
 ---
@@ -50,8 +53,9 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
 | **AM-2** | Channel Ingress Misuse | `POST /api/command` | Gateway Command Filter | **Yes** (Ingress Drop) | Monitor: $\ge 1$ dry-run event in $\ge 9/10$ seeds (~390 dry ticks); Prevention: 0 dry ticks. |
 | **AM-3** | Wire / Fieldbus Tamper | Downstream Wire Reply Override | 4-Way Actuator Consistency | **No** (Detect-Only) | Detection delay $\le 3$ ticks, correct attribution; physical harm identical in Monitor and Prevention. |
 | **AM-4** | In-Deadband Toggle | `POST /api/command` | Empirical Engine Test | No (Within Deadband) | Policy & Physics Twin do NOT fire; record empirical engine behavior without unverified claims. |
-| **AM-5** | In-Band Hold (Filling) | `POST /api/command` | Continuous Enforcement Filter | **Yes** (Hold Drop) | Monitor: $\ge 1$ overflow event in $\ge 9/10$ seeds (~210 ov ticks with hold 1500s); Prevention: 0 ov ticks. |
-| **AM-6** | In-Band Hold (Draining) | `POST /api/command` | Continuous Enforcement Filter | **Yes** (Hold Drop) | Monitor: $\ge 1$ dry-run event in $\ge 9/10$ seeds (~247 dry ticks with hold 1800s); Prevention: 0 dry ticks. |
+| **AM-5** | In-Band Hold (Filling, Authenticated) | `POST /api/command` | Continuous Enforcement Filter | **Yes** (Hold Drop) | Monitor: $\ge 1$ overflow event in $\ge 9/10$ seeds (~210 ov ticks with hold 1500s); Prevention: 0 ov ticks. |
+| **AM-6** | In-Band Hold (Draining, Authenticated) | `POST /api/command` | Continuous Enforcement Filter | **Yes** (Hold Drop) | Monitor: $\ge 1$ dry-run event in $\ge 9/10$ seeds (~247 dry ticks with hold 1800s); Prevention: 0 dry ticks. |
+| **AM-7** | In-Band Hold (Unauthenticated Cap) | `POST /api/command` | Ingress Payload Validator | **Yes** (Hold Cap) | Capped at 60 ticks; hold expires at $t=60\text{ s}$ before reaching $1.25\text{ m}$; 0 ov ticks. |
 
 ---
 
@@ -84,30 +88,35 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
 - **Packet `cmd` Semantics:** Telemetry packet fields `pkt.pump_cmd` and `pkt.valve_cmd` represent what the plant actuators physically received and set (what the plant echoes back in telemetry).
 - **Tamper Location:** The tamper acts downstream of the Gateway on the wire (injector reply override middleware intercepting the plant's sense reply). The Gateway issues `pump_cmd = 0, valve_cmd = 50%`, but the wire tamper forces the reply to `pump_cmd = 1`. The plant receives $1$, executes it, and echoes `pkt.pump_cmd = 1, pkt.pump_on = True`.
 - **Mitigation Limitation:** **The Gateway cannot mitigate a bus-level override.** Because the override occurs downstream of the gateway's network boundary, software commands cannot override the forced wire state. AM-3 is strictly **detect-only**.
-- **Explicit Boolean Detection Rule (Conditioned on Gateway Command History & Delay):**
-  The pump actuator requires an electrical/activation delay of $D = 2\text{ ticks}$ (`cfg.pump.delay_s = 2`).
-  Therefore, the Gateway evaluates:
-  ```python
-  # Gateway issued pump OFF for at least D=2 ticks:
-  gateway_pump_off_for_delay = (
-      len(gateway_issued_pump_history) >= 2
-      and all(cmd == 0 for cmd in gateway_issued_pump_history[-2:])
-  )
-  is_wire_tampered = (
-      gateway_pump_off_for_delay
-      and (
-          telemetry.pump_command == 1
-          or telemetry.pump_state == 1
-          or telemetry.q_in > 0.001
-      )
-  )
-  ```
+- **Pump Class Delay Semantics & Historical Command Indexing:**
+  - In `simulator/pump.py`, response delay is governed by `self._delay_steps = max(1, math.ceil(response_delay_s / dt)) = 2`.
+  - When `set_command(cmd)` is invoked with a changed command, `self._command` updates and `self._steps_since_command` is reset to 0.
+  - In `step()`, `self._steps_since_command` is incremented by 1, and only transitions `self._state = self._command` when `self._steps_since_command >= self._delay_steps`.
+  - Consequently, when transitioning from ON to OFF, the physical pump remains ON (`state = 1`) during the first step after `command = 0` is received.
+  - **Indexing Definition:** The Gateway maintains `gateway_issued_pump_history`:
+    - `history[-1]` is the pump command issued at the current timestep $t$.
+    - `history[-2]` is the pump command issued at timestep $t-1$.
+  - Therefore, `gateway_pump_off_for_delay = (len(history) >= 2 and history[-1] == 0 and history[-2] == 0)`.
+  - The tamper detection rule is:
+    ```python
+    is_wire_tampered = (
+        len(gateway_issued_pump_history) >= 2
+        and gateway_issued_pump_history[-1] == 0
+        and gateway_issued_pump_history[-2] == 0
+        and (
+            telemetry.pump_command == 1
+            or telemetry.pump_on == True
+            or telemetry.q_in > 0.001
+        )
+    )
+    ```
 - **Return Telemetry Integrity Assumption:**
   This rule explicitly assumes that the return telemetry path from the plant to the gateway (sensor level, flow meters, actuator echo) is **NOT** tampered. The adversary tampers solely with the forward control wire from gateway to plant actuators. If the return path were also spoofed, the attack becomes a multi-point attack (addressed by the physics twin tracking unmodelled water level rise).
 - **Tests & Verification:**
-  1. **False-Alarm Soak Test:** Run a 30-minute (1800-tick) normal soak test with no attacks: exactly **0 alerts** (0 false alarms).
-  2. **Detection Delay Measurement:** Under AM-3 injection, measure the delay from wire tamper inception to alert: exactly $D_{delay} = 2\text{ ticks}$ (matching the plant actuator activation delay).
-  3. **Identical Physical Harm:** Physical harm (overflow ticks) is **identical** in both Monitor and Prevention modes because downstream wire overrides bypass gateway command routing.
+  1. **Legitimate Turn-off Transition Test:** Explicitly test legitimate pump turn-off transitions from autonomous cycling. During the 2-step transition window where the pump remains mechanically ON while shutting down, verify zero alerts are triggered.
+  2. **30-Minute False-Alarm Soak Test:** Run a 30-minute (1800-tick) normal cycling soak test with no attacks: count the total number of legitimate pump turn-off transitions (typically 15–20 transitions across cycling) and verify that false wire-tamper alerts are exactly **0 alerts**.
+  3. **Detection Delay Measurement:** Under AM-3 injection, measure the delay from wire tamper inception to alert: exactly $D_{delay} = 2\text{ ticks}$ (matching the plant actuator activation delay).
+  4. **Identical Physical Harm:** Physical harm (overflow ticks) is **identical** in both Monitor and Prevention modes because downstream wire overrides bypass gateway command routing.
 
 #### AM-4: In-Deadband Pump Toggle at Nominal Level
 - **Attack Nature:** Attacker issues valid valve command ($50\%$) but rapidly toggles `pump_cmd` ($0 \leftrightarrow 1$) while the water level is nominal ($H \approx 1.0\text{ m}$, inside the $[0.8, 1.2\text{ m}]$ deadband).
@@ -117,40 +126,56 @@ In Phase 6b, we address **actuator-level command attacks (Authorization Misuse /
   - **Temporal Engine (LSTM):** Evaluated empirically. We make no unverified claims of detection; the evaluation harness records the empirical maximum LSTM anomaly score.
 
 #### AM-5: In-Band Malicious Hold - Filling ($H=1.0\text{ m}$, Pump ON, Hold 1500s)
-- **Attack Nature:** Attacker issues `pump_cmd = 1, valve_cmd = 50.0%, hold_ticks = 1500` while tank level is nominal ($H \approx 1.0\text{ m}$).
-- **Analytical Timing from 1.0m to 2.5m:**
-  $$\frac{dh}{dt} = 0.0025 - 0.001\sqrt{h}$$
-  Let $u = \sqrt{h}$, $h = u^2$, $dh = 2u du$.
-  $$t = \int_{1.0}^{\sqrt{2.5}} \frac{2u du}{0.001(2.5 - u)} = 2000 \int_{1.0}^{\sqrt{2.5}} \left( -1 + \frac{2.5}{2.5 - u} \right) du = \left[ -2000u - 5000\ln(2.5 - u) \right]_{1.0}^{\sqrt{2.5}}$$
-  - At $u = 1.0$: $t_1 = -2000 - 5000\ln(1.5) = -2000 - 2027.3 = -4027.3\text{ s}$.
-  - At $u = \sqrt{2.5} \approx 1.5811$: $t_2 = -3162.3 - 5000\ln(0.9189) = -3162.3 + 423.1 = -2739.2\text{ s}$.
-  - $t_{fill} = t_2 - t_1 = -2739.2 - (-4027.3) \approx 1288.1\text{ s} \approx 1288\text{ s}$.
+- **Threat Model:** The attacker is an authenticated insider possessing the valid API shared secret (A4 threat model). Because the attacker possesses valid credentials, the 60-tick hold cap does not prevent the attack. Therefore, **Continuous Enforcement is the primary defense**.
+- **Attack Nature:** Attacker issues authenticated command `pump_cmd = 1, valve_cmd = 50.0%, hold_ticks = 1500` while tank level is nominal ($H \approx 1.0\text{ m}$).
+- **Analytical Timing from 1.0m to 1.25m and 2.5m:**
+  - Net fill rate: $\frac{dh}{dt} = \frac{0.005 - 0.002\sqrt{h}}{2.0} = 0.0025 - 0.001\sqrt{h}$.
+  - At $h = 1.0\text{ m}$: $\frac{dh}{dt} = 0.0025 - 0.001(1.0) = 0.0015\text{ m/s} = 1.5\text{ mm/s}$.
+  - Analytical time to reach the upper safety boundary $1.25\text{ m}$ ($setpoint + deadband + \epsilon$):
+    $$t_{1.25} = \left[ -2000u - 5000\ln(2.5 - u) \right]_{1.0}^{\sqrt{1.25}} \approx -3853.54 - (-4027.33) \approx 173.8\text{ s} \approx 174\text{ s}$$
+  - Analytical fill time from $1.0\text{ m}$ to tank crest overflow ($2.50\text{ m}$):
+    $$t_{fill} = \left[ -2000u - 5000\ln(2.5 - u) \right]_{1.0}^{\sqrt{2.5}} \approx -2739.2 - (-4027.3) \approx 1288.1\text{ s} \approx 1288\text{ s}$$
   - Because $1288\text{ s} > 1200\text{ s}$, a 1200 s hold produces NO overflow. Therefore, AM-5 uses `hold_ticks = 1500`.
   - Overflow ticks in Monitor mode: $1500 - 1288 = 212 \approx 210\text{ ticks}$.
-- **Ingress Filter Behavior:** At $H = 1.0\text{ m}$, pump ON is completely valid ($1.0\text{ m} \le 1.25\text{ m}$). Ingress filter allows the command.
+- **Ingress Filter Behavior:** At $H = 1.0\text{ m}$, pump ON is valid ($1.0\text{ m} \le 1.25\text{ m}$). Ingress filter allows the command.
 - **Continuous Enforcement Behavior:**
   - On every simulation tick, the active hold is re-evaluated against the live level estimate $h_{est}$.
-  - Tank fills at $\approx 1.16\text{ mm/s}$.
-  - When $h_{est}$ crosses $1.25\text{ m}$ ($setpoint + deadband + \epsilon$, at $t \approx 215\text{ s}$), Continuous Enforcement flags a safety violation and **drops the hold** (`hold_ticks = 0`).
+  - Tank fills at $1.5\text{ mm/s}$ initially, crossing $1.25\text{ m}$ at $t \approx 174\text{ s}$.
+  - When $h_{est} > 1.25\text{ m}$ ($t \approx 174\text{ s}$), Continuous Enforcement flags a safety violation and **drops the hold** (`hold_ticks = 0`).
   - Control reverts immediately to the autonomous controller, which de-energizes the pump.
 - **Pass Conditions:**
-  - **Monitor Mode:** Command hold persists for 1500 s without continuous enforcement. Tank overflows in $\ge 9$ of 10 seeds ($\approx 210$ overflow ticks). Gateway dispatches `would_drop` event at $H > 1.25\text{ m}$.
-  - **Prevention Mode:** Continuous enforcement drops the hold at $H > 1.25\text{ m}$. Exactly **0 overflow ticks** across all 10 seeds.
+  - **Monitor Mode:** Command hold persists for 1500 s without continuous enforcement. Tank overflows in $\ge 9$ of 10 seeds ($\approx 210$ overflow ticks). Gateway dispatches `would_drop` event at $H > 1.25\text{ m}$ ($t \approx 174\text{ s}$).
+  - **Prevention Mode:** Continuous enforcement drops the hold at $H > 1.25\text{ m}$ ($t \approx 174\text{ s}$). Exactly **0 overflow ticks** across all 10 seeds.
 
 #### AM-6: In-Band Malicious Hold - Draining ($H=1.0\text{ m}$, Pump OFF, Hold 1800s)
-- **Attack Nature:** Attacker issues `pump_cmd = 0, valve_cmd = 50.0%, hold_ticks = 1800` while tank level is nominal ($H \approx 1.0\text{ m}$).
-- **Analytical Timing from 1.0m to 0.05m:**
-  $$\frac{dh}{dt} = -0.001\sqrt{h} \implies \int_{1.0}^{0.05} \frac{dh}{\sqrt{h}} = -0.001 t \implies t_{drain} = \frac{2}{0.001} \left( \sqrt{1.0} - \sqrt{0.05} \right) = 2000(1.0 - 0.2236) \approx 1552.8\text{ s} \approx 1553\text{ s}$$
-  - To cause dry-run ($H \le 0.05\text{ m}$), hold duration must exceed 1553 s; we use `hold_ticks = 1800` (or hold to end of run).
+- **Threat Model:** Authenticated insider possessing the valid API shared secret (A4 threat model). Continuous Enforcement is the primary defense.
+- **Attack Nature:** Attacker issues authenticated command `pump_cmd = 0, valve_cmd = 50.0%, hold_ticks = 1800` while tank level is nominal ($H \approx 1.0\text{ m}$).
+- **Analytical Timing from 1.0m to 0.75m and 0.05m:**
+  - Gravity drain rate: $\frac{dh}{dt} = -\frac{0.002\sqrt{h}}{2.0} = -0.001\sqrt{h}$. At $h = 1.0\text{ m}$, rate is $-1.0\text{ mm/s}$.
+  - Analytical time to reach the lower safety boundary $0.75\text{ m}$ ($setpoint - deadband - \epsilon$):
+    $$t_{0.75} = \frac{2}{0.001} \left( \sqrt{1.0} - \sqrt{0.75} \right) = 2000(1.0 - 0.866025) \approx 267.95\text{ s} \approx 268\text{ s}$$
+  - Analytical drain time from $1.0\text{ m}$ to pump cavitation/dry-run ($0.05\text{ m}$):
+    $$t_{drain} = \frac{2}{0.001} \left( \sqrt{1.0} - \sqrt{0.05} \right) = 2000(1.0 - 0.22361) \approx 1552.8\text{ s} \approx 1553\text{ s}$$
   - Dry-run ticks in Monitor mode: $1800 - 1553 = 247\text{ ticks}$.
 - **Ingress Filter Behavior:** At $H = 1.0\text{ m}$, pump OFF is valid ($1.0\text{ m} \ge 0.75\text{ m}$). Ingress filter allows the command.
 - **Continuous Enforcement Behavior:**
   - On every simulation tick, active hold is re-evaluated against live level estimate $h_{est}$.
-  - When $h_{est}$ falls below $setpoint - deadband - \epsilon = 1.0 - 0.20 - 0.05 = 0.75\text{ m}$ (at $t \approx 280\text{ s}$), Continuous Enforcement flags a safety violation and **drops the hold** (`hold_ticks = 0`).
+  - When $h_{est}$ falls below $0.75\text{ m}$ ($t \approx 268\text{ s}$), Continuous Enforcement flags a safety violation and **drops the hold** (`hold_ticks = 0`).
   - Control reverts immediately to the autonomous controller, which commands pump ON ($1$), arresting tank drainage.
 - **Pass Conditions:**
-  - **Monitor Mode:** Command hold persists for 1800 s. Tank reaches dry-run ($0.05\text{ m}$) at $t \approx 1553\text{ s}$, remaining in dry-run for $\approx 247$ ticks. Gateway dispatches `would_drop` event at $H < 0.75\text{ m}$.
-  - **Prevention Mode:** Continuous enforcement drops the hold at $H < 0.75\text{ m}$. Exactly **0 dry-run ticks** across all 10 seeds.
+  - **Monitor Mode:** Command hold persists for 1800 s. Tank reaches dry-run ($0.05\text{ m}$) at $t \approx 1553\text{ s}$, remaining in dry-run for $\approx 247$ ticks. Gateway dispatches `would_drop` event at $H < 0.75\text{ m}$ ($t \approx 268\text{ s}$).
+  - **Prevention Mode:** Continuous enforcement drops the hold at $H < 0.75\text{ m}$ ($t \approx 268\text{ s}$). Exactly **0 dry-run ticks** across all 10 seeds.
+
+#### AM-7: Unauthenticated Hold Cap Test ($H=1.0\text{ m}$, Pump ON, Hold 1500s)
+- **Threat Model:** Unauthenticated attacker issuing commands without credentials or with an invalid secret.
+- **Attack Payload:** `POST /api/command` with `pump_cmd = 1, valve_cmd = 50.0%, hold_ticks = 1500`.
+- **Validation & Cap Enforcement:**
+  - Ingress validator detects unauthenticated request.
+  - Applies uniform 60-tick hold cap: `hold_ticks = min(1500, 60) = 60`.
+  - Ingress filter accepts the command since $H = 1.0\text{ m} \le 1.25\text{ m}$.
+  - Over 60 seconds, tank level fills by $\Delta h \approx 60 \times 0.0014\text{ m/s} \approx 0.084\text{ m} = 8.4\text{ cm}$, reaching $H \approx 1.084\text{ m}$, safely inside the $[0.8, 1.2\text{ m}]$ operational deadband.
+  - At $t = 60\text{ s}$, the hold expires naturally, returning authority to the autonomous controller well before reaching the $1.25\text{ m}$ limit ($t \approx 174\text{ s}$).
+- **Pass Condition:** Command accepted with `hold_ticks: 60`. Exactly **0 overflow ticks** and **0 dry-run ticks** across all 10 seeds.
 
 ---
 
@@ -209,12 +234,15 @@ def evaluate_command_with_live_setpoint(
     Returns:
         (is_valid, rejection_reason)
     """
-    # Strict attribute assertions - no silent defaults
-    assert hasattr(controller, "setpoint"), "Controller missing 'setpoint' attribute"
+    # Strict attribute validation - explicit exceptions instead of assert
+    if not hasattr(controller, "setpoint"):
+        raise AttributeError("Controller missing 'setpoint' attribute")
     setpoint = float(controller.setpoint)
-    assert hasattr(controller, "_deadband"), "Controller missing '_deadband' attribute"
+    if not hasattr(controller, "_deadband"):
+        raise AttributeError("Controller missing '_deadband' attribute")
     deadband = float(controller._deadband)
-    assert hasattr(controller, "_default_valve_pct"), "Controller missing '_default_valve_pct' attribute"
+    if not hasattr(controller, "_default_valve_pct"):
+        raise AttributeError("Controller missing '_default_valve_pct' attribute")
     default_valve = float(controller._default_valve_pct)
 
     # Valve invariant
@@ -279,19 +307,24 @@ def handle_command():
     if hold_ticks <= 0:
         return jsonify({"error": "Bad Request", "details": "hold_ticks must be positive"}), 400
 
-    # 2. Hold Duration Cap for Non-Authenticated Callers (Uniform Policy)
-    auth_header = request.headers.get('Authorization', '')
-    api_key_header = request.headers.get('X-API-Key', '')
-    shared_secret = current_app.config.get('SCADA_API_SECRET', 'secret_key_ICS_2026')
+    # 2. Hold Duration Cap for Non-Authenticated Callers (Fail-Closed, hmac.compare_digest)
+    cfg_obj = current_app.config.get('SCADA_CONFIG')
+    api_cfg = getattr(cfg_obj, 'api', None) if cfg_obj else None
+    shared_secret = str(getattr(api_cfg, 'shared_secret', '') or '')
     
-    is_authenticated = (
-        auth_header == f"Bearer {shared_secret}"
-        or api_key_header == shared_secret
-    )
+    is_authenticated = False
+    if shared_secret:  # If secret missing or empty in config -> Fail Closed (all callers unauthenticated)
+        auth_header = request.headers.get('Authorization', '')
+        bearer_token = auth_header[7:].strip() if auth_header.startswith("Bearer ") else ""
+        api_key = request.headers.get('X-API-Key', '').strip()
+        is_authenticated = (
+            (bool(bearer_token) and hmac.compare_digest(bearer_token, shared_secret))
+            or (bool(api_key) and hmac.compare_digest(api_key, shared_secret))
+        )
     if not is_authenticated:
         hold_ticks = min(hold_ticks, 60)  # Max 60 ticks without cryptographic shared secret
 
-    # Metadata role attribute for telemetry logging
+    # Metadata role attribute for telemetry logging ONLY (MUST NOT be used in validation)
     role = request.headers.get('X-Actor-Role', 'unauthenticated')
 
     # 3. Gateway Ingress Filtering & Mode Handling
@@ -328,7 +361,7 @@ def handle_command():
        - Record metric `holds_dropped_total`.
        - Immediately invoke `controller.step(h_est)` to issue legitimate autonomous commands.
 3. **Resumption State Synchronization:**
-   - When hold expires or drops, the autonomous controller synchronizes its internal state (`controller._pump_command = plant.pump.state`) to prevent erratic toggling.
+   - When hold expires or drops, the autonomous controller synchronizes its internal state (`controller._pump_command = latest_telemetry.pump_on`) to prevent erratic toggling (the Gateway has no direct plant reference; it uses the echoed `latest_telemetry.pump_on` from the incoming telemetry packet).
 
 ---
 
@@ -386,6 +419,7 @@ Recorded in the existing `MetricsCollector` instance in `scada_ids/`:
 | | Prevention | Ingress allows command; Continuous Enforcement drops hold at $H > 1.25\text{ m}$; pump de-energized. | Exactly **0 overflow ticks** across all 10 seeds. |
 | **AM-6 (In-Band Hold - Draining)** | Monitor | Pump OFF held at $H = 1.0\text{ m}$ for 1800 ticks without continuous enforcement; drains to $0.05\text{ m}$ in $\approx 1553\text{ s}$; dry-run for $\approx 247$ ticks. | $\ge 1$ dry-run event in $\ge 9$ of 10 seeds ($> 150$ mean dry-run ticks). |
 | | Prevention | Ingress allows command; Continuous Enforcement drops hold at $H < 0.75\text{ m}$; pump energized. | Exactly **0 dry-run ticks** across all 10 seeds. |
+| **AM-7 (Unauthenticated Cap)** | Both | Unauthenticated command with requested hold = 500 ticks is capped to 60 ticks. | Hold expires after exactly 60 ticks; subsequent plant state determined by autonomous controller. |
 | **Normal Soak** | Prevention | 30-minute unattacked normal cycling with legitimate commands. | Exactly **0 false blocks** and **0 false takeovers**. |
 
 ---
@@ -396,11 +430,11 @@ When Phase 6b is approved for implementation, execution will proceed in strict o
 
 ### Step 1: Ingress API & Command Schema (`POST /api/command`)
 - Implement Flask route handler in `scada_ids/server.py` with HTTP 400 validation for invalid/missing fields.
-- Attach `X-Actor-Role` header as metadata label; enforce uniform 60-tick hold cap for unauthenticated callers.
+- Attach `X-Actor-Role` header as non-authoritative metadata label (must NOT be used in validation); enforce uniform 60-tick hold cap for unauthenticated callers.
 - *Test:* `test_api_command_validation.py`.
 
 ### Step 2: GatewayCore Command Pipeline, Live Validation & Continuous Enforcement
-- Implement `evaluate_command_with_live_setpoint(h_est, pump_cmd, valve_cmd, controller)` in `GatewayCore` asserting controller attributes exist.
+- Implement `evaluate_command_with_live_setpoint(h_est, pump_cmd, valve_cmd, controller)` in `GatewayCore` raising explicit `AttributeError` if controller attributes missing.
 - Add Continuous Enforcement tick loop: re-evaluate active holds every tick; drop hold in Prevention mode, raise `would_drop` in Monitor mode.
 - Validate across all 60 normal scenarios (0 fires) and offline test suite.
 - Dispatch blocked command, dropped hold, would-block, and would-drop alerts to `EventHub` and `MetricsCollector`.
@@ -408,14 +442,15 @@ When Phase 6b is approved for implementation, execution will proceed in strict o
 
 ### Step 3: Wire Tamper Hook & 4-Way Actuator Consistency
 - Place bus tamper injector strictly in downstream wire/reply layer (`attacker_wire/injector.py`), never inside `LivePlant` or `GatewayCore`.
-- Implement explicit boolean 4-way consistency check conditioned on Gateway pump OFF history for 2 ticks.
+- Implement explicit boolean 4-way consistency check conditioned on Gateway pump OFF history for 2 ticks (`gateway_issued_pump_history[-2:] == [0, 0]`).
 - Verify detection delay $\le 3\text{ ticks}$ and identical physical harm between Monitor and Prevention modes.
 - Verify 30-minute normal soak has 0 wire tamper alerts.
 - *Test:* `test_tamper_consistency_check.py`.
 
-### Step 4: A/B Verification Harness & AM-1 to AM-6 Evaluation
-- Implement `experiments/run_auth_misuse_ab.py` evaluating 10 seeds across AM-1, AM-2, AM-3, AM-4, AM-5, AM-6.
+### Step 4: A/B Verification Harness & AM-1 to AM-7 Evaluation
+- Implement `experiments/run_auth_misuse_ab.py` evaluating 10 seeds across AM-1, AM-2, AM-3, AM-4, AM-5, AM-6, AM-7.
 - Verify 0 overflows/dry-runs for AM-1, AM-2, AM-5, AM-6 in Prevention mode.
+- Verify unauthenticated hold cap expires at 60 ticks for AM-7.
 - Record empirical engine firing measurements for AM-4.
 - Update `PROJECT_REVIEW_CHEAT_SHEET.md`.
 

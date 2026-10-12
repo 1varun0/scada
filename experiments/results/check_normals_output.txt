@@ -1,0 +1,14 @@
+﻿FP on N_017 tick 898: {'physics': 0.9966858267967155, 'lstm': 0.08581797181464293, 'policy': 0.0, 'availability': 0.0}
+FP on N_060 tick 443: {'physics': 0.012003512726150536, 'lstm': 0.9609071866554372, 'policy': 0.0, 'availability': 0.0}
+Normal Scenarios FPR (DB, includes 51 normals used for training/validation): 2 FPs out of 60000 ticks
+
+Held-out normals from data/evaluation_results.csv (9 scenarios):
+  N_001 (Steady_State): max LSTM score 0.803 (margin 0.147)
+  N_006 (Steady_State): max LSTM score 0.936 (margin 0.014)
+  N_013 (Steady_State): max LSTM score 0.850 (margin 0.100)
+  N_014 (Steady_State): max LSTM score 0.815 (margin 0.135)
+  N_034 (Setpoint_Change): max LSTM score 0.762 (margin 0.188)
+  N_037 (Variable_Load): max LSTM score 0.769 (margin 0.181)
+  N_046 (Variable_Load): max LSTM score 0.792 (margin 0.158)
+  N_049 (Variable_Load): max LSTM score 0.722 (margin 0.228)
+  N_055 (Recovery): max LSTM score 0.821 (margin 0.129)

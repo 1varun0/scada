@@ -13,17 +13,22 @@ Rule Definition:
      - Steady_State      : 20 scenarios, 20000 ticks, 0 rule violations
      - Variable_Load     : 15 scenarios, 15000 ticks, 0 rule violations
    Total False Positives / Rule Violations: 0 ticks across 60 scenarios.
-   Verdict: PASSED (Expected: 0, Measured: 0)
+   Threshold Margins on Normals:
+     - Pump ON ticks minimum margin:  0.0500 m [(sp+db+eps) - h]
+     - Pump OFF ticks minimum margin: 0.0500 m [h - (sp-db-eps)]
+     - Minimum overall margin:        0.0500 m
+     - Note: 0 fires is expected by construction: the closed-loop controller hysteresis band is [sp-0.20, sp+0.20], strictly inside the rule limits [sp-0.25, sp+0.25] by epsilon=0.05m.
+   Verdict: PASSED (Expected by construction: 0, Measured: 0)
 
 2. A1 FALSE DATA INJECTION (A1_001 to A1_045: 45 scenarios, 45000 ticks total):
    Inside Ground-Truth Attack Window (8245 ticks):
      - Rule Violations: 1818 ticks across 35 scenarios.
-     - Physical Rationale: Dataset artifact. In MATLAB, apply_fdi was called post-hoc after the normal closed-loop
+     - Physical Rationale: Dataset finding / post-hoc overlay artifact. In MATLAB, apply_fdi was called post-hoc after the normal closed-loop
        simulation. When normal control had pump=1 filling toward 1.20m, the post-hoc bias overlay shifted H_obs
        above 1.25m while recorded pump_command remained 1 (the recorded controller never reacted to spoofed level).
    Outside Ground-Truth Attack Window (36755 ticks):
      - Rule Violations: 0 ticks across 0 scenarios.
-   Verdict: PASSED (Expected Inside: 1818, Measured Inside: 1818; Expected Outside: 0, Measured Outside: 0)
+   Verdict: REGRESSION PIN (Expected Inside: 1818, Measured Inside: 1818; Expected Outside: 0, Measured Outside: 0)
 
 3. A2 REPLAY ATTACKS (A2_001 to A2_015: 15 scenarios, 15000 ticks total):
    Inside Ground-Truth Attack Window (990 ticks):  0 rule violations.
@@ -86,5 +91,5 @@ Finding on Stored vs Live Closed-Loop FDI:
   the controller immediately shuts off the pump when observed level crosses 1.20m.
 ===================================================================================================================
 
-OVERALL VALIDATION SUITE RESULT: ALL TESTS PASSED
+OVERALL VALIDATION SUITE RESULT: ALL TESTS PASSED / REGRESSION PINS VERIFIED
 
