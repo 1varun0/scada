@@ -37,12 +37,18 @@ class PolicyEngine:
 
     def evaluate_v2(self, h_observed: float, pump_command: int, valve_command: float) -> float:
         """
-        Evaluate stricter safety rules based on Controller hysteresis band and valve logic.
+        Evaluate safety rules based on Controller valve logic and critical boundaries.
         
-        Rules:
-        1. Pump ON when H > H_off (1.2m) + epsilon => 1.0
-        2. Pump OFF when H < H_on (0.8m) - epsilon => 1.0
-        3. Valve is not a legitimate value (default or safe_position) => 1.0
+        Note on Hysteresis Rules:
+        h_off (1.2m) and h_on (0.8m) are defined for reference, but static pump-vs-level
+        hysteresis rules are omitted here because PolicyEngine is not setpoint-aware
+        and hardcoding [0.8, 1.2m] causes false alarms during dynamic setpoint transitions
+        (e.g., setpoint profile steps). Setpoint-aware pump filtering is handled by the
+        gateway command filter with live controller state.
+        
+        Active Rules in v2:
+        1. Valve must be default (50%) or legitimate fail-safe (0% with pump OFF) => 1.0 if violated
+        2. Fall back to v1 critical boundary checks (overflow near h_max, drain near h_crit_low)
         """
         h_off = PARAMS.controller.pump_off_threshold_m
         h_on = PARAMS.controller.pump_on_threshold_m

@@ -54,31 +54,90 @@ def ode_dry_run_time(h_start: float, h_end: float = 0.05) -> float:
     """Analytical ODE time to dry-run: dh/dt = -0.001*sqrt(h)."""
     return 2000.0 * (np.sqrt(h_start) - np.sqrt(h_end))
 
-def print_theoretical_predictions():
-    print("=" * 115)
-    print("PHYSICAL DYNAMICS & PREDICTED VS MEASURED TIMES (clamp_flow_noise=False)")
-    print("=" * 115)
+def print_theoretical_predictions(seeds: list = None):
+    if seeds is None:
+        seeds = [101, 102, 103, 104, 105, 106, 107, 108, 109, 110]
+    print("=" * 130)
+    print("PHYSICAL DYNAMICS & LATCH ODE VERIFICATION (ALL 10 SEEDS, clamp_flow_noise=False)")
+    print("=" * 130)
     print("Header Definitions:")
     print("  - Dry-Run:  True tank level H_true <= 0.05 m (pump cavitation / suction loss hazard)")
     print("  - Overflow: True tank level H_true >= 2.50 m (tank crest overflow / spillage hazard)")
     print("  - Critical Low: H_true < 0.30 m (abnormal depletion boundary)")
     print("  - Operational Deadband: [0.80 m, 1.20 m]\n")
-    print("Physical Timing & ODE Mechanism (Seed 101, t_start = 300 s, duration = 1200 s):")
-    print("1. Negative Ramp (-1.5 m, slope = -1.25 mm/s):")
-    print("   - In an idealized midpoint start (h=1.0m), pump would latch at t=460s and overflow at t=1748s.")
-    print("   - Measured simulation latch: Pump latches permanently ON at t_latch = 300 s with true level h_latch = 0.9507 m.")
-    print("   - Analytical filling ODE: dh/dt = (Q_in - Q_out)/A = (0.005 - 0.002*sqrt(h))/2.0 = 0.0025 - 0.001*sqrt(h).")
-    print("   - Analytical fill time from h_latch = 0.9507 m to 2.50 m: t_ODE = 1320.8 s.")
-    print("   - Predicted overflow tick: t = 300 + 1320.8 = 1620.8 s.")
-    print("   - Observed overflow tick:  t = 1621 s (elapsed: 1321 s from latch). ODE prediction matches to 0.2 s!\n")
-    print("2. Positive Ramp (+1.5 m, slope = +1.25 mm/s):")
-    print("   - In an idealized midpoint start (h=1.0m), gravity drainage predicts dry-run at t=1853s.")
-    print("   - Measured simulation latch: Pump turns permanently OFF at t_latch = 391 s with true level h_latch = 1.0863 m.")
-    print("   - Analytical gravity drainage ODE: dh/dt = -Q_out/A = -0.002*sqrt(h)/2.0 = -0.001*sqrt(h).")
-    print("   - Analytical drain time from h_latch = 1.0863 m to 0.05 m: t_ODE = 2000*(sqrt(1.0863) - sqrt(0.05)) = 1637.3 s.")
-    print("   - Predicted dry-run tick:  t = 391 + 1637.3 = 2028.3 s.")
-    print("   - Observed dry-run tick:   t = 2028 s (elapsed: 1637 s from latch). ODE prediction matches to 0.3 s!")
-    print("=" * 115 + "\n")
+    print("Latch Definition (Strict & Non-Back-Fitted):")
+    print("  - Negative Ramp (Overflow): First tick t_latch >= t_start after which pump stays ON (state=1) continuously to t=2399.")
+    print("  - Positive Ramp (Dry-run):  First tick t_latch >= t_start after which pump stays OFF (state=0) continuously to t=2399.\n")
+    print("Analytical ODEs:")
+    print("  - Filling ODE:  dh/dt = (Q_in - Q_out)/A = (0.005 - 0.002*sqrt(h))/2.0 = 0.0025 - 0.001*sqrt(h)")
+    print("  - Draining ODE: dh/dt = -Q_out/A = -0.002*sqrt(h)/2.0 = -0.001*sqrt(h)\n")
+    
+    cfg = load_config('scada_live/config.yaml')
+    cfg.simulation.clamp_flow_noise = False
+    cfg.ids.dos_gap_rule = True
+    
+    print("-" * 130)
+    print("1. NEGATIVE RAMP (OVERFLOW Threat, Target H >= 2.50 m):")
+    print(f"{'Seed':<5} | {'Start':<6} | {'Duration':<8} | {'Latch Tick':<10} | {'h_latch (m)':<12} | {'t_ODE (s)':<10} | {'Pred Ov Tick':<13} | {'Obs Ov Tick':<12} | {'Diff (s)':<8}")
+    print("-" * 130)
+    for s in seeds:
+        t_start, ramp_dur = get_attack_schedule(s)
+        gw = GatewayCore(cfg, EventHub(), dos_gap_rule=True)
+        gw.set_mode("monitor")
+        plant = LivePlant(cfg, standalone_mode=False, seed=s)
+        pump_states, true_levels = [], []
+        for t in range(2400):
+            obs = plant.observe()
+            spoof = -1.5 * min(1.0, (t - t_start) / float(ramp_dur)) if t >= t_start else 0.0
+            cmds = gw.process_sense(obs + spoof)
+            pkt = plant.advance(cmds["pump_cmd"], cmds["valve_cmd"])
+            pkt.level_m = obs + spoof
+            gw.process_telemetry(pkt)
+            pump_states.append(plant.pump.state)
+            true_levels.append(plant.tank.level)
+        latch_tick = t_start
+        for t in range(2399, t_start - 1, -1):
+            if pump_states[t] != 1:
+                latch_tick = t + 1
+                break
+        h_latch = true_levels[latch_tick]
+        t_ode = ode_overflow_time(h_latch, 2.50)
+        pred_ov = latch_tick + t_ode
+        obs_ov = next((t for t in range(2400) if true_levels[t] >= 2.50), None)
+        diff_str = f"{obs_ov - pred_ov:+.1f}" if obs_ov is not None else "N/A"
+        print(f"{s:<5d} | {t_start:<6d} | {ramp_dur:<8d} | {latch_tick:<10d} | {h_latch:<12.4f} | {t_ode:<10.1f} | {pred_ov:<13.1f} | {str(obs_ov):<12} | {diff_str:<8}")
+    print("-" * 130)
+    
+    print("\n2. POSITIVE RAMP (DRY-RUN Threat, Target H <= 0.05 m):")
+    print(f"{'Seed':<5} | {'Start':<6} | {'Duration':<8} | {'Latch Tick':<10} | {'h_latch (m)':<12} | {'t_ODE (s)':<10} | {'Pred Dry Tick':<13} | {'Obs Dry Tick':<12} | {'Diff (s)':<8}")
+    print("-" * 130)
+    for s in seeds:
+        t_start, ramp_dur = get_attack_schedule(s)
+        gw = GatewayCore(cfg, EventHub(), dos_gap_rule=True)
+        gw.set_mode("monitor")
+        plant = LivePlant(cfg, standalone_mode=False, seed=s)
+        pump_states, true_levels = [], []
+        for t in range(2400):
+            obs = plant.observe()
+            spoof = +1.5 * min(1.0, (t - t_start) / float(ramp_dur)) if t >= t_start else 0.0
+            cmds = gw.process_sense(obs + spoof)
+            pkt = plant.advance(cmds["pump_cmd"], cmds["valve_cmd"])
+            pkt.level_m = obs + spoof
+            gw.process_telemetry(pkt)
+            pump_states.append(plant.pump.state)
+            true_levels.append(plant.tank.level)
+        latch_tick = t_start
+        for t in range(2399, t_start - 1, -1):
+            if pump_states[t] != 0:
+                latch_tick = t + 1
+                break
+        h_latch = true_levels[latch_tick]
+        t_ode = ode_dry_run_time(h_latch, 0.05)
+        pred_dry = latch_tick + t_ode
+        obs_dry = next((t for t in range(2400) if true_levels[t] <= 0.05), None)
+        diff_str = f"{obs_dry - pred_dry:+.1f}" if obs_dry is not None else "N/A"
+        print(f"{s:<5d} | {t_start:<6d} | {ramp_dur:<8d} | {latch_tick:<10d} | {h_latch:<12.4f} | {t_ode:<10.1f} | {pred_dry:<13.1f} | {str(obs_dry):<12} | {diff_str:<8}")
+    print("=" * 130 + "\n")
 
 def run_simulation(scenario_name: str, mode: str, seed: int, duration_s: int = 2400) -> dict:
     """Run a single in-process simulated closed-loop scenario."""
@@ -312,7 +371,7 @@ def run_ab_comparison():
     print("=" * 115)
     print("Explanation of Prolonged Takeover in Ramps:")
     print("  In Negative_Ramp and Positive_Ramp, the spoof bias holds at +/-1.5m after the ramp duration.")
-    print("  Because the sensor remains permanently compromised, |h_obs - h_twin| >> tolerance (0.02m),")
+    print("  Because the sensor remains permanently compromised, |h_obs - h_twin| >> tolerance (config 0.05m),")
     print("  so hand-back CANNOT and SHOULD NOT engage. Takeover legitimately stays active to the end.")
     print("  Below, Scenario (e) removes the bias to verify hand-back engages cleanly once sensor recovers:\n")
     
@@ -380,10 +439,11 @@ def run_ab_comparison():
         m_r = f"{sub['ratio_tau_p'].mean():.3f} ± {sub['ratio_tau_p'].std():.3f}"
         print(f"{sl_label:<12} | {m_el:<18} | {m_b:<16} | {m_r:<25} | {sub['ratio_tau_p'].min():.3f}       | {sub['ratio_tau_p'].max():.3f}")
     print("-" * 115)
-    print("Physical Insight on Detection Ratio (0.54 to 0.83 of tau_p):")
+    print("Physical Insight on Detection Ratio (0.16 to 0.90 across slopes and seeds):")
     print("  Physics detection fires when total residual |h_obs - h_twin| = |bias(t) + noise(t) + e_twin(t)| > tau_p (3.5 cm).")
-    print("  Constructive addition of sensor noise (sigma=5 mm, 2-3 sigma peaks ~ 1.0-1.5 cm) pushes the residual over tau_p")
-    print("  when the deterministic ramp bias reaches 0.54 to 0.83 of tau_p (about 1.9 to 2.9 cm).")
+    print("  Across slopes 0.01 to 0.10 mm/s and 10 seeds, the individual ratio (bias/tau_p) spans 0.16 to 0.90.")
+    print("  Slow-ramp detections are helped by sensor noise peaks (3*sigma ~ 1.5 cm) and twin integration error")
+    print("  constructively adding to the residual, causing threshold crossing well before deterministic bias reaches tau_p.")
     print("  A constant bias below tau_p is never detected and shifts the pump cycling band by at most 3.5 cm.\n")
 
     # Generate Summary Table: Mean and Std per Scenario and Mode

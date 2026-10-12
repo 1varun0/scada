@@ -106,8 +106,17 @@ All detection thresholds were calibrated strictly on normal baseline operational
 **Key Findings:**
 - In this simulation, 0 of 10 seeds had overflow/dry-run in Prevention mode.
 - In Monitor mode, unmitigated negative ramps cause on average 642.9 overflow ticks (hitting 2.50m), and positive ramps cause on average 275.3 dry-run ticks (draining to 0.009m).
-- In Stealthy Ramp, the crossing occurs at 0.54 to 0.83 of $\tau_p$ (mean undetected bias 1.9 to 2.9 cm across slopes 0.01 to 0.10 mm/s) because sensor noise and twin error add to the residual; a constant bias below $\tau_p = 0.035\text{ m}$ is never detected and shifts the pump band by at most 3.5 cm.
+- In Stealthy Ramp, detection occurs across individual seeds/slopes at ratios of 0.16 to 0.90 of $\tau_p$ (mean undetected bias 1.52 to 2.56 cm across slopes 0.01 to 0.10 mm/s) because sensor noise peaks ($3\sigma = 1.5\text{ cm}$) and twin open-loop integration error constructively add to the residual; a constant bias below $\tau_p = 0.035\text{ m}$ is never detected and shifts the pump cycling band by at most 3.5 cm.
 - On 30-minute unattacked normal runs across all 10 seeds, Prevention mode had exactly 0 false takeover ticks.
+
+### Physical Parameter Mismatch & Drift Sensitivity (Horizon T = 2400 s)
+- **Harness Handback Tolerance:** The harness uses config **0.05 m** (`cfg.prevention.handback_tolerance_m = 0.05`) loaded by `GatewayCore`. This value accounts for $3\sigma$ sensor noise ($1.5\text{ cm}$) plus minor open-loop twin integration divergence, ensuring smooth hand-back when sensor bias returns to zero while preventing premature hand-back during active spoofing.
+- **Linear Growth of Flow-Sensor Bias:** With a 5% flow-sensor bias on nominal flow $Q_{in} = 0.002\text{ m}^3\text{/s}$ in a tank with area $A = 2.0\text{ m}^2$, the rate of level error accumulation is:
+  $$\frac{dh}{dt} = \frac{\Delta Q_{in}}{A} = \frac{0.05 \times 0.002\text{ m}^3\text{/s}}{2.0\text{ m}^2} = 0.00005\text{ m/s} = 0.05\text{ mm/s}$$
+  Over a full simulation horizon of $T = 2400\text{ s}$, the worst-case continuous filling drift is $\Delta h = 2400 \times 0.05\text{ mm/s} = 0.12\text{ m} = 12\text{ cm}$ (or $\approx 6\text{ cm}$ at typical 50% pump duty cycle).
+- **Relationship to `max_degraded_s` (600 s):** In live SCADA deployment, open-loop twin takeover is bounded by a watchdog timeout `max_degraded_s = 600\text{ s}` before transitioning to plant fail-safe. Over 600 s of continuous takeover, the maximum drift from 5% flow mismatch is:
+  $$\Delta h_{600s} = 600\text{ s} \times 0.05\text{ mm/s} = 30\text{ mm} = 3.0\text{ cm}$$
+  This 3.0 cm deviation is safely absorbed inside the $[0.8, 1.2\text{ m}]$ operational deadband, proving that parametric mismatch does not breach safety boundaries ($0.3\text{ m}$ or $2.5\text{ m}$) during degraded operation.
 
 ## 4. Technical Challenges Overcome
 Be prepared to discuss these challenges that you successfully debugged and fixed during the project:
