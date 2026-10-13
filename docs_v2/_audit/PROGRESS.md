@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: matlab/run_all_scenarios.m next
+- Active Task: matlab/scada_params.m next
 - Context usage: Normal
 
 ## Tasks Done
@@ -45,9 +45,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_dos.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_auth_misuse.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__run_single_scenario.m.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/matlab__run_all_scenarios.m.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__run_all_scenarios.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_params.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_simulink_guide.m.md`
 - [ ] Phase 1: Proceed through dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
