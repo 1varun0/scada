@@ -1,8 +1,8 @@
 # Progress Tracker: SCADA Hybrid IDS Documentation Audit (docs_v2)
 
 ## Current Status
-- Phase: Transition from Phase 0 (Inventory) to Phase 1 (Source File Notes & DB Verification)
-- Active Task: Source file inspection and note generation
+- Phase: Phase 1 - Source File Analysis & Verification
+- Active Task: Source file analysis starting with simulator/
 - Context usage: Normal
 
 ## Tasks Done
@@ -11,26 +11,20 @@
 - [x] Phase 0: Saved `git ls-files` grouped by folder with line counts to `docs_v2/_audit/outputs/file_inventory.txt`.
 - [x] Phase 0: Created `docs_v2/_audit/existing_docs.md` with first heading and last commit for all 18 existing doc files.
 - [x] Phase 0: Created `docs_v2/_audit/UNVERIFIED.md`.
+- [x] Phase 1: Database read-only queries saved to `docs_v2/_audit/outputs/query_db.py` and `docs_v2/_audit/outputs/db_queries_output.txt`. Confirmed schemas, 150 scenarios in telemetry (60 N, 45 A1, 15 A2, 15 A3, 15 A4), 1000 ticks per scenario, 0 rows in sqlite evaluation_results, verified `data/evaluation_results.csv` contains 99 scenarios (45 A1, 15 A2, 15 A3, 15 A4, 9 held-out test N) exactly matching `checkpoints/data_split_v1.json`.
 
 ## Next Tasks
-- [ ] Phase 1: Database read-only queries saved to `docs_v2/_audit/outputs/` (PRAGMA table_info, scenario counts, ticks, initial levels, operating conditions, attack windows).
-- [ ] Phase 1: Read code thoroughly and write note for each source file in `docs_v2/_audit/notes/<path_with___>.md`.
-  - simulator/ (controller.py, noise.py, process_simulator.py, pump.py, scenario_runner.py, tank.py, valve.py)
-  - config/ (parameters.py, scenarios.py)
-  - digital_twin/ (physics_twin.py)
-  - engines/ (availability_engine.py, fusion_engine.py, physics_engine.py, policy_engine.py, temporal_engine.py)
-  - models/ (lstm_autoencoder.py, preprocessor.py, trainer.py)
-  - evaluation/ (ablation.py, metrics.py, reporter.py)
-  - storage/ (sqlite_client.py)
-  - scripts/ (import_matlab_csv.py, run_ablation.py, run_e0_validation.py, run_evaluation.py, train_lstm.py, validate_matlab_vs_python.py)
-  - matlab/ (apply_auth_misuse.m, apply_dos.m, apply_fdi.m, apply_replay.m, run_all_scenarios.m, run_single_scenario.m, scada_params.m, scada_simulink_guide.m)
-  - dashboard/ (app.py, static/app.js, static/style.css, templates/index.html)
-  - scada_live/ (config.yaml, run_demo.py, common/*, plant_sim/*, attacker_wire/*, scada_ids/*)
-  - experiments/ (all python scripts and committed results)
-  - tests/ and scada_live/tests/ (all test files)
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__controller.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__noise.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__process_simulator.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__pump.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__scenario_runner.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__tank.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__valve.py.md`
+- [ ] Phase 1: Proceed through config/, digital_twin/, engines/, models/, evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
-- [ ] Phase 1 Verification and pause: STOP and wait for user.
+- [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
 
 ## Blockers
 - None.
