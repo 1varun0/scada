@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\projects\p1\New folder
+plugins: anyio-4.14.2
+collected 116 items
+
+scada_live\tests\test_api_command_validation.py ............             [ 10%]
+scada_live\tests\test_gateway_safety_rule.py ........                    [ 17%]
+scada_live\tests\test_phase0_imports.py ..........                       [ 25%]
+scada_live\tests\test_phase1_plant.py .......                            [ 31%]
+scada_live\tests\test_phase2_equivalence.py ........                     [ 38%]
+scada_live\tests\test_phase3a_gateway.py ...........                     [ 48%]
+scada_live\tests\test_phase3b_alert_metrics.py ...                       [ 50%]
+scada_live\tests\test_phase3b_metrics.py .                               [ 51%]
+scada_live\tests\test_phase4_api.py .........                            [ 59%]
+scada_live\tests\test_phase4_injector.py ....                            [ 62%]
+scada_live\tests\test_phase6a_prevention.py .............                [ 74%]
+scada_live\tests\test_phase6b_command_filtering.py ................      [ 87%]
+scada_live\tests\test_phase7_auto_demo.py ....                           [ 91%]
+scada_live\tests\test_phase7_evaluation.py ....                          [ 94%]
+scada_live\tests\test_tamper_consistency_check.py ......                 [100%]
+
+======================= 116 passed in 314.58s (0:05:14) =======================

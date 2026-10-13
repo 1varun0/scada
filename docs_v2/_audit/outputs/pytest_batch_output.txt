@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.6, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\projects\p1\New folder
+plugins: anyio-4.14.2
+collected 66 items
+
+tests\test_controller.py ........                                        [ 12%]
+tests\test_engines.py ....                                               [ 18%]
+tests\test_fusion.py ..                                                  [ 21%]
+tests\test_pump.py .........                                             [ 34%]
+tests\test_simulator.py ..........                                       [ 50%]
+tests\test_tank.py ...........                                           [ 66%]
+tests\test_twin.py ...........                                           [ 83%]
+tests\test_valve.py ...........                                          [100%]
+
+============================= 66 passed in 1.86s ==============================
