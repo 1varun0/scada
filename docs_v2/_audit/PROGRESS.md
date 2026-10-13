@@ -71,8 +71,9 @@
 - [x] Stop point 2 reached: 01_ARCHITECTURE_V2.md finished.
 - [x] Phase 2: `02_DATASET_DOCUMENTATION_V2.md` (Schema from PRAGMA, scenario taxonomy, data splits, artifacts)
 - [x] Stop point 3 reached: 02_DATASET_DOCUMENTATION_V2.md finished.
-- [ ] Phase 2: `03_FORMULAS_REFERENCE_V2.md`
-- [ ] Phase 2: Follow sequential order through 04 to 16.
+- [x] Phase 2: `03_FORMULAS_REFERENCE_V2.md` (Continuous and discrete ODEs, engine mathematics, bounds, metrics)
+- [ ] Phase 2: `04_CODEBASE_MAP.md`
+- [ ] Phase 2: Follow sequential order through 05 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
