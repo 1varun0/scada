@@ -61,13 +61,16 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/experiments__registry.md`.
 - [x] Phase 1: Both test suites executed; outputs saved to `pytest_batch_output.txt` (66 passed in 1.86s) and `pytest_live_output.txt` (116 passed in 314.58s).
 
-## Next Tasks
-- [ ] Phase 1: Compile `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
-- [ ] Phase 1: Address all "Leads to VERIFY" items.
-- [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
-- [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
-- [ ] Phase 1: Address all "Leads to VERIFY" items.
-- [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
+- [x] Phase 1: Compile `docs_v2/DOC_VS_CODE_DISCREPANCIES.md` auditing all 12 major contradictions between old docs and code.
+- [x] Phase 1: Address and verify all 13 "Leads to VERIFY" items with empirical code/data evidence.
+- [x] Stop point 1 reached: Phase 1 is 100% complete.
+
+## Next Tasks (Phase 2 - Documentation Writing)
+- [ ] Phase 2: `00_README_INDEX.md` (Index, reading order, relationship to legacy docs, evidence tag guide)
+- [ ] Phase 2: `01_ARCHITECTURE_V2.md` (STOP POINT 2)
+- [ ] Phase 2: `02_DATASET_DOCUMENTATION_V2.md` (STOP POINT 3)
+- [ ] Phase 2: Follow sequential order through 03 to 16.
+- [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
 - None.
