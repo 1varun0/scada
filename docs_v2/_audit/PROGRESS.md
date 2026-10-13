@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: evaluation/metrics.py next
+- Active Task: evaluation/reporter.py next
 - Context usage: Normal
 
 ## Tasks Done
@@ -31,9 +31,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/models__preprocessor.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/models__trainer.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/evaluation__ablation.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/evaluation__metrics.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/evaluation__metrics.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/evaluation__reporter.py.md`
 - [ ] Phase 1: Proceed through storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
