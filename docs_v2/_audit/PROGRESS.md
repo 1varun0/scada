@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 2 - Documentation Writing
-- Active Task: 05_API_AND_PACKET_REFERENCE.md
+- Active Task: 06_CONFIGURATION_REFERENCE.md
 - Context usage: Normal
 
 ## Tasks Done
@@ -73,8 +73,9 @@
 - [x] Stop point 3 reached: 02_DATASET_DOCUMENTATION_V2.md finished.
 - [x] Phase 2: `03_FORMULAS_REFERENCE_V2.md` (Continuous and discrete ODEs, engine mathematics, bounds, metrics)
 - [x] Phase 2: `04_CODEBASE_MAP.md` (Directory tree, component role, entry points, stubs vs active)
-- [ ] Phase 2: `05_API_AND_PACKET_REFERENCE.md` (All 21 Flask routes, packet schemas, SSE streams, truth channel)
-- [ ] Phase 2: Follow sequential order through 06 to 16.
+- [x] Phase 2: `05_API_AND_PACKET_REFERENCE.md` (All 21 Flask routes, packet schemas, SSE streams, truth channel)
+- [ ] Phase 2: `06_CONFIGURATION_REFERENCE.md` (Every key in config.yaml and parameters.py, units, cross-config gaps)
+- [ ] Phase 2: Follow sequential order through 07 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
