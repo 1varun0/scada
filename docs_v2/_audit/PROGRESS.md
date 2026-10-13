@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: models/preprocessor.py next
+- Active Task: models/trainer.py next
 - Context usage: Normal
 
 ## Tasks Done
@@ -28,9 +28,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__availability_engine.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__fusion_engine.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/models__lstm_autoencoder.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/models__preprocessor.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/models__preprocessor.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/models__trainer.py.md`
 - [ ] Phase 1: Proceed through evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
