@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/compute_fresh_latency.py"
+  ],
+  "command_str": "python experiments/compute_fresh_latency.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:55:15+0530",
+  "duration_s": 1.0383,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/f1_fresh_latency.log"
+}

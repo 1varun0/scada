@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python",
+    "run_demo.py",
+    "--auto",
+    "--exit-on-finish",
+    "--speed",
+    "10.0"
+  ],
+  "command_str": "python run_demo.py --auto --exit-on-finish --speed 10.0",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:56:01+0530",
+  "duration_s": 24.5523,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/g1_live_demo.log"
+}

@@ -30,9 +30,14 @@
 - [x] E3. Executed `experiments/run_auth_misuse_ab.py` in sandbox (298.92s, exit code 0). Generated [`t10_auth_misuse_prevention_ab.md`](../tables/t10_auth_misuse_prevention_ab.md) verifying 100% mitigation in Prevention mode for AM-1 to AM-7 across 10 evaluation seeds.
 - [x] E4. Executed `experiments/run_2x2_grid.py` in sandbox (8.29s, exit code 0). Generated [`t11_lstm_pump_alignment_grid.md`](../tables/t11_lstm_pump_alignment_grid.md) analyzing LSTM sensitivity to pump telemetry alignment vs commands.
 - [x] E5. Executed `experiments/run_mismatch_sensitivity.py` in sandbox (781.04s, exit code 0). Generated [`t12_plant_model_mismatch_sensitivity.md`](../tables/t12_plant_model_mismatch_sensitivity.md) proving 0 safety breaches across 160 runs over 2400s horizon under 8 parameter mismatch cases.
+- [x] F. Executed `experiments/compute_fresh_latency.py` in sandbox (1.04s, exit code 0). Generated [`t13_fresh_detection_latency.md`](../tables/t13_fresh_detection_latency.md) proving 0.0s detection latency and 0 pre-attack false alarms across all 90 attacks.
+- [x] G. Executed full automated live demo `run_demo.py --auto --exit-on-finish --speed 10.0` in sandbox (24.55s, exit code 0). Generated [`t14_live_demo_execution_summary.md`](../tables/t14_live_demo_execution_summary.md) validating all 7 phases: 0 overflows, 0 dry-runs, 100% TPR, 0.0% FPR, 1 ingress command blocked, 1 rogue hold dropped, 17 wire tamper alerts.
+- [x] Stop Point 3 reached: Live-System Results Verified.
 
 ## Active / Next Tasks
-- [ ] F & G. Live streaming pipeline execution, real-time benchmarks, latency measurements, and full automated live demonstration leading to Stop Point 3.
+- [ ] Final authoring of comprehensive reports R00 through R14 in `results_v2/docs/` synthesizing all tables T01-T14 and raw evidence.
+- [ ] Post-execution SHA-256 verification of all 434 base files (`hashes_after.txt` vs `hashes_before.txt`).
+- [ ] Stop Point 4: Final project wrap-up presentation.
 
 ## Blockers
-- None. Proceeding to Phase F & G.
+- None. Awaiting user 'continue' at Stop Point 3.
