@@ -87,29 +87,29 @@ Each STRIDE threat category is mapped directly to operational manifestations and
 | Threat Category   | SCADA Attack Manifestation           | Mitigation & Defense Implementation     |
 +-------------------+--------------------------------------+-----------------------------------------+
 | Spoofing (S)      | Sensor telemetry spoofing (FDI-1/2);  | Digital Twin analytical redundancy      |
-|                   | unauthorized manual command claims.  | [CODE gateway_core.py:399-430];         |
+|                   | unauthorized manual command claims.  | [CODE scada_live/scada_ids/gateway_core.py:399-430]; |
 |                   |                                      | Ingress role validation [Line 274].     |
 +-------------------+--------------------------------------+-----------------------------------------+
 | Tampering (T)     | Payload modification on wire;        | 4-way Actuator Consistency Check        |
-|                   | timestamp backdating in Replay;      | [CODE gateway_core.py:362-372];         |
+|                   | timestamp backdating in Replay;      | [CODE scada_live/scada_ids/gateway_core.py:362-372]; |
 |                   | physical wire bridge on pump coil.   | Availability Engine timestamp checking  |
 |                   |                                      | [CODE engines/availability_engine.py:46]|
 +-------------------+--------------------------------------+-----------------------------------------+
 | Repudiation (R)   | Operator denying destructive command | Command audit trail logging with        |
 |                   | issuance during high-water alarms.   | role, timestamp, and hold duration      |
-|                   |                                      | [CODE gateway_core.py:302-305].         |
+|                   |                                      | [CODE scada_live/scada_ids/gateway_core.py:302-305]. |
 +-------------------+--------------------------------------+-----------------------------------------+
 | Information       | Sniffing telemetry SSE event streams | Operational segmentation; separate      |
 | Disclosure (I)    | or scraping REST history routes.     | internal truth channel (`send_truth`)   |
 |                   |                                      | isolated from telemetry bus.            |
 +-------------------+--------------------------------------+-----------------------------------------+
 | Denial of         | Dropping sensor sense() calls or     | Watchdog synthetic packet synthesis     |
-| Service (D)       | fieldbus telemetry packets (DOS).    | [CODE run_full_evaluation.py:270-275];  |
+| Service (D)       | fieldbus telemetry packets (DOS).    | [CODE experiments/run_full_evaluation.py:270-275]; |
 |                   |                                      | Local actuator fail-safe fallback.      |
 +-------------------+--------------------------------------+-----------------------------------------+
 | Elevation of      | Unauthenticated entity issuing       | Gatekeeper role enforcement:            |
 | Privilege (E)     | supervisor-level pump latching cmds. | `role == 'operator'` check              |
-|                   |                                      | [CODE gateway_core.py:275-279].         |
+|                   |                                      | [CODE scada_live/scada_ids/gateway_core.py:275-279]. |
 +-------------------+--------------------------------------+-----------------------------------------+
 ```
 
@@ -122,12 +122,12 @@ The hybrid IDS maps directly to recognized MITRE Adversarial Tactics, Techniques
 | Technique ID | Technique Name | MITRE Tactic | SCADA Implementation & Code Vector | Relevant Scenarios | Detecting Engine |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **T0888** | Point & Tag Manipulation | Impair Process Control | Interception and arithmetic biasing of `level_m` via `Injector.sense()` [CODE scada_live/attacker_wire/injector.py:73-75]. | A1, FDI-1, FDI-2, Neg/Pos Ramp | Physics Engine ($S_p$), Temporal LSTM ($S_l$) |
-| **T0879** | Adversary-in-the-Middle | Collection / Evasion | Inline packet interception buffering and historical re-transmission via `Injector.send_telemetry()` [CODE injector.py:115-121]. | A2, REP | Availability Engine ($S_a$), Physics ($S_p$) |
-| **T0814** | Denial of Service | Inhibit Response Function | Deliberate dropping of 100% of telemetry and sense frames via `Injector` drop probabilities [CODE injector.py:61-62, 112-113]. | A3, DOS | Availability Watchdog ($S_a$) |
-| **T0855** | Unauthorized Command Message | Impair Process Control | Direct injection of unauthenticated or unauthorized actuation requests via `POST /api/command` [CODE server.py:236-270]. | A4, AM-1, AM-2, AM-7 | Command Admission Filter, Policy Engine ($S_c$) |
-| **T0836** | Modify Parameter | Impair Process Control | Forcing persistent pump holds or abnormal valve apertures to drive tank into physical dry-run or overflow [CODE gateway_core.py:280-295]. | AM-5, AM-6 | Continuous Safety Monitor [CODE gateway_core.py:318-348] |
-| **T0889** | Modify Control Logic / Hardware Tamper | Impair Process Control | Downstream bridging of electrical pump contactor directly at field terminal block [CODE gateway_core.py:362-372]. | AM-3 | 4-Way Actuator Consistency Check |
-| **T0809** | Data Destruction / Process Disruption | Impact | Sustained physical flooding ($H > 2.20\text{ m}$) or pump cavitation ($H < 0.30\text{ m}$) due to unmitigated command execution [CODE plant.py:126-136]. | AM-1, AM-2 (Monitor Mode) | Prevention Twin Takeover [CODE gateway_core.py:408-417] |
+| **T0879** | Adversary-in-the-Middle | Collection / Evasion | Inline packet interception buffering and historical re-transmission via `Injector.send_telemetry()` [CODE scada_live/attacker_wire/injector.py:115-121]. | A2, REP | Availability Engine ($S_a$), Physics ($S_p$) |
+| **T0814** | Denial of Service | Inhibit Response Function | Deliberate dropping of 100% of telemetry and sense frames via `Injector` drop probabilities [CODE scada_live/attacker_wire/injector.py:61-62, 112-113]. | A3, DOS | Availability Watchdog ($S_a$) |
+| **T0855** | Unauthorized Command Message | Impair Process Control | Direct injection of unauthenticated or unauthorized actuation requests via `POST /api/command` [CODE scada_live/scada_ids/server.py:236-270]. | A4, AM-1, AM-2, AM-7 | Command Admission Filter, Policy Engine ($S_c$) |
+| **T0836** | Modify Parameter | Impair Process Control | Forcing persistent pump holds or abnormal valve apertures to drive tank into physical dry-run or overflow [CODE scada_live/scada_ids/gateway_core.py:280-295]. | AM-5, AM-6 | Continuous Safety Monitor [CODE scada_live/scada_ids/gateway_core.py:318-348] |
+| **T0889** | Modify Control Logic / Hardware Tamper | Impair Process Control | Downstream bridging of electrical pump contactor directly at field terminal block [CODE scada_live/scada_ids/gateway_core.py:362-372]. | AM-3 | 4-Way Actuator Consistency Check |
+| **T0809** | Data Destruction / Process Disruption | Impact | Sustained physical flooding ($H > 2.20\text{ m}$) or pump cavitation ($H < 0.30\text{ m}$) due to unmitigated command execution [CODE scada_live/plant_sim/plant.py:126-136]. | AM-1, AM-2 (Monitor Mode) | Prevention Twin Takeover [CODE scada_live/scada_ids/gateway_core.py:408-417] |
 
 ---
 

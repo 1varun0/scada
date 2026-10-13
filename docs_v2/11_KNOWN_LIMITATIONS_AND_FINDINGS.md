@@ -191,3 +191,14 @@ graph TD
 | **Physics** | Razor-thin threshold margin ($0.116\text{ mm}$ / 0.33%). | Pinned to $\tau_p = 0.035\text{ m}$ for regression equivalence. | Expand $\tau_p$ to $0.040\text{ m}$ in production or introduce dynamic adaptive thresholding. |
 | **Detection** | Stealth bias cliff at $< 3.0\text{ cm}$. | Empirically characterized in constant bias sweep. | Train higher-order temporal models or cumulative sum (CUSUM) statistical residual filters. |
 | **Control** | AM-3 fieldbus wire tamper is detect-only. | Verified by 53.0 overflow ticks in both modes. | Implement hardware-isolated emergency kill-switch relays wired in series with the motor contactor. |
+
+---
+
+## 8. Verification
+
+All audited limitations, post-hoc artifacts, noise clamp drifts, threshold margins, and sim-to-real boundaries cataloged in this document have been verified against active code, unit tests, and empirical output files:
+1. **Post-Hoc Overlays**: Verified in `matlab/attacks/` and `DOC_VS_CODE_DISCREPANCIES.md`.
+2. **Noise Clamp Drift**: Verified in `experiments/results/soak_comparison_output.txt` and `scada_live/config.yaml`.
+3. **Threshold Margins**: Verified in `experiments/results/recompute_all60_residuals.txt` and `checkpoints/data_split_v1.json`.
+4. **Detect-Only Wire Tampering**: Verified in `experiments/run_full_evaluation.py` and `data/full_evaluation_results.csv`.
+
