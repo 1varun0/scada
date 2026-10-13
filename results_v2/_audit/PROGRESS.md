@@ -1,8 +1,8 @@
 # Progress Tracker: SCADA Hybrid IDS Results Reproduction (results_v2)
 
 ## Current Status
-- Phase: Phase C Complete (Dataset Facts & Statistics Recorded)
-- Active Task: Phase D1 (Batch Evaluation Reproduction - Stop Point 2)
+- Phase: Stop Point 2 Reached (Phase D1 Batch Evaluation Reproduction Verified)
+- Active Task: Awaiting User Approval to Proceed to Phase D2 & E (Ablations & Sweeps)
 - Context Usage: Normal
 
 ## Tasks Done
@@ -20,9 +20,14 @@
   - `t03_attack_scenarios_breakdown.md`: Threat profiles, windows, and telemetry ingress totals (150k rows, 1,035 dropped packets).
   - `t04_dataset_split_and_coverage.md`: Partition verification (42 train, 9 val, 9 test normal, 90 test attacks; 0 leakage).
   - `t05_signal_statistics_by_scenario_type.md`: Min/mean/max water levels, flow rates, and pump duty cycles per group.
+- [x] D1. Executed `python -m scripts.run_evaluation` in sandbox (259.26s, exit code 0). Captured verbatim log `results_v2/raw/d1_run_evaluation.log` and sidecar JSON.
+- [x] D1. Copied produced CSV to `results_v2/raw/reproduced_evaluation_results.csv` and ROC curve to `results_v2/figures/reproduced_roc_curve.png`.
+- [x] D1. Executed `results_v2/scripts/compare_evaluation_reproduction.py` generating `results_v2/raw/d1_reproduction_diff.json` and `results_v2/tables/t06_batch_evaluation_reproduction_comparison.md`. Confirmed **100% bit-for-bit identical reproduction** (SHA-256 match `6bd6b6a1e556afcca920d2b936a723ed88f7326da14d6234c5e077dd3c4c5ac0`, 0 deltas across all 99,000 rows and all metrics).
+- [x] Stop Point 2 reached: Batch Evaluation Reproduction verified bit-for-bit identical.
 
 ## Active / Next Tasks
-- [ ] D1. Run `python -m scripts.run_evaluation` in sandbox copy, compare output against committed `data/evaluation_results.csv`, generate table T06, and reach Stop Point 2.
+- [ ] D2. Offline threshold ablations and single-engine ablations (`scripts.run_ablation`).
+- [ ] E. Parameter sweeps and sensitivity analyses (`experiments/run_constant_bias_sweep.py`, `experiments/run_mismatch_sensitivity.py`).
 
 ## Blockers
-- None. Proceeding to Phase D1.
+- None. Awaiting user 'continue' at Stop Point 2.

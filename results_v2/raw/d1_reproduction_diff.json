@@ -1,0 +1,206 @@
+{
+  "committed_sha256": "6bd6b6a1e556afcca920d2b936a723ed88f7326da14d6234c5e077dd3c4c5ac0",
+  "reproduced_sha256": "6bd6b6a1e556afcca920d2b936a723ed88f7326da14d6234c5e077dd3c4c5ac0",
+  "exact_hash_match": true,
+  "shape_committed": [
+    99000,
+    11
+  ],
+  "shape_reproduced": [
+    99000,
+    11
+  ],
+  "shape_match": true,
+  "columns_match": true,
+  "float_column_diffs": {
+    "S_p": {
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "exact_equal_fraction": 1.0
+    },
+    "S_l": {
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "exact_equal_fraction": 1.0
+    },
+    "S_c": {
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "exact_equal_fraction": 1.0
+    },
+    "S_a": {
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "exact_equal_fraction": 1.0
+    },
+    "S_hybrid": {
+      "max_abs_diff": 0.0,
+      "mean_abs_diff": 0.0,
+      "exact_equal_fraction": 1.0
+    }
+  },
+  "int_column_diffs": {
+    "predicted_anomaly": {
+      "mismatch_count": 0,
+      "fraction_match": 1.0
+    },
+    "ground_truth": {
+      "mismatch_count": 0,
+      "fraction_match": 1.0
+    },
+    "sequence_id": {
+      "mismatch_count": 0,
+      "fraction_match": 1.0
+    }
+  },
+  "committed_overall_metrics": {
+    "accuracy": 0.8132424242424242,
+    "precision": 0.38912410690658905,
+    "recall": 0.9982180738226559,
+    "f1": 0.5599638241664089,
+    "roc_auc": 0.8945564279419984,
+    "pr_auc": 0.390530677418434,
+    "tp": 11764,
+    "fp": 18468,
+    "tn": 68747,
+    "fn": 21,
+    "fpr": 0.21175256549905405,
+    "fnr": 0.0017819261773440816
+  },
+  "reproduced_overall_metrics": {
+    "accuracy": 0.8132424242424242,
+    "precision": 0.38912410690658905,
+    "recall": 0.9982180738226559,
+    "f1": 0.5599638241664089,
+    "roc_auc": 0.8945564279419984,
+    "pr_auc": 0.390530677418434,
+    "tp": 11764,
+    "fp": 18468,
+    "tn": 68747,
+    "fn": 21,
+    "fpr": 0.21175256549905405,
+    "fnr": 0.0017819261773440816
+  },
+  "per_attack_breakdown": {
+    "FDI": {
+      "committed": {
+        "accuracy": 0.9974530018192844,
+        "precision": 1.0,
+        "recall": 0.9974530018192844,
+        "f1": 0.9987248770417148,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 8224,
+        "fp": 0,
+        "tn": 0,
+        "fn": 21,
+        "fpr": 0.0,
+        "fnr": 0.0025469981807155853
+      },
+      "reproduced": {
+        "accuracy": 0.9974530018192844,
+        "precision": 1.0,
+        "recall": 0.9974530018192844,
+        "f1": 0.9987248770417148,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 8224,
+        "fp": 0,
+        "tn": 0,
+        "fn": 21,
+        "fpr": 0.0,
+        "fnr": 0.0025469981807155853
+      }
+    },
+    "Replay": {
+      "committed": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 990,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      },
+      "reproduced": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 990,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      }
+    },
+    "DoS": {
+      "committed": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 1035,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      },
+      "reproduced": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 1035,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      }
+    },
+    "Auth_Misuse": {
+      "committed": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 1515,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      },
+      "reproduced": {
+        "accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "roc_auc": NaN,
+        "pr_auc": NaN,
+        "tp": 1515,
+        "fp": 0,
+        "tn": 0,
+        "fn": 0,
+        "fpr": 0.0,
+        "fnr": 0.0
+      }
+    }
+  }
+}

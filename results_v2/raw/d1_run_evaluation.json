@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "scripts.run_evaluation"
+  ],
+  "command_str": "python -m scripts.run_evaluation",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:19:19+0530",
+  "duration_s": 259.2579,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/d1_run_evaluation.log"
+}

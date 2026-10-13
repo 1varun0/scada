@@ -32,16 +32,25 @@ def sha256_of_file(path: Path) -> str:
 
 
 def compute_metrics(y_true, y_pred, y_score):
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
     fpr = fp / (fp + tn) if (fp + tn) > 0 else 0.0
     fnr = fn / (fn + tp) if (fn + tp) > 0 else 0.0
+    
+    unique_classes = len(np.unique(y_true))
+    if unique_classes >= 2:
+        roc_auc = float(roc_auc_score(y_true, y_score))
+        pr_auc = float(average_precision_score(y_true, y_score))
+    else:
+        roc_auc = float("nan")
+        pr_auc = float("nan")
+
     return {
         "accuracy": float(accuracy_score(y_true, y_pred)),
         "precision": float(precision_score(y_true, y_pred, zero_division=0)),
         "recall": float(recall_score(y_true, y_pred, zero_division=0)),
         "f1": float(f1_score(y_true, y_pred, zero_division=0)),
-        "roc_auc": float(roc_auc_score(y_true, y_score)),
-        "pr_auc": float(average_precision_score(y_true, y_score)),
+        "roc_auc": roc_auc,
+        "pr_auc": pr_auc,
         "tp": int(tp),
         "fp": int(fp),
         "tn": int(tn),
