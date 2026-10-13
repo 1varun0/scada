@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 2 - Documentation Writing
-- Active Task: 08_PREVENTION_AND_CONTROL.md
+- Active Task: 09_TESTING_GUIDE.md
 - Context usage: Normal
 
 ## Tasks Done
@@ -76,8 +76,9 @@
 - [x] Phase 2: `05_API_AND_PACKET_REFERENCE.md` (All 21 Flask routes, packet schemas, SSE streams, truth channel)
 - [x] Phase 2: `06_CONFIGURATION_REFERENCE.md` (Every key in config.yaml and parameters.py, units, cross-config gaps)
 - [x] Phase 2: `07_DETECTION_ENGINES_REFERENCE.md` (Physics, Temporal, Policy, Availability, Fusion engines, mathematical equations, failure modes)
-- [ ] Phase 2: `08_PREVENTION_AND_CONTROL.md` (Control server, level-source switching, twin takeover, hand-back, DoS gap re-seed rule, command filtering)
-- [ ] Phase 2: Follow sequential order through 09 to 16.
+- [x] Phase 2: `08_PREVENTION_AND_CONTROL.md` (Control server, level-source switching, twin takeover, hand-back, DoS gap re-seed rule, command filtering)
+- [ ] Phase 2: `09_TESTING_GUIDE.md` (Test suites catalog, execution commands, slow tests, real summary metrics from batch & live suites)
+- [ ] Phase 2: Follow sequential order through 10 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
