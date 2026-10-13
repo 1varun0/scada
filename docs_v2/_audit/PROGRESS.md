@@ -67,7 +67,8 @@
 
 ## Next Tasks (Phase 2 - Documentation Writing)
 - [x] Phase 2: `00_README_INDEX.md` (Index, reading order, relationship to legacy docs, evidence tag guide)
-- [ ] Phase 2: `01_ARCHITECTURE_V2.md` (STOP POINT 2)
+- [x] Phase 2: `01_ARCHITECTURE_V2.md` (Dual architecture, per-tick sequence, state machines, stubs vs code)
+- [x] Stop point 2 reached: 01_ARCHITECTURE_V2.md finished.
 - [ ] Phase 2: `02_DATASET_DOCUMENTATION_V2.md` (STOP POINT 3)
 - [ ] Phase 2: Follow sequential order through 03 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
