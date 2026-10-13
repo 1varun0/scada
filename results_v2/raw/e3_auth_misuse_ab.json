@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/run_auth_misuse_ab.py"
+  ],
+  "command_str": "python experiments/run_auth_misuse_ab.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:33:47+0530",
+  "duration_s": 298.9226,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/e3_auth_misuse_ab.log"
+}

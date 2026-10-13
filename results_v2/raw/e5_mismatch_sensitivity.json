@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/run_mismatch_sensitivity.py"
+  ],
+  "command_str": "python experiments/run_mismatch_sensitivity.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:40:01+0530",
+  "duration_s": 781.0355,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/e5_mismatch_sensitivity.log"
+}

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/run_2x2_grid.py"
+  ],
+  "command_str": "python experiments/run_2x2_grid.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:39:40+0530",
+  "duration_s": 8.2901,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/e4_2x2_grid.log"
+}

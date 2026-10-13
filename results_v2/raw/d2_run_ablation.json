@@ -1,0 +1,13 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "scripts.run_ablation"
+  ],
+  "command_str": "python -m scripts.run_ablation",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:27:46+0530",
+  "duration_s": 9.7054,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/d2_run_ablation.log"
+}

@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/run_constant_bias_sweep.py"
+  ],
+  "command_str": "python experiments/run_constant_bias_sweep.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:29:57+0530",
+  "duration_s": 163.7763,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/e2_constant_bias_sweep.log"
+}

@@ -1,0 +1,8 @@
+Scenario,Description,Monitor Harm,Prevention Harm,Status,Details
+AM-1,Overflow Misuse (Pump Latched ON at 1.30m),Ov: 121.0t | Dry: 0.0t,Ov: 0.0t | Dry: 0.0t,PASSED,"Mon ov=121.0t (>=9/10 seeds), Prev ov=0.0t (100% blocked)"
+AM-2,Dry-Run Misuse (Valve Latched 90% at 0.90m),Ov: 0.0t | Dry: 151.0t,Ov: 0.0t | Dry: 0.0t,PASSED,"Mon dry=151.0t (>=9/10 seeds), Prev dry=0.0t (100% blocked)"
+AM-3,Wire / Fieldbus Tamper (Detect-Only Override),Ov: 58.0t | Dry: 0.0t,Ov: 58.0t | Dry: 0.0t,PASSED,"Detect delay=0.0t (<=3t), Harm identical: Mon=58.0t, Prev=58.0t"
+AM-4,In-Deadband Pump Toggle (Nominal 1.0m),Ov: 0.0t | Dry: 0.0t,Ov: 0.0t | Dry: 0.0t,PASSED,"Quiescent in deadband (0 ov, 0 dry); empirical ML scores recorded"
+AM-5,"In-Band Hold - Filling (Pump ON, Hold 1500s)",Ov: 211.0t | Dry: 0.0t,Ov: 0.0t | Dry: 0.0t,PASSED,"Mon ov=211.0t (>=9/10 seeds), Prev ov=0.0t (100% dropped)"
+AM-6,"In-Band Hold - Draining (Pump OFF, Hold 1800s)",Ov: 0.0t | Dry: 1.0t,Ov: 0.0t | Dry: 0.0t,PASSED,"Mon dry=1.0t (>=9/10 seeds), Prev dry=0.0t (100% dropped)"
+AM-7,Unauthenticated Hold Cap (Requested 1500s -> 60s),Ov: 0.0t | Dry: 0.0t,Ov: 0.0t | Dry: 0.0t,PASSED,Hold capped to 60 ticks; 0 overflow ticks in all runs

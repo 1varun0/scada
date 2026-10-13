@@ -1,0 +1,12 @@
+{
+  "command": [
+    "python",
+    "experiments/validate_gateway_rule.py"
+  ],
+  "command_str": "python experiments/validate_gateway_rule.py",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:29:34+0530",
+  "duration_s": 9.897,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/e1_gateway_rule_validation.log"
+}
