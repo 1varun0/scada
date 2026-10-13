@@ -19,6 +19,52 @@ def build_controller(cfg):
         default_valve_pct=PARAMS.controller.default_valve_pct
     )
 
+def evaluate_command_with_live_setpoint(
+    h_est: float,
+    pump_cmd: int,
+    valve_cmd: float,
+    controller,
+    epsilon: float = 0.05,
+    safe_valve: float = 0.0,
+) -> tuple[bool, str]:
+    """
+    Gateway-side command validation against live controller setpoint and deadband.
+    
+    Safety Invariants:
+    1. Valve must equal default_valve_pct OR (safe_valve with pump_cmd == 0).
+    2. Pump ON is invalid if h_est >= setpoint + deadband + epsilon (>= 1.25m).
+    3. Pump OFF is invalid if h_est <= setpoint - deadband - epsilon (<= 0.75m).
+    
+    Returns:
+        (is_valid: bool, rejection_reason: str)
+    """
+    # Strict attribute validation — explicit exceptions
+    if not hasattr(controller, 'setpoint'):
+        raise AttributeError("Controller missing 'setpoint' attribute")
+    setpoint = float(controller.setpoint)
+    if not hasattr(controller, '_deadband'):
+        raise AttributeError("Controller missing '_deadband' attribute")
+    deadband = float(controller._deadband)
+    if not hasattr(controller, '_default_valve_pct'):
+        raise AttributeError("Controller missing '_default_valve_pct' attribute")
+    default_valve = float(controller._default_valve_pct)
+
+    # Valve invariant
+    if round(valve_cmd, 6) != round(default_valve, 6):
+        if round(valve_cmd, 6) != round(safe_valve, 6) or pump_cmd != 0:
+            return False, f"Invalid valve position {valve_cmd}% (allowed: {default_valve}% or safe {safe_valve}% with pump OFF)"
+
+    # Dynamic pump-vs-level hysteresis rules
+    upper_limit = round(setpoint + deadband + epsilon, 6)
+    if pump_cmd == 1 and round(h_est, 6) >= upper_limit:
+        return False, f"Pump ON forbidden at h_est={h_est:.3f}m >= limit={upper_limit:.3f}m"
+
+    lower_limit = round(setpoint - deadband - epsilon, 6)
+    if pump_cmd == 0 and round(h_est, 6) <= lower_limit:
+        return False, f"Pump OFF forbidden at h_est={h_est:.3f}m <= limit={lower_limit:.3f}m"
+
+    return True, "Valid"
+
 class GatewayCore:
     def __init__(self, cfg, sse_hub, dos_gap_rule=True):
         self.cfg = cfg
@@ -53,6 +99,24 @@ class GatewayCore:
         self.twin_takeover_active = False
         self.clean_ticks = 0
         self.last_action_taken = "none"
+
+        # External override / command hold state
+        self.external_override_active = False
+        self.held_pump_cmd = 0
+        self.held_valve_cmd = 50.0
+        self.hold_ticks_remaining = 0
+
+        # Command pipeline metrics
+        self.commands_received = 0
+        self.commands_blocked = 0
+        self.commands_would_block = 0
+        self.holds_dropped = 0
+        self.holds_would_drop = 0
+
+        # Gateway-issued pump history for wire tamper detection
+        self.gateway_pump_history = []
+        self.wire_tamper_detected = False
+        self.wire_tamper_alerts = 0
 
     def _watchdog_loop(self):
         while True:
@@ -101,6 +165,18 @@ class GatewayCore:
             self.twin_takeover_active = False
             self.clean_ticks = 0
             self.last_action_taken = "none"
+            self.external_override_active = False
+            self.held_pump_cmd = 0
+            self.held_valve_cmd = 50.0
+            self.hold_ticks_remaining = 0
+            self.commands_received = 0
+            self.commands_blocked = 0
+            self.commands_would_block = 0
+            self.holds_dropped = 0
+            self.holds_would_drop = 0
+            self.gateway_pump_history = []
+            self.wire_tamper_detected = False
+            self.wire_tamper_alerts = 0
 
     def set_mode(self, mode: str):
         """Set gateway mode: 'monitor' or 'prevention'."""
@@ -139,8 +215,39 @@ class GatewayCore:
             self.ids.recalibrate(levels)
             return {"status": "ok"}
             
+    def evaluate_ingress_command(self, pump_cmd: int, valve_cmd: float, 
+                                  hold_ticks: int, role: str) -> tuple[bool, str]:
+        """Evaluate an incoming command against live plant state.
+        Returns (is_valid, reason)."""
+        with self.lock:
+            if hasattr(self, 'level_buffer') and self.level_buffer:
+                h_est = self.level_buffer[-1]
+            else:
+                h_est = self.ids.get_twin_estimate()
+            
+            return evaluate_command_with_live_setpoint(
+                h_est, pump_cmd, valve_cmd, self.controller
+            )
+
+    def apply_override(self, pump_cmd: int, valve_cmd: float, hold_ticks: int):
+        """Activate an external command override hold."""
+        with self.lock:
+            self.external_override_active = True
+            self.held_pump_cmd = pump_cmd
+            self.held_valve_cmd = valve_cmd
+            self.hold_ticks_remaining = hold_ticks
+
+    def drop_hold(self, reason: str):
+        """Drop an active external hold."""
+        with self.lock:
+            self.external_override_active = False
+            self.hold_ticks_remaining = 0
+            # Sync controller state from last known telemetry
+            if self.last_pkt is not None:
+                self.controller._pump_command = 1 if self.last_pkt.pump_on else 0
+
     def process_sense(self, level_m: float) -> dict:
-        """Handle /api/sense: return pump/valve commands, applying twin takeover in prevention mode."""
+        """Handle /api/sense: return pump/valve commands, applying overrides and enforcement."""
         with self.lock:
             if not hasattr(self, 'level_buffer'):
                 self.level_buffer = []
@@ -148,15 +255,77 @@ class GatewayCore:
             # keep reasonable buffer
             if len(self.level_buffer) > 50:
                 self.level_buffer.pop(0)
-                
+
+            # --- Twin takeover (Phase 6a, unchanged) ---
             if self.mode == "prevention" and self.twin_takeover_active:
                 active_level = self.ids.get_twin_estimate()
                 level_source = "twin"
             else:
                 active_level = level_m
                 level_source = "sensor"
-                
+
+            # --- External Override Hold ---
+            if self.external_override_active and self.hold_ticks_remaining > 0:
+                # Continuous enforcement: re-validate hold against live level
+                h_est = active_level
+                is_valid, reason = evaluate_command_with_live_setpoint(
+                    h_est, self.held_pump_cmd, self.held_valve_cmd, self.controller
+                )
+
+                if not is_valid:
+                    if self.mode == "prevention":
+                        # Drop the hold
+                        self.holds_dropped += 1
+                        self.sse_hub.publish({
+                            "event_type": "Auth misuse",
+                            "source": "continuous_enforcement",
+                            "action": "hold_dropped",
+                            "reason": reason,
+                            "h_est": h_est
+                        })
+                        self.drop_hold(reason)
+                        # Fall through to autonomous controller below
+                    else:
+                        # Monitor: log would_drop but allow hold to continue
+                        self.holds_would_drop += 1
+                        self.sse_hub.publish({
+                            "event_type": "Auth misuse",
+                            "source": "continuous_enforcement",
+                            "action": "would_drop",
+                            "reason": reason,
+                            "h_est": h_est
+                        })
+
+                # If hold is still active after enforcement check
+                if self.external_override_active and self.hold_ticks_remaining > 0:
+                    self.hold_ticks_remaining -= 1
+                    if self.hold_ticks_remaining == 0:
+                        self.external_override_active = False
+                        # Sync controller from telemetry
+                        if self.last_pkt is not None:
+                            self.controller._pump_command = 1 if self.last_pkt.pump_on else 0
+
+                    # Track issued command for tamper detection
+                    self.gateway_pump_history.append(self.held_pump_cmd)
+                    if len(self.gateway_pump_history) > 10:
+                        self.gateway_pump_history.pop(0)
+
+                    return {
+                        "pump_cmd": self.held_pump_cmd,
+                        "valve_cmd": self.held_valve_cmd,
+                        "level_source": level_source,
+                        "active_level": active_level,
+                        "action_taken": "external_hold"
+                    }
+
+            # --- Autonomous controller (normal path) ---
             ctrl_cmds = self.controller.step(active_level)
+
+            # Track issued command for tamper detection
+            self.gateway_pump_history.append(ctrl_cmds['pump_command'])
+            if len(self.gateway_pump_history) > 10:
+                self.gateway_pump_history.pop(0)
+
             return {
                 "pump_cmd": ctrl_cmds['pump_command'],
                 "valve_cmd": ctrl_cmds['valve_command'],
@@ -188,6 +357,39 @@ class GatewayCore:
         stale = False
         if self.last_pkt is not None and pkt.src_t <= self.last_pkt.src_t:
             stale = True
+
+        # 4-Way Actuator Consistency Check (AM-3 Wire Tamper)
+        wire_tamper = (
+            len(self.gateway_pump_history) >= 3
+            and self.gateway_pump_history[-1] == 0
+            and self.gateway_pump_history[-2] == 0
+            and self.gateway_pump_history[-3] == 0
+            and (
+                pkt.pump_cmd == 1
+                or pkt.pump_on is True
+                or (pkt.q_in is not None and pkt.q_in > 0.001)
+            )
+        )
+
+        if wire_tamper:
+            self.wire_tamper_detected = True
+            self.wire_tamper_alerts += 1
+            verdict["is_anomaly"] = True
+            if "engines_firing" not in verdict:
+                verdict["engines_firing"] = []
+            if "actuator_consistency" not in verdict["engines_firing"]:
+                verdict["engines_firing"].append("actuator_consistency")
+            self.sse_hub.publish({
+                "event_type": "Wire tamper",
+                "source": "actuator_consistency",
+                "seq": pkt.seq,
+                "ts": pkt.ts,
+                "gateway_history": list(self.gateway_pump_history[-3:]),
+                "echoed_pump_cmd": pkt.pump_cmd,
+                "echoed_pump_on": pkt.pump_on,
+                "q_in": pkt.q_in,
+                "action": "wire_tamper_detected"
+            })
             
         # Alert Manager
         am_state = self.alert_manager.update(
@@ -236,6 +438,9 @@ class GatewayCore:
 
         # Enrich verdict
         verdict.update(am_state)
+        if wire_tamper:
+            verdict["attack_type"] = "Wire tamper"
+        verdict["wire_tamper"] = wire_tamper
         # Assuming calibrating is True during the warm-up
         recalibrating = verdict.get("calibrating", False)
         

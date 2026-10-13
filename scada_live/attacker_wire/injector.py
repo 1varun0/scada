@@ -74,12 +74,14 @@ class Injector:
             spoofed_level = level_m + self.magnitude # Bias for now
             return self.client.sense(seq, ts, spoofed_level)
 
-        if self.attack_type == "Auth misuse":
+        if self.attack_type in ("Auth misuse", "Wire tamper"):
             # Pass true level to sense
             pump_cmd, valve_cmd = self.client.sense(seq, ts, level_m)
-            # Override response
+            # Override response on wire
             if self.target_command is not None:
                 pump_cmd = self.target_command
+            elif self.attack_type == "Wire tamper":
+                pump_cmd = 1
             if self.target_valve is not None:
                 valve_cmd = self.target_valve
             return pump_cmd, valve_cmd
@@ -120,8 +122,8 @@ class Injector:
         elif self.attack_type == "FDI":
             spoofed_pkt['level_m'] = pkt_dict['level_m'] + self.magnitude
             
-        elif self.attack_type == "Auth misuse":
-            # Auth misuse overrides command, which was returned in sense.
+        elif self.attack_type in ("Auth misuse", "Wire tamper"):
+            # Auth misuse / Wire tamper overrides command, which was returned in sense.
             # Plant executed it, so pump_cmd and valve_cmd in pkt_dict are already the rogue ones.
             pass
 

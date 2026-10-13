@@ -133,12 +133,27 @@ def events():
 
 @app.route('/api/metrics', methods=['GET'])
 def metrics():
-    return jsonify(gateway.metrics.get_metrics())
+    data = gateway.metrics.get_metrics()
+    data["commands"] = {
+        "received": gateway.commands_received,
+        "blocked": gateway.commands_blocked,
+        "would_block": gateway.commands_would_block,
+        "holds_dropped": gateway.holds_dropped,
+        "holds_would_drop": gateway.holds_would_drop,
+        "wire_tamper_alerts": gateway.wire_tamper_alerts
+    }
+    return jsonify(data)
 
-@app.route('/api/mode', methods=['POST'])
+@app.route('/api/mode', methods=['GET', 'POST'])
 def mode():
-    # Placeholder for Phase 6
-    return jsonify({"status": "mode_set"})
+    if request.method == 'GET':
+        return jsonify({"status": "ok", "mode": gateway.mode}), 200
+    data = request.get_json(silent=True) or {}
+    new_mode = data.get('mode', 'monitor')
+    if new_mode not in ('monitor', 'prevention'):
+        return jsonify({"error": "mode must be 'monitor' or 'prevention'"}), 400
+    gateway.set_mode(new_mode)
+    return jsonify({"status": "ok", "mode": new_mode}), 200
 
 @app.route('/api/command', methods=['POST'])
 def handle_command():
@@ -205,13 +220,61 @@ def handle_command():
     # Metadata role attribute for telemetry logging ONLY (MUST NOT be used in validation)
     role = request.headers.get('X-Actor-Role', 'unauthenticated')
 
-    # Step 1 ONLY: NO gateway override logic yet
+    # 3. Gateway Ingress Filtering & Mode Handling
+    gateway.commands_received += 1
+    is_valid, reason = gateway.evaluate_ingress_command(
+        pump_cmd, valve_cmd, effective_hold_ticks, role
+    )
+
+    if not is_valid:
+        if gateway.mode == "monitor":
+            # Monitor: dispatch would_block, record metric, pass through
+            gateway.commands_would_block += 1
+            hub.publish({
+                "event_type": "Auth misuse",
+                "source": "command_filter",
+                "action": "would_block",
+                "pump_cmd": pump_cmd,
+                "valve_cmd": valve_cmd,
+                "reason": reason,
+                "role": role
+            })
+            gateway.apply_override(pump_cmd, valve_cmd, effective_hold_ticks)
+            return jsonify({
+                "status": "accepted_monitor",
+                "would_block": True,
+                "reason": reason,
+                "hold_ticks": effective_hold_ticks,
+                "pump_cmd": pump_cmd,
+                "valve_cmd": valve_cmd,
+                "capped": is_capped,
+                "authenticated": is_authenticated,
+                "role": role
+            }), 200
+        else:
+            # Prevention: block at ingress
+            gateway.commands_blocked += 1
+            hub.publish({
+                "event_type": "Auth misuse",
+                "source": "command_filter",
+                "action": "command_blocked",
+                "pump_cmd": pump_cmd,
+                "valve_cmd": valve_cmd,
+                "reason": reason,
+                "role": role
+            })
+            return jsonify({
+                "status": "blocked",
+                "reason": reason
+            }), 403
+
+    # Valid command — apply hold
+    gateway.apply_override(pump_cmd, valve_cmd, effective_hold_ticks)
     return jsonify({
-        "status": "validated",
-        "applied": False,
+        "status": "accepted",
+        "hold_ticks": effective_hold_ticks,
         "pump_cmd": pump_cmd,
         "valve_cmd": valve_cmd,
-        "hold_ticks": effective_hold_ticks,
         "capped": is_capped,
         "authenticated": is_authenticated,
         "role": role

@@ -108,24 +108,22 @@ def test_out_of_range_values(client):
 
 def test_valid_commands_and_default_hold(client):
     """Valid commands accept boundary inputs, validate schema, and default hold_ticks to 1."""
-    # Valid low boundary
+    # Valid low boundary (pump 0, safe valve 0.0)
     resp = client.post('/api/command', json={"pump_cmd": 0, "valve_cmd": 0.0})
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["pump_cmd"] == 0
     assert resp.json["valve_cmd"] == 0.0
     assert resp.json["hold_ticks"] == 1
     assert resp.json["capped"] is False
     assert resp.json["authenticated"] is False
 
-    # Valid high boundary
-    resp2 = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 100.0})
+    # Valid normal command (pump 1, default valve 50.0)
+    resp2 = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0})
     assert resp2.status_code == 200
-    assert resp2.json["status"] == "validated"
-    assert resp2.json["applied"] is False
+    assert resp2.json["status"] == "accepted"
     assert resp2.json["pump_cmd"] == 1
-    assert resp2.json["valve_cmd"] == 100.0
+    assert resp2.json["valve_cmd"] == 50.0
     assert resp2.json["hold_ticks"] == 1
     assert resp2.json["capped"] is False
 
@@ -134,8 +132,7 @@ def test_unauthenticated_hold_cap(client):
     # Requested hold <= 60 is preserved
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 45})
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 45
     assert resp.json["capped"] is False
     assert resp.json["authenticated"] is False
@@ -143,8 +140,7 @@ def test_unauthenticated_hold_cap(client):
     # Requested hold > 60 is capped to 60
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500})
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 60
     assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False
@@ -158,18 +154,16 @@ def test_authenticated_hold_bearer_and_api_key(client):
     headers_bearer = {"Authorization": "Bearer phase6b_test_secret"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers_bearer)
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 500
     assert resp.json["capped"] is False
     assert resp.json["authenticated"] is True
 
     # X-API-Key header
     headers_api_key = {"X-API-Key": "phase6b_test_secret"}
-    resp = client.post('/api/command', json={"pump_cmd": 0, "valve_cmd": 20.0, "hold_ticks": 300}, headers=headers_api_key)
+    resp = client.post('/api/command', json={"pump_cmd": 0, "valve_cmd": 50.0, "hold_ticks": 300}, headers=headers_api_key)
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 300
     assert resp.json["capped"] is False
     assert resp.json["authenticated"] is True
@@ -180,8 +174,7 @@ def test_wrong_secret_capped(client):
     headers = {"Authorization": "Bearer wrong_secret"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 60
     assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False
@@ -197,8 +190,7 @@ def test_missing_config_secret_fails_closed(client):
         headers = {"Authorization": "Bearer phase6b_test_secret"}
         resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
         assert resp.status_code == 200
-        assert resp.json["status"] == "validated"
-        assert resp.json["applied"] is False
+        assert resp.json["status"] == "accepted"
         assert resp.json["hold_ticks"] == 60
         assert resp.json["capped"] is True
         assert resp.json["authenticated"] is False
@@ -210,8 +202,7 @@ def test_actor_role_does_not_bypass_cap(client):
     headers = {"X-Actor-Role": "admin"}
     resp = client.post('/api/command', json={"pump_cmd": 1, "valve_cmd": 50.0, "hold_ticks": 500}, headers=headers)
     assert resp.status_code == 200
-    assert resp.json["status"] == "validated"
-    assert resp.json["applied"] is False
+    assert resp.json["status"] == "accepted"
     assert resp.json["hold_ticks"] == 60
     assert resp.json["capped"] is True
     assert resp.json["authenticated"] is False

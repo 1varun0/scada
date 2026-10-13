@@ -26,6 +26,8 @@ class AlertManager:
             self.history.clear()
         
     def _attribute_type(self, engines_firing: list[str], received: bool, stale: bool) -> str:
+        if "actuator_consistency" in engines_firing:
+            return "Wire tamper"
         if "availability" in engines_firing:
             if not received:
                 return "DoS"

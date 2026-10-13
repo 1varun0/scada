@@ -13,7 +13,25 @@
             <span id="banner-state">SAFE</span>
             <span id="banner-details"></span>
         </div>
-        <div id="calibrating-badge" class="badge" style="display: none;">Calibrating (<span id="calib-ticks"></span>)</div>
+        
+        <!-- Prevention & Status Badges -->
+        <div class="banner-controls">
+            <div id="control-source-badge" class="badge badge-source" title="Active plant control signal source">
+                Control: <span id="source-name">Sensor</span>
+            </div>
+            <div id="tamper-badge" class="badge badge-tamper" style="display: none;">
+                ⚠️ Wire Tamper
+            </div>
+            <div id="calibrating-badge" class="badge" style="display: none;">Calibrating (<span id="calib-ticks"></span>)</div>
+            
+            <!-- Mode Switcher Toggle -->
+            <div class="mode-toggle-group">
+                <span class="mode-label">Mode:</span>
+                <button id="btn-mode-toggle" class="btn-mode monitor" title="Toggle between Monitor and Prevention mode">
+                    MONITOR
+                </button>
+            </div>
+        </div>
     </div>
     
     <div class="main-layout">
@@ -94,6 +112,7 @@
                     <option value="Replay">Replay</option>
                     <option value="DoS">DoS</option>
                     <option value="Auth misuse">Auth misuse</option>
+                    <option value="Wire tamper">Wire tamper</option>
                 </select>
                 <button id="btn-attack-start">Start Attack</button>
                 <button id="btn-attack-stop">Stop Attack</button>

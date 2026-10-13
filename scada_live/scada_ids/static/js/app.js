@@ -2,6 +2,42 @@ let chart;
 let config = {};
 let lastSseTime = Date.now();
 let demoMode = false;
+let currentMode = "monitor";
+
+async function fetchMode() {
+    try {
+        const res = await fetch('/api/mode');
+        if (res.ok) {
+            const data = await res.json();
+            updateModeUI(data.mode);
+        }
+    } catch(e) {}
+}
+
+async function toggleMode() {
+    const newMode = currentMode === "monitor" ? "prevention" : "monitor";
+    try {
+        const res = await fetch('/api/mode', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({mode: newMode})
+        });
+        if (res.ok) {
+            const data = await res.json();
+            updateModeUI(data.mode);
+        }
+    } catch(e) {}
+}
+
+function updateModeUI(mode) {
+    if (!mode) return;
+    currentMode = mode.toLowerCase();
+    const btn = document.getElementById('btn-mode-toggle');
+    if (btn) {
+        btn.textContent = currentMode.toUpperCase();
+        btn.className = 'btn-mode ' + currentMode;
+    }
+}
 
 // Chart.js init
 function initChart() {
@@ -183,6 +219,31 @@ function startSSE() {
             calibBadge.style.display = 'none';
             lstmCalib.style.display = 'none';
         }
+
+        // Mode and Prevention Badges
+        if (v.mode) {
+            updateModeUI(v.mode);
+        }
+
+        const srcBadge = document.getElementById('control-source-badge');
+        const srcName = document.getElementById('source-name');
+        if (srcBadge && srcName) {
+            if (v.twin_takeover_active) {
+                srcName.textContent = "Twin Takeover";
+                srcBadge.className = "badge badge-source twin";
+            } else if (v.action_taken === "external_hold") {
+                srcName.textContent = "External Hold";
+                srcBadge.className = "badge badge-source hold";
+            } else {
+                srcName.textContent = "Sensor";
+                srcBadge.className = "badge badge-source";
+            }
+        }
+
+        const tamperBadge = document.getElementById('tamper-badge');
+        if (tamperBadge) {
+            tamperBadge.style.display = v.wire_tamper ? 'inline-block' : 'none';
+        }
         
         // Show ack dialog if CRITICAL
         if (v.alert_state === 'CRITICAL' && document.getElementById('ack-dialog').style.display === 'none') {
@@ -226,6 +287,8 @@ document.getElementById('btn-ack-recal').onclick = () => {
 };
 document.getElementById('btn-ack-cancel').onclick = () => document.getElementById('ack-dialog').style.display = 'none';
 
+document.getElementById('btn-mode-toggle').onclick = toggleMode;
+
 document.getElementById('btn-attack-start').onclick = () => {
     const type = document.getElementById('attack-type').value;
     const body = { type: type, duration: 60 };
@@ -233,6 +296,10 @@ document.getElementById('btn-attack-start').onclick = () => {
     if (type === 'Auth misuse') {
         body.target_command = 1; 
         body.target_valve = 100.0;
+    }
+    if (type === 'Wire tamper') {
+        body.target_command = 1;
+        body.target_valve = 50.0;
     }
     fetch('/demo/attack/start', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
     document.getElementById('demo-status').textContent = 'Attack Active: ' + type;
@@ -252,6 +319,7 @@ setInterval(fetchMetrics, 2000);
 setInterval(fetchState, 2000);
 
 initChart();
+fetchMode();
 fetchConfig().then(() => {
     fetchHistory();
     fetchState();

@@ -126,6 +126,69 @@ All detection thresholds were calibrated strictly on normal baseline operational
   $$\Delta h_{600s} = 600\text{ s} \times 0.05\text{ mm/s} = 30\text{ mm} = 3.0\text{ cm}$$
   This 3.0 cm deviation is safely absorbed inside the $[0.8, 1.2\text{ m}]$ operational deadband, proving that parametric mismatch does not breach safety boundaries ($0.3\text{ m}$ or $2.5\text{ m}$) during degraded operation.
 
+### Phase 6b: Authorization Misuse & Actuator Consistency A/B Verification (Monitor vs Prevention Mode)
+
+**Simulation Assumptions & Setup:**
+- **Evaluated Scenarios:** AM-1 through AM-7 across $n = 10$ seeds (101 to 110), un-clamped flow noise (`clamp_flow_noise = False`).
+- **Defenses Evaluated:** Gateway Ingress Command Filtering, Ingress 60-Tick Hold Cap, Continuous Hold Enforcement in `/api/sense`, and 4-Way Actuator Consistency Check.
+
+| Scenario ID | Attack Description | Ingress / Vector | Primary Defense | Monitor Mode Harm | Prevention Mode Harm | Status |
+| :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| **AM-1** | High-Level Pump Latch ($H=1.30\text{ m}$) | `POST /api/command` | Gateway Ingress Filter | 121.0 ov ticks | **0.0 ov ticks** (100% blocked) | ✅ PASSED |
+| **AM-2** | Extreme Drainage ($H=0.90\text{ m}$, Valve 90%) | `POST /api/command` | Gateway Ingress Filter | 151.0 dry ticks | **0.0 dry ticks** (100% blocked) | ✅ PASSED |
+| **AM-3** | Downstream Fieldbus Override (Pump forced ON) | Wire / Reply Path | 4-Way Consistency Check | 58.0 ov ticks | 58.0 ov ticks (Detect delay $\le 3\text{t}$) | ✅ PASSED |
+| **AM-4** | In-Deadband Pump Toggle ($H=1.00\text{ m}$) | `POST /api/command` | Empirical Observation | 0.0 ov / 0.0 dry | 0.0 ov / 0.0 dry (Quiescent in deadband) | ✅ PASSED |
+| **AM-5** | In-Band Malicious Hold - Filling (Hold 1500s) | Authenticated API | Continuous Enforcement | 211.0 ov ticks | **0.0 ov ticks** (Hold dropped at $1.25\text{ m}$) | ✅ PASSED |
+| **AM-6** | In-Band Malicious Hold - Draining (Hold 1800s) | Authenticated API | Continuous Enforcement | 1.0 dry ticks | **0.0 dry ticks** (Hold dropped at $0.75\text{ m}$) | ✅ PASSED |
+| **AM-7** | Unauthenticated Long Hold (Requested 1500s) | Unauthenticated API | Ingress Hold Cap | 0.0 ov / 0.0 dry | **0.0 ov ticks** (Capped to 60 ticks) | ✅ PASSED |
+
+**Key Findings & Defenses:**
+- **Zero Physical Harm in Prevention Mode:** In scenarios AM-1, AM-2, AM-5, and AM-6, Prevention mode completely eliminated physical harm (exactly 0.0 overflow and 0.0 dry-run ticks across all 10 seeds).
+- **Continuous Enforcement is Vital for Insider Attacks:** An authenticated insider possessing the cryptographic shared secret (A4 threat model) bypasses the 60-tick hold cap. Continuous Enforcement re-evaluating the hold on every simulation tick dropped the hold the moment tank level crossed $1.25\text{ m}$ (AM-5, $t \approx 174\text{ s}$) or $0.75\text{ m}$ (AM-6, $t \approx 268\text{ s}$), reverting authority to the autonomous controller and completely preventing tank crest overflow or pump cavitation.
+- **AM-3 Wire Tampering Detect-Only Invariance:** Downstream wire overrides bypass gateway command routing; physical harm (58.0 overflow ticks) is identical between Monitor and Prevention modes, proving the detect-only property. The 4-way consistency check ($D+1=3$ ticks of Gateway OFF history) reliably flagged the tampering with detection delay $\le 3\text{ ticks}$ while achieving 0 false alarms across normal cycling and a 30-minute soak run.
+### Phase 7: Consolidated Multi-Threat Benchmark Evaluation (12 Threats x 10 Seeds x 2 Modes)
+
+**Evaluation Harness:** `experiments/run_full_evaluation.py` evaluated all 12 operational and threat scenarios across $n = 10$ seeds (201 to 210) under un-clamped zero-mean noise (`clamp_flow_noise = False`) in paired Monitor and Prevention modes (240 total simulation runs).
+
+#### 1. Detection Performance Matrix
+
+| Scenario | Threat Name | Category | Event Recall (TPR) | FPR (Per-Tick) | Mean Delay (s) | Primary Engine |
+|:---|:---|:---|:---:|:---:|:---:|:---|
+| **NORM** | Baseline Normal Operation | Baseline | 100.0% | 0.033% | 0.00s | None (Clean) |
+| **FDI-1** | FDI Step Bias (+0.20m) | Sensor Spoofing | 100.0% | 0.000% | 0.00s | Physics Twin |
+| **FDI-2** | FDI Ramp Drift (+0.35m) | Sensor Spoofing | 100.0% | 0.000% | 5.10s | Physics Twin |
+| **REP** | Replay Attack (60s Buffer) | History Tampering | 100.0% | 0.000% | 0.00s | Availability Engine |
+| **DOS** | DoS Network Outage (100% Drop) | Network Outage | 100.0% | 0.000% | 0.00s | Availability Engine |
+| **AM-1** | Rogue Ingress: High-Level Latch | Authorization Misuse | 100.0% | 0.000% | 0.00s | Command Filter |
+| **AM-2** | Rogue Ingress: Excessive Drain | Authorization Misuse | 100.0% | 0.000% | 0.00s | Command Filter |
+| **AM-3** | Fieldbus Wire Tamper (Override) | Actuator Tampering | 100.0% | 0.000% | 0.00s | Actuator Consistency |
+| **AM-4** | In-Deadband Pump Toggling | Authorization Misuse | 100.0% | 0.000% | 9.20s | LSTM Autoencoder |
+| **AM-5** | In-Band Hold: Malicious Filling | Authorization Misuse | 100.0% | 0.000% | 9.00s | LSTM Autoencoder |
+| **AM-6** | In-Band Hold: Malicious Draining | Authorization Misuse | 100.0% | 0.000% | 264.90s | Continuous Enforcement |
+| **AM-7** | Unauthenticated Hold Cap (60t) | Authorization Misuse | 100.0% | 0.000% | 9.00s | LSTM Autoencoder |
+
+#### 2. Physical Harm Prevention & Defense Effectiveness
+
+| Scenario | Threat Name | Monitor Mode Harm | Prevention Mode Harm | Harm Reduction | Defense Status |
+|:---|:---|:---:|:---:|:---:|:---:|
+| **NORM** | Baseline Normal Operation | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **FDI-1** | FDI Step Bias (+0.20m) | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **FDI-2** | FDI Ramp Drift (+0.35m) | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **REP** | Replay Attack (60s Buffer) | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **DOS** | DoS Network Outage (100% Drop) | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **AM-1** | Rogue Ingress: High-Level Latch | Ov: 121.0t \| Dry: 0.0t | **Ov: 0.0t \| Dry: 0.0t** | **100.0%** | ✅ PASSED |
+| **AM-2** | Rogue Ingress: Excessive Drain | Ov: 0.0t \| Dry: 151.0t | **Ov: 0.0t \| Dry: 0.0t** | **100.0%** | ✅ PASSED |
+| **AM-3** | Fieldbus Wire Tamper (Override) | Ov: 53.0t \| Dry: 0.0t | Ov: 53.0t \| Dry: 0.0t | 0.0% (Detect-Only) | ✅ PASSED |
+| **AM-4** | In-Deadband Pump Toggling | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+| **AM-5** | In-Band Hold: Malicious Filling | Ov: 211.0t \| Dry: 0.0t | **Ov: 0.0t \| Dry: 0.0t** | **100.0%** | ✅ PASSED |
+| **AM-6** | In-Band Hold: Malicious Draining | Ov: 0.0t \| Dry: 1.0t | **Ov: 0.0t \| Dry: 0.0t** | **100.0%** | ✅ PASSED |
+| **AM-7** | Unauthenticated Hold Cap (60t) | Ov: 0.0t \| Dry: 0.0t | Ov: 0.0t \| Dry: 0.0t | N/A (0 Harm) | ✅ PASSED |
+
+**Consolidated Benchmark Takeaway:**
+- **100% Event-Level Detection:** All 12 scenarios detected across all 10 seeds without a single missed attack.
+- **100% Physical Harm Elimination on Mitigable Channels:** AM-1, AM-2, AM-5, and AM-6 achieved zero overflow or dry-run ticks in Prevention mode.
+- **Rigorous Detect-Only Invariance on Fieldbus Wire Overrides:** AM-3 demonstrates exact parity between Monitor and Prevention modes (53.0 overflow ticks) confirming that physical bypasses downstream of the controller are promptly detected ($\le 3\text{ ticks}$) without false claims of software mitigation.
+
 ## 4. Technical Challenges Overcome
 Be prepared to discuss these challenges that you successfully debugged and fixed during the project:
 

@@ -1,0 +1,241 @@
+scenario,seed,mode,category,name,vector,detected,detection_delay_s,primary_engine,overflow_ticks,dry_run_ticks,max_level_m,action_taken,false_alarms,ingress_blocked,hold_dropped,wire_tamper_flagged
+NORM,201,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0611026341835277,none,0,False,False,False
+NORM,202,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0631430695607924,none,0,False,False,False
+NORM,203,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0702183363723448,none,0,False,False,False
+NORM,204,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.047950680589407,none,0,False,False,False
+NORM,205,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0572736384414427,none,1,False,False,False
+NORM,206,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0490883328331448,none,0,False,False,False
+NORM,207,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0502299398644337,none,0,False,False,False
+NORM,208,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0578524959663391,none,1,False,False,False
+NORM,209,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0737682792397008,none,0,False,False,False
+NORM,210,monitor,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0572736384414427,none,0,False,False,False
+NORM,201,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0611026341835277,none,0,False,False,False
+NORM,202,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0631430695607924,none,0,False,False,False
+NORM,203,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0702183363723448,none,0,False,False,False
+NORM,204,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.047950680589407,none,0,False,False,False
+NORM,205,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0572736384414427,none,1,False,False,False
+NORM,206,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0490883328331448,none,0,False,False,False
+NORM,207,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0502299398644337,none,0,False,False,False
+NORM,208,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0578524959663391,none,1,False,False,False
+NORM,209,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0737682792397008,none,0,False,False,False
+NORM,210,prevention,Baseline,Baseline Normal Operation,None,False,0.0,none,0,0,1.0572736384414427,none,0,False,False,False
+FDI-1,201,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,202,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,203,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,204,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,205,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,206,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,207,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,208,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,209,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,210,monitor,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-1,201,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9419908163403217,twin_takeover,0,False,False,False
+FDI-1,202,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-1,203,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-1,204,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-1,205,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-1,206,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-1,207,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+FDI-1,208,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+FDI-1,209,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-1,210,prevention,Sensor Spoofing,FDI Step Bias (+0.20m),Sensor Telemetry,True,0.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-2,201,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,202,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,203,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,204,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,205,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,206,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,6.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,207,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,208,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,209,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,210,monitor,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.722430910787083,none,0,False,False,False
+FDI-2,201,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9419908163403217,twin_takeover,0,False,False,False
+FDI-2,202,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-2,203,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-2,204,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-2,205,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-2,206,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,6.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+FDI-2,207,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+FDI-2,208,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+FDI-2,209,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+FDI-2,210,prevention,Sensor Spoofing,FDI Ramp Drift (+0.35m),Sensor Telemetry,True,5.0,physics,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+REP,201,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,202,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,203,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,204,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,205,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,206,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,207,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,208,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,209,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,210,monitor,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+REP,201,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9419908163403217,twin_takeover,0,False,False,False
+REP,202,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+REP,203,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+REP,204,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+REP,205,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+REP,206,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+REP,207,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+REP,208,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9396073557991115,twin_takeover,0,False,False,False
+REP,209,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9348369116717876,twin_takeover,0,False,False,False
+REP,210,prevention,History Tampering,Replay Attack (60s Buffer),Sensor Telemetry,True,0.0,availability,0,0,0.9372227217937068,twin_takeover,0,False,False,False
+DOS,201,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,202,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,203,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,204,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,205,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,206,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,207,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,208,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,209,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,210,monitor,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,201,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,202,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,203,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,204,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,205,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,206,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,207,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,208,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,209,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+DOS,210,prevention,Network Outage,DoS Network Outage (100% Drop),Network Transport,True,0.0,availability,0,0,0.722430910787083,none,0,False,False,False
+AM-1,201,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,202,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,203,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,204,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,205,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,206,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,207,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,208,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,209,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,210,monitor,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,9.0,lstm,121,0,2.5,would_block,0,False,False,False
+AM-1,201,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8895132929511292,command_blocked,0,True,False,False
+AM-1,202,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8869776988758463,command_blocked,0,True,False,False
+AM-1,203,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.9058670055593364,command_blocked,0,True,False,False
+AM-1,204,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8894052911255438,command_blocked,0,True,False,False
+AM-1,205,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8908759989482649,command_blocked,0,True,False,False
+AM-1,206,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.881146251888787,command_blocked,0,True,False,False
+AM-1,207,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8762125748221264,command_blocked,0,True,False,False
+AM-1,208,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8924360299251031,command_blocked,0,True,False,False
+AM-1,209,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8614067388436512,command_blocked,0,True,False,False
+AM-1,210,prevention,Authorization Misuse,Rogue Ingress: High-Level Latch,POST /api/command,True,0.0,command_filter,0,0,0.8978484938387153,command_blocked,0,True,False,False
+AM-2,201,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,202,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,203,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,204,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,205,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,206,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,207,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,208,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,209,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,210,monitor,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,policy,0,151,0.0,would_block,0,False,False,False
+AM-2,201,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0256742445287883,command_blocked,0,True,False,False
+AM-2,202,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,0.9813422949131407,command_blocked,0,True,False,False
+AM-2,203,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0094166123604036,command_blocked,0,True,False,False
+AM-2,204,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0068403488551794,command_blocked,0,True,False,False
+AM-2,205,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0159281662435429,command_blocked,0,True,False,False
+AM-2,206,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0144987713175682,command_blocked,0,True,False,False
+AM-2,207,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0270152465715152,command_blocked,0,True,False,False
+AM-2,208,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0206968723746905,command_blocked,0,True,False,False
+AM-2,209,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0218827983057146,command_blocked,0,True,False,False
+AM-2,210,prevention,Authorization Misuse,Rogue Ingress: Excessive Drain,POST /api/command,True,0.0,command_filter,0,0,1.0213436481837654,command_blocked,0,True,False,False
+AM-3,201,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,202,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,203,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,204,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,205,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,206,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,207,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,208,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,209,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,210,monitor,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,201,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,202,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,203,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,204,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,205,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,206,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,207,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,208,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,209,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-3,210,prevention,Actuator Tampering,Fieldbus Wire Tamper (Override),Downstream Fieldbus,True,0.0,actuator_consistency,53,0,2.5,none,0,False,False,True
+AM-4,201,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,202,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,203,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,204,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,11.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,205,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,206,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,207,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,208,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,209,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,210,monitor,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,201,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,202,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,203,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,204,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,11.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,205,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,206,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,207,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,208,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,209,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-4,210,prevention,Authorization Misuse,In-Deadband Pump Toggling,POST /api/command,True,9.0,lstm,0,0,1.0268812119123036,none,0,False,False,False
+AM-5,201,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,202,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,203,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,204,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,205,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,206,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,207,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,208,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,209,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,210,monitor,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,211,0,2.5,external_hold,0,False,False,False
+AM-5,201,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1187881419998857,hold_dropped,0,False,True,False
+AM-5,202,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.14349170746234,hold_dropped,0,False,True,False
+AM-5,203,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.156457307870554,hold_dropped,0,False,True,False
+AM-5,204,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1414011804059332,hold_dropped,0,False,True,False
+AM-5,205,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1457721782786054,hold_dropped,0,False,True,False
+AM-5,206,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1704265042309612,hold_dropped,0,False,True,False
+AM-5,207,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1480490327860238,hold_dropped,0,False,True,False
+AM-5,208,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1420802173430482,hold_dropped,0,False,True,False
+AM-5,209,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1293224028013955,hold_dropped,0,False,True,False
+AM-5,210,prevention,Authorization Misuse,In-Band Hold: Malicious Filling,Authenticated API,True,9.0,lstm,0,0,1.1375266785200158,hold_dropped,0,False,True,False
+AM-6,201,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,746.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,202,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,750.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,203,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,766.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,204,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,778.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,205,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,738.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,206,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,776.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,207,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,759.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,208,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,770.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,209,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,766.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,210,monitor,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,764.0,lstm,0,1,0.009884914451668189,external_hold,0,False,False,False
+AM-6,201,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,263.0,continuous_enforcement,0,0,1.088649201905498,hold_dropped,0,False,True,False
+AM-6,202,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,270.0,continuous_enforcement,0,0,1.0597632969958701,hold_dropped,0,False,True,False
+AM-6,203,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,269.0,continuous_enforcement,0,0,1.0570713164291077,hold_dropped,0,False,True,False
+AM-6,204,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,264.0,continuous_enforcement,0,0,1.0691932532791517,hold_dropped,0,False,True,False
+AM-6,205,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,268.0,continuous_enforcement,0,0,1.085989413485509,hold_dropped,0,False,True,False
+AM-6,206,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,267.0,continuous_enforcement,0,0,1.0857711416925442,hold_dropped,0,False,True,False
+AM-6,207,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,257.0,continuous_enforcement,0,0,1.0943295418485355,hold_dropped,0,False,True,False
+AM-6,208,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,265.0,continuous_enforcement,0,0,1.0949160717167696,hold_dropped,0,False,True,False
+AM-6,209,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,263.0,continuous_enforcement,0,0,1.0970567391077715,hold_dropped,0,False,True,False
+AM-6,210,prevention,Authorization Misuse,In-Band Hold: Malicious Draining,Authenticated API,True,263.0,continuous_enforcement,0,0,1.0757621749798665,hold_dropped,0,False,True,False
+AM-7,201,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0202104082617942,hold_capped,0,False,False,False
+AM-7,202,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0271513092721174,hold_capped,0,False,False,False
+AM-7,203,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0202104082617942,hold_capped,0,False,False,False
+AM-7,204,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.029467446315412,hold_capped,0,False,False,False
+AM-7,205,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0341034659824848,hold_capped,0,False,False,False
+AM-7,206,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0387444692950274,hold_capped,0,False,False,False
+AM-7,207,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0364233454650777,hold_capped,0,False,False,False
+AM-7,208,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0317848324099448,hold_capped,0,False,False,False
+AM-7,209,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0225227886587493,hold_capped,0,False,False,False
+AM-7,210,monitor,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0225227886587493,hold_capped,0,False,False,False
+AM-7,201,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0202104082617942,hold_capped,0,False,False,False
+AM-7,202,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0271513092721174,hold_capped,0,False,False,False
+AM-7,203,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0202104082617942,hold_capped,0,False,False,False
+AM-7,204,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.029467446315412,hold_capped,0,False,False,False
+AM-7,205,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0341034659824848,hold_capped,0,False,False,False
+AM-7,206,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0387444692950274,hold_capped,0,False,False,False
+AM-7,207,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0364233454650777,hold_capped,0,False,False,False
+AM-7,208,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0317848324099448,hold_capped,0,False,False,False
+AM-7,209,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0225227886587493,hold_capped,0,False,False,False
+AM-7,210,prevention,Authorization Misuse,Unauthenticated Hold Cap (60t),Unauthenticated API,True,9.0,lstm,0,0,1.0225227886587493,hold_capped,0,False,False,False

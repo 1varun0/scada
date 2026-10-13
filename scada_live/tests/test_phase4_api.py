@@ -83,3 +83,50 @@ def test_stream_no_truth(client):
     # Actually /stream sends SSE from hub. We just want to check payload keys. 
     # But checking SSE stream in pytest needs special handling. 
     pass
+
+
+def test_index_route_serves_defender_ui(client):
+    resp = client.get('/')
+    assert resp.status_code == 200
+    html = resp.data.decode('utf-8')
+    assert 'btn-mode-toggle' in html
+    assert 'control-source-badge' in html
+    assert 'tamper-badge' in html
+    assert 'Wire tamper' in html
+
+
+def test_mode_toggle_api(client):
+    # GET initial mode
+    resp = client.get('/api/mode')
+    assert resp.status_code == 200
+    assert resp.json['mode'] in ('monitor', 'prevention')
+
+    # Switch to prevention
+    resp = client.post('/api/mode', json={'mode': 'prevention'})
+    assert resp.status_code == 200
+    assert resp.json['mode'] == 'prevention'
+
+    # Switch back to monitor
+    resp = client.post('/api/mode', json={'mode': 'monitor'})
+    assert resp.status_code == 200
+    assert resp.json['mode'] == 'monitor'
+
+    # Invalid mode rejection
+    resp = client.post('/api/mode', json={'mode': 'invalid_mode'})
+    assert resp.status_code == 400
+
+
+def test_demo_attack_wire_tamper(client):
+    app.config['demo_mode'] = True
+    resp = client.post('/demo/attack/start', json={
+        'type': 'Wire tamper',
+        'target_command': 1,
+        'target_valve': 50.0
+    })
+    assert resp.status_code == 200
+    assert resp.json['status'] == 'attack started'
+
+    resp = client.post('/demo/attack/stop')
+    assert resp.status_code == 200
+    assert resp.json['status'] == 'attack stopped'
+

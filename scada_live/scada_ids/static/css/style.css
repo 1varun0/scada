@@ -71,7 +71,7 @@ body {
     background-color: var(--calib-color);
     padding: 5px 10px;
     border-radius: 4px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
 }
 .tiny-badge {
     background-color: var(--calib-color);
@@ -80,6 +80,94 @@ body {
     font-size: 0.7rem;
     margin-left: 8px;
     display: none;
+}
+
+/* Banner Controls & Mode Toggle */
+.banner-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mode-toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 3px 8px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.mode-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #e0e0e0;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+
+.btn-mode {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+.btn-mode.monitor {
+    background: rgba(33, 150, 243, 0.35);
+    color: #90caf9;
+    border-color: #2196f3;
+}
+.btn-mode.monitor:hover {
+    background: rgba(33, 150, 243, 0.55);
+}
+.btn-mode.prevention {
+    background: rgba(76, 175, 80, 0.35);
+    color: #a5d6a7;
+    border-color: #4caf50;
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+}
+.btn-mode.prevention:hover {
+    background: rgba(76, 175, 80, 0.55);
+}
+
+/* Control Source Badge */
+.badge-source {
+    background: rgba(33, 150, 243, 0.25);
+    border: 1px solid #42a5f5;
+    color: #bbdefb;
+    font-weight: 600;
+}
+.badge-source.twin {
+    background: rgba(156, 39, 176, 0.4);
+    border: 1px solid #ab47bc;
+    box-shadow: 0 0 8px rgba(171, 71, 188, 0.5);
+    color: #f3e5f5;
+    font-weight: bold;
+}
+.badge-source.hold {
+    background: rgba(255, 152, 0, 0.35);
+    border: 1px solid #ffa726;
+    color: #ffe0b2;
+    font-weight: bold;
+}
+
+/* Tamper Alert Badge */
+.badge-tamper {
+    background: rgba(244, 67, 54, 0.4);
+    border: 1px solid #ef5350;
+    color: #ffebee;
+    font-weight: bold;
+    animation: pulse-tamper 1s infinite alternate;
+}
+@keyframes pulse-tamper {
+    from { opacity: 0.7; transform: scale(0.98); }
+    to { opacity: 1.0; transform: scale(1.02); }
 }
 
 .main-layout {
