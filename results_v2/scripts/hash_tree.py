@@ -10,7 +10,8 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-OUTPUT_FILE = REPO_ROOT / "results_v2" / "_audit" / "hashes_before.txt"
+out_name = sys.argv[1] if len(sys.argv) > 1 else "hashes_before.txt"
+OUTPUT_FILE = REPO_ROOT / out_name if Path(out_name).is_absolute() else (REPO_ROOT / "results_v2" / "_audit" / Path(out_name).name)
 OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # 1. Get tracked files
