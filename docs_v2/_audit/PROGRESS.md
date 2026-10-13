@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: engines/availability_engine.py next
+- Active Task: engines/fusion_engine.py next
 - Context usage: Normal
 
 ## Tasks Done
@@ -25,9 +25,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__physics_engine.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__temporal_engine.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__policy_engine.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/engines__availability_engine.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/engines__availability_engine.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/engines__fusion_engine.py.md`
 - [ ] Phase 1: Proceed through models/, evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
