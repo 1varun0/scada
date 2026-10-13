@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 2 - Documentation Writing
-- Active Task: 09_TESTING_GUIDE.md
+- Active Task: 10_RESULTS_AND_METRICS.md
 - Context usage: Normal
 
 ## Tasks Done
@@ -77,8 +77,9 @@
 - [x] Phase 2: `06_CONFIGURATION_REFERENCE.md` (Every key in config.yaml and parameters.py, units, cross-config gaps)
 - [x] Phase 2: `07_DETECTION_ENGINES_REFERENCE.md` (Physics, Temporal, Policy, Availability, Fusion engines, mathematical equations, failure modes)
 - [x] Phase 2: `08_PREVENTION_AND_CONTROL.md` (Control server, level-source switching, twin takeover, hand-back, DoS gap re-seed rule, command filtering)
-- [ ] Phase 2: `09_TESTING_GUIDE.md` (Test suites catalog, execution commands, slow tests, real summary metrics from batch & live suites)
-- [ ] Phase 2: Follow sequential order through 10 to 16.
+- [x] Phase 2: `09_TESTING_GUIDE.md` (Test suites catalog, execution commands, slow tests, real summary metrics from batch & live suites)
+- [ ] Phase 2: `10_RESULTS_AND_METRICS.md` (Headline numbers, A/B Monitor vs Prevention tables, sweeps, soaks, mismatch study, population definitions)
+- [ ] Phase 2: Follow sequential order through 11 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
