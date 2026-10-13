@@ -15,7 +15,7 @@ The SCADA Hybrid IDS live system operates across three logical tiers connected v
 
 ```mermaid
 flowchart TD
-    subgraph Tier1["Plant Simulator (Port 5002)"]
+    subgraph Tier1["Plant Simulator (Port 5100)"]
         PS["LivePlant Instance"]
         PSServer["Flask Server (plant_sim/server.py)"]
         PS --> PSServer
@@ -55,7 +55,7 @@ flowchart TD
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **SCADA IDS & Gateway** | `127.0.0.1` | `5000` | `network.scada_host`, `network.scada_port` | [scada_live/scada_ids/server.py:411](file:///c:/projects/p1/New%20folder/scada_live/scada_ids/server.py#L411) | **Active** (21 Flask routes + UI) |
 | **Attacker Wire Proxy** | `127.0.0.1` | `5001` | `network.attacker_host`, `network.attacker_port` | [scada_live/attacker_wire/server.py:1](file:///c:/projects/p1/New%20folder/scada_live/attacker_wire/server.py#L1) | **Stub** (Unified in [run_demo.py](file:///c:/projects/p1/New%20folder/run_demo.py)) |
-| **Plant Simulator** | `127.0.0.1` | `5002` | `network.plant_host`, `network.plant_port` | [scada_live/plant_sim/server.py:80](file:///c:/projects/p1/New%20folder/scada_live/plant_sim/server.py#L80) | **Active** (3 Flask routes + background ODE thread) |
+| **Plant Simulator** | `127.0.0.1` | `5100` | `network.plant_host`, `network.plant_port` | [scada_live/plant_sim/server.py:80](file:///c:/projects/p1/New%20folder/scada_live/plant_sim/server.py#L80) | **Active** (3 Flask routes + background ODE thread) |
 | **Legacy Replay Dashboard** | `127.0.0.1` | `5000` | N/A (Standalone Flask app) | [dashboard/app.py:19-78](file:///c:/projects/p1/New%20folder/dashboard/app.py#L19-L78) | **Active** (3 Flask routes for offline data exploration) |
 
 [CODE [scada_live/config.yaml:70-76](file:///c:/projects/p1/New%20folder/scada_live/config.yaml#L70-L76), [scada_live/scada_ids/server.py:410-412](file:///c:/projects/p1/New%20folder/scada_live/scada_ids/server.py#L410-L412), [scada_live/plant_sim/server.py:75-81](file:///c:/projects/p1/New%20folder/scada_live/plant_sim/server.py#L75-L81)].
@@ -568,7 +568,7 @@ These endpoints are gated by `app.config['demo_mode']`. If `demo_mode` is `False
 
 ## 4. Plant Simulator Server API Reference (`plant_sim/server.py`)
 
-The plant simulator operates on port 5002, simulating physical continuous ODE dynamics in a background thread while exposing three HTTP endpoints [CODE [scada_live/plant_sim/server.py:20-60](file:///c:/projects/p1/New%20folder/scada_live/plant_sim/server.py#L20-L60)].
+The plant simulator operates on port 5100, simulating physical continuous ODE dynamics in a background thread while exposing three HTTP endpoints [CODE [scada_live/plant_sim/server.py:20-60](file:///c:/projects/p1/New%20folder/scada_live/plant_sim/server.py#L20-L60), [scada_live/config.yaml:87](file:///c:/projects/p1/New%20folder/scada_live/config.yaml#L87)].
 
 ### Route Catalog
 
