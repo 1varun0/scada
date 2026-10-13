@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: matlab/attacks/apply_auth_misuse.m next
+- Active Task: matlab/run_single_scenario.m next
 - Context usage: Normal
 
 ## Tasks Done
@@ -43,9 +43,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_fdi.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_replay.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_dos.m.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_auth_misuse.m.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_auth_misuse.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__run_single_scenario.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__run_all_scenarios.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_params.m.md`
