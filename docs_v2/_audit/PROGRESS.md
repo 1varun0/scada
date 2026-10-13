@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: Source file analysis (simulator/process_simulator.py next)
+- Active Task: Source file analysis (simulator/pump.py next)
 - Context usage: Normal
 
 ## Tasks Done
@@ -14,9 +14,9 @@
 - [x] Phase 1: Database read-only queries saved to `docs_v2/_audit/outputs/query_db.py` and `docs_v2/_audit/outputs/db_queries_output.txt`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__controller.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__noise.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/simulator__process_simulator.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__process_simulator.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__pump.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__scenario_runner.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__tank.py.md`
