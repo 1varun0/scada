@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: models/trainer.py next
+- Active Task: Completed all 3 files in models/; moving to evaluation/
 - Context usage: Normal
 
 ## Tasks Done
@@ -29,10 +29,13 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/engines__fusion_engine.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/models__lstm_autoencoder.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/models__preprocessor.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/models__trainer.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/models__trainer.py.md`
-- [ ] Phase 1: Proceed through evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
+- [ ] Phase 1: File note `docs_v2/_audit/notes/evaluation__ablation.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/evaluation__metrics.py.md`
+- [ ] Phase 1: File note `docs_v2/_audit/notes/evaluation__reporter.py.md`
+- [ ] Phase 1: Proceed through storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
 - [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
