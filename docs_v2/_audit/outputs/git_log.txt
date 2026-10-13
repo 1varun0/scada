@@ -1,0 +1,570 @@
+HEAD: b7a6c999dd0b333475349fb33c3272ea434b447c
+
+=== GIT LOG --ONELINE --STAT ===
+
+b7a6c99 Complete Phase 6b & Phase 7: Prevention enforcement, auto-demo, and full benchmark evaluation
+ data/auth_misuse_ab_results.csv                    |   8 +
+ data/full_evaluation_results.csv                   | 241 ++++++++++
+ experiments/run_auth_misuse_ab.py                  | 299 ++++++++++++
+ experiments/run_full_evaluation.py                 | 500 +++++++++++++++++++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          |  63 +++
+ projectdocs/Phase7_Implementation_Plan.md          | 143 ++++++
+ reports/full_evaluation_report.md                  |  50 +++
+ run_demo.py                                        | 242 +++++++++-
+ scada_live/attacker_wire/injector.py               |  10 +-
+ scada_live/scada_ids/alert_manager.py              |   2 +
+ scada_live/scada_ids/gateway_core.py               | 211 ++++++++-
+ scada_live/scada_ids/server.py                     |  81 +++-
+ scada_live/scada_ids/static/css/style.css          |  90 +++-
+ scada_live/scada_ids/static/defender.html          |  21 +-
+ scada_live/scada_ids/static/js/app.js              |  68 +++
+ scada_live/tests/test_api_command_validation.py    |  37 +-
+ scada_live/tests/test_phase4_api.py                |  47 ++
+ scada_live/tests/test_phase6b_command_filtering.py | 487 ++++++++++++++++++++
+ scada_live/tests/test_phase7_auto_demo.py          | 101 +++++
+ scada_live/tests/test_phase7_evaluation.py         |  70 +++
+ scada_live/tests/test_tamper_consistency_check.py  | 241 ++++++++++
+ temporrr/imp prog                                  | 176 ++++++++
+ 22 files changed, 3139 insertions(+), 49 deletions(-)
+81240b3 Address review feedback on items 1-7: path verification, handback explanation, check_normals held-out alignment, dataset doc citations, handle_command contract, AM-3 D+1 rule, and regression pin label
+ experiments/check_a4_levels.py                  |  29 ++++
+ experiments/check_normals.py                    | 196 +++++++++++++++++++-----
+ experiments/results/check_normals_output.txt    |  87 +++++++++--
+ experiments/results/gateway_rule_validation.txt |   2 +-
+ experiments/validate_gateway_rule.py            |   2 +-
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md       |   2 +-
+ projectdocs/Phase6a_Implementation_Plan.md      |   2 +-
+ projectdocs/Phase6b_Implementation_Plan.md      |  27 ++--
+ scada_live/config.yaml                          |   3 -
+ scada_live/scada_ids/server.py                  |  31 +++-
+ scada_live/tests/test_api_command_validation.py |  51 +++++-
+ 11 files changed, 350 insertions(+), 82 deletions(-)
+2843c34 Complete review deliverables 1-4 and Step 1 of Phase 6b (API command validation and tests)
+ .gitignore                                         |   4 +-
+ experiments/README.md                              |  15 +-
+ experiments/check_normals.py                       |  28 ++--
+ experiments/results/check_normals_output.txt       |  14 ++
+ experiments/results/gateway_rule_validation.txt    |  13 +-
+ .../results/handback_verification_output.txt       |  25 +++
+ experiments/run_handback_check.py                  |  55 +++++++
+ experiments/validate_gateway_rule.py               |  33 +++-
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          |  13 +-
+ projectdocs/Phase6b_Implementation_Plan.md         | 175 ++++++++++++--------
+ scada_live/config.yaml                             |   4 +
+ scada_live/scada_ids/server.py                     |  63 +++++++-
+ scada_live/tests/test_api_command_validation.py    | 177 +++++++++++++++++++++
+ 13 files changed, 514 insertions(+), 105 deletions(-)
+de1f477 Phase 6a/6b evidence reconciliation: empirical registry, gateway rule DB evaluation, AM scenario unit tests, and revised Phase 6b plan
+ .gitignore                                         |   2 +
+ experiments/README.md                              |  75 ++++
+ experiments/compute_metrics.py                     |  37 ++
+ experiments/results/compute_metrics_output.txt     |  26 ++
+ experiments/results/constant_bias_sweep_output.txt |  20 ++
+ experiments/results/gateway_rule_validation.txt    | 142 +++++---
+ .../results/mismatch_sensitivity_output.txt        |  40 +++
+ experiments/results/run_comparison_output.txt      | 213 +++++++++++
+ experiments/results/soak_comparison_output.txt     |  35 ++
+ experiments/run_constant_bias_sweep.py             |  33 +-
+ experiments/validate_gateway_rule.py               | 389 +++++++++++++--------
+ projectdocs/Phase6a_Implementation_Plan.md         |   2 +-
+ projectdocs/Phase6b_Implementation_Plan.md         | 339 +++++++++++-------
+ scada_live/tests/test_gateway_safety_rule.py       | 128 +++++++
+ 14 files changed, 1143 insertions(+), 338 deletions(-)
+f3332c6 Phase 6a/6b reconciliation: measured latch/ODE table, full per-seed report, gateway rule validation, in-memory determinism test, and updated plan
+ experiments/compute_latch_all10.py              | 187 +++++++++++++++++++++
+ experiments/print_ab_per_seed.py                |  75 +++++++++
+ experiments/results/ab_per_seed_output.txt      | 111 +++++++++++++
+ experiments/results/compute_latch_output.txt    |  47 ++++++
+ experiments/results/gateway_rule_validation.txt |  58 +++++++
+ experiments/results/run1.csv                    |  81 ----------
+ experiments/results/run2.csv                    |  81 ----------
+ experiments/validate_gateway_rule.py            | 206 ++++++++++++++++++++++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md       |   5 +-
+ projectdocs/Phase6b_Implementation_Plan.md      |  74 ++++-----
+ scada_live/tests/test_phase6a_prevention.py     |  32 ++++
+ 11 files changed, 757 insertions(+), 200 deletions(-)
+695abca Phase 6a evidence updates & Phase 6b revised plan (B1-B4)
+ engines/policy_engine.py                           |  16 +-
+ .../results/constant_bias_sweep_results.csv        |   7 +
+ experiments/results/run1.csv                       |  81 ++++
+ experiments/results/run2.csv                       |  81 ++++
+ experiments/run_comparison.py                      | 108 ++++--
+ experiments/run_constant_bias_sweep.py             | 129 +++++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          |  11 +-
+ projectdocs/Phase6b_Implementation_Plan.md         | 427 ++++++++++++---------
+ 8 files changed, 641 insertions(+), 219 deletions(-)
+e4fc3b6 Phase 6a fixes and revised Phase 6b implementation plan
+ experiments/results/ab_comparison_results.csv      | 162 ++++----
+ .../results/mismatch_sensitivity_results.csv       | 242 ++++++++----
+ experiments/run_comparison.py                      | 213 +++++++---
+ experiments/run_mismatch_sensitivity.py            | 146 ++++---
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          |   2 +-
+ projectdocs/Phase6b_Implementation_Plan.md         | 434 +++++++++++++--------
+ 6 files changed, 760 insertions(+), 439 deletions(-)
+2a304fa Phase 6a follow-ups: extended A/B harness, mismatch sensitivity, soak comparison, A3 FP reconciliation, docs update, and Phase 6b plan
+ experiments/reconcile_a3_fp.py                     | 164 ++++++++++++++
+ experiments/results/ab_comparison_figure.png       | Bin 420233 -> 419838 bytes
+ experiments/results/ab_comparison_results.csv      | 162 +++++++-------
+ experiments/results/ab_comparison_summary.txt      |  28 +--
+ .../results/mismatch_sensitivity_results.csv       |  81 +++++++
+ experiments/results/reconcile_a3_fp.txt            |  45 ++++
+ experiments/results/soak_comparison_results.csv    |  41 ++++
+ experiments/run_comparison.py                      | 238 ++++++++++++++-------
+ experiments/run_mismatch_sensitivity.py            | 189 ++++++++++++++++
+ experiments/run_soak_comparison.py                 | 119 +++++++++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          |  27 ++-
+ projectdocs/Phase6a_Implementation_Plan.md         |   8 +-
+ projectdocs/Phase6b_Implementation_Plan.md         | 212 ++++++++++++++++++
+ 13 files changed, 1137 insertions(+), 177 deletions(-)
+87d29c9 Phase 6a Step 3: implement A/B comparison harness, generate CSV, summary table, and comparison figure
+ experiments/results/ab_comparison_figure.png  | Bin 0 -> 420233 bytes
+ experiments/results/ab_comparison_results.csv |  81 ++++++
+ experiments/results/ab_comparison_summary.txt |  14 ++
+ experiments/run_comparison.py                 | 338 ++++++++++++++++++++++++++
+ projectdocs/Phase6a_Implementation_Plan.md    |  11 +-
+ 5 files changed, 441 insertions(+), 3 deletions(-)
+4eb411e Phase 6a Step 2b refinement: fix gap suppression timeout hole, clean module logging, pass dos_gap_rule explicitly in GatewayCore, add equivalence and replay tests, and update docs
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md   |   5 +-
+ projectdocs/Phase6a_Implementation_Plan.md  |  11 +-
+ scada_live/config.yaml                      |   1 +
+ scada_live/scada_ids/gateway_core.py        |   4 +-
+ scada_live/scada_ids/streaming_ids.py       |  26 +++-
+ scada_live/tests/test_phase6a_prevention.py | 183 +++++++++++++++++++++++++++-
+ 6 files changed, 219 insertions(+), 11 deletions(-)
+c54c446 Phase 6a Step 2b: DoS gap re-seed rule, physical rate bounds, prevention tests, and cheat sheet updates
+ experiments/check_a3_gap.py                 |  81 ++++++++++++++++++
+ experiments/results/check_a3_gap.txt        |  21 +++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md   |  18 +++-
+ scada_live/config.yaml                      |   2 +
+ scada_live/scada_ids/gateway_core.py        |  11 ++-
+ scada_live/scada_ids/streaming_ids.py       |  87 ++++++++++++++++++-
+ scada_live/tests/test_phase6a_prevention.py | 128 ++++++++++++++++++++++++++--
+ 7 files changed, 334 insertions(+), 14 deletions(-)
+76e1038 Experiments: save evidence scripts, execution outputs, and updated cheat sheet
+ experiments/compute_a3_mechanism_detailed.py       | 93 ++++++++++++++++++++++
+ experiments/compute_fresh_latency.py               | 85 ++++++++++++++++++++
+ experiments/inspect_tick0_baseline.py              | 75 +++++++++++++++++
+ experiments/recompute_all60_residuals.py           | 64 +++++++++++++++
+ .../results/compute_a3_mechanism_detailed.txt      | 26 ++++++
+ experiments/results/compute_fresh_latency.txt      | 26 ++++++
+ experiments/results/inspect_tick0_baseline.txt     | 18 +++++
+ experiments/results/recompute_all60_residuals.txt  | 19 +++++
+ experiments/results/run_2x2_grid.txt               |  5 ++
+ experiments/results/run_soak_tick0.txt             | 15 ++++
+ experiments/results/test_aligned_loop.txt          | 27 +++++++
+ experiments/run_2x2_grid.py                        | 70 ++++++++++++++++
+ experiments/run_soak_tick0.py                      | 42 ++++++++++
+ experiments/test_aligned_loop.py                   | 52 ++++++++++++
+ experiments/test_dos_takeover_hole.py              | 90 +++++++++++++++++++++
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md          | 20 ++---
+ scada_live/tests/test_phase6a_prevention.py        | 60 +++++++++++++-
+ 17 files changed, 776 insertions(+), 11 deletions(-)
+f36c01c Phase 6a Step 2: GatewayCore mode, twin takeover, handback logic, and unit tests
+ experiments/run_attacks_live.py             |   2 +-
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md   |   4 +-
+ scada_live/scada_ids/gateway_core.py        |  79 ++++++++++++-
+ scada_live/scada_ids/streaming_ids.py       |   6 +
+ scada_live/tests/test_phase6a_prevention.py | 171 ++++++++++++++++++++++++++++
+ 5 files changed, 256 insertions(+), 6 deletions(-)
+6b06c76 Experiments: fix live attacks loop to execute physical auth misuse and sanitize DoS watchdog packets
+ experiments/run_attacks_live.py | 122 +++++++++++++---------------------------
+ 1 file changed, 39 insertions(+), 83 deletions(-)
+8d6e8a8 Docs: update cheat sheet and Phase 6a plan with A3 investigation note, tau_p calibration, and evaluation precision scope
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md  | 10 ++++++----
+ projectdocs/Phase6a_Implementation_Plan.md | 10 +++++-----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
+e687374 Code: sanitize DoS packets, guarantee finite LSTM scores, and add prevention trigger config
+ scada_live/config.yaml                   |  2 ++
+ scada_live/scada_ids/gateway_core.py     |  8 +++++-
+ scada_live/scada_ids/streaming_ids.py    | 43 +++++++++++++++++++++++-------
+ scada_live/tests/test_phase3a_gateway.py | 45 ++++++++++++++++++++++++++++++++
+ 4 files changed, 87 insertions(+), 11 deletions(-)
+1602bd1 Phase 6a Step 1: config prevention block, StreamingIDS twin estimate accessor, policy version flag, and tests
+ experiments/check_a3_batch_eval.py         | 56 ++++++++++++++++++++++++++++++
+ experiments/check_normals.py               | 19 +++++++---
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md  | 27 ++++++++++++--
+ projectdocs/Phase6a_Implementation_Plan.md | 22 ++++++------
+ requirements-lock.txt                      | 14 ++++++++
+ scada_live/config.yaml                     |  7 ++++
+ scada_live/scada_ids/streaming_ids.py      | 20 +++++++++--
+ scada_live/tests/test_phase0_imports.py    | 37 ++++++++++++++++++++
+ tests/test_engines.py                      | 23 ++++++++++++
+ 9 files changed, 203 insertions(+), 22 deletions(-)
+55967c4 Update .gitignore: add venv, db, and test output patterns
+ .gitignore | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+d8d924c Update check_normals script to reset IDS state per scenario
+ experiments/check_normals.py | 74 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 45 insertions(+), 29 deletions(-)
+323eb56 Clean up repo: ignore venv, db and output files
+ .gitignore                     |  9 +++++
+ compute_metrics.py             | 90 ------------------------------------------
+ scada_live/scada_ids/events.db |  0
+ 3 files changed, 9 insertions(+), 90 deletions(-)
+da5c30e Update events.db
+ scada_live/scada_ids/events.db | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+b09a14d Add verification scripts for metrics and attacks
+ experiments/check_a3_001.py         |  64 +++++++++++++++
+ experiments/check_a3_batch.py       |  38 +++++++++
+ experiments/check_a4_cmds.py        |   6 ++
+ experiments/check_a4_missed.py      |  15 ++++
+ experiments/check_normals.py        |  60 ++++++++++++++
+ experiments/check_policy_v2.py      |  37 +++++++++
+ experiments/check_residual.py       |  32 ++++++++
+ experiments/check_trend.py          |  27 ++++++
+ experiments/check_trend_all.py      |  41 ++++++++++
+ experiments/check_trend_no_noise.py |  22 +++++
+ experiments/compute_metrics.py      |  90 ++++++++++++++++++++
+ experiments/debug_a4.py             |  11 +++
+ experiments/lstm_dist.py            |  37 +++++++++
+ experiments/measure_twin.py         |  18 ++++
+ experiments/metrics_normal.py       |  18 ++++
+ experiments/print_a4_rows.py        |   7 ++
+ experiments/residual.png            | Bin 0 -> 38922 bytes
+ experiments/run_attacks_live.py     | 158 ++++++++++++++++++++++++++++++++++++
+ experiments/run_checks.py           |  83 +++++++++++++++++++
+ experiments/run_soak.py             |  31 +++++++
+ 20 files changed, 795 insertions(+)
+ee3276e Update IDS for policy v2 and prevention mode prep
+ scada_live/scada_ids/gateway_core.py  |  2 +-
+ scada_live/scada_ids/streaming_ids.py | 15 ++++++++++-----
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+fcf5ea0 Fix tests for flow noise and demo injector
+ scada_live/tests/test_phase1_plant.py | 1 +
+ scada_live/tests/test_phase4_api.py   | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+bc0c068 Update Policy Engine v2 rules
+ engines/policy_engine.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+82f4087 Update project docs and Phase 6a plan
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md  |  37 +++++----
+ projectdocs/Phase6a_Implementation_Plan.md | 118 +++++++++++++++++++++++++++++
+ 2 files changed, 141 insertions(+), 14 deletions(-)
+4bbb265 Restore original flow noise behavior and add clamp config
+ scada_live/config.yaml        | 1 +
+ scada_live/plant_sim/plant.py | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+4cf890e Restore flow noise clamping as default and add option
+ simulator/noise.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+d800855 Clean .gitignore and requirements
+ .gitignore | Bin 1162 -> 525 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+d59da9e Clean .gitignore
+ .gitignore                                | Bin 645 -> 1162 bytes
+ compute_metrics.py                        | 111 +++++++++++++++---------------
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md |  20 +++---
+ requirements.txt                          |   6 +-
+ scada_live/scada_ids/server.py            |   2 +
+ scada_live/scada_ids/streaming_ids.py     |   2 +-
+ 6 files changed, 73 insertions(+), 68 deletions(-)
+d7f3e9f Fix file encodings
+ .gitignore       | Bin 572 -> 645 bytes
+ requirements.txt | Bin 342 -> 151 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+40b423d Fix: Ignore db files, Update run_demo soak test and metrics
+ .gitignore                                | Bin 550 -> 572 bytes
+ compute_metrics.py                        | 100 +++++++++++++-----------------
+ data/live_run.db                          | Bin 409600 -> 0 bytes
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md |  32 +++++++---
+ run_demo.py                               |  74 +++++++++++++++-------
+ 5 files changed, 119 insertions(+), 87 deletions(-)
+c4a3043 Docs: Update Cheat Sheet with final empirical metrics
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+cf48dbb Phase 4: API, Server, and Soak Test implementation
+ compute_metrics.py                       | 101 ++++++++++
+ data/live_run.db                         | Bin 0 -> 409600 bytes
+ phase3b_summary.md                       |  25 +++
+ phase4_plan.md                           |  72 +++++++
+ projectdocs/Phase3_Plan.md               | 301 ++++++++++++++++++++++++++++
+ projectdocs/Phase4_Plan.md               | 203 +++++++++++++++++++
+ projectdocs/SCADA_Hybrid_IDS_Plan.md     | 325 +++++++++++++++++++++++++++++++
+ run_demo.py                              |  36 ++--
+ scada_live/attacker_wire/injector.py     |   2 +-
+ scada_live/scada_ids/server.py           |  15 +-
+ scada_live/tests/test_phase4_injector.py |   4 +-
+ 11 files changed, 1064 insertions(+), 20 deletions(-)
+55f7e91 Add remaining files
+ scada_live/__init__.py                 |   1 +
+ scada_live/common/__init__.py          |   1 +
+ scada_live/common/config_loader.py     |  26 +++++++
+ scada_live/common/packets.py           |  56 +++++++++++++++
+ scada_live/common/transport.py         |  52 ++++++++++++++
+ scada_live/config.yaml                 |  96 ++++++++++++++++++++++++++
+ scada_live/plant_sim/__init__.py       |   1 +
+ scada_live/plant_sim/gateway_client.py |  71 +++++++++++++++++++
+ scada_live/plant_sim/plant.py          | 120 +++++++++++++++++++++++++++++++++
+ scada_live/plant_sim/server.py         |  83 +++++++++++++++++++++++
+ scada_live/run_all.py                  |   2 +
+ scada_live/tools/watch_sse.py          |  29 ++++++++
+ 12 files changed, 538 insertions(+)
+d549b2f Phase 4: Add UI, Demo Runner, Injector and API
+ .gitignore                                     | Bin 514 -> 550 bytes
+ requirements.txt                               | Bin 314 -> 342 bytes
+ run_demo.py                                    | 149 ++++++++++++++
+ scada_live/attacker_wire/__init__.py           |   1 +
+ scada_live/attacker_wire/injector.py           | 128 ++++++++++++
+ scada_live/attacker_wire/server.py             |   1 +
+ scada_live/tests/__init__.py                   |   1 +
+ scada_live/tests/test_phase0_imports.py        |  59 ++++++
+ scada_live/tests/test_phase1_plant.py          | 111 +++++++++++
+ scada_live/tests/test_phase2_equivalence.py    | 262 +++++++++++++++++++++++++
+ scada_live/tests/test_phase3a_gateway.py       | 228 +++++++++++++++++++++
+ scada_live/tests/test_phase3b_alert_metrics.py |  81 ++++++++
+ scada_live/tests/test_phase3b_metrics.py       |  57 ++++++
+ scada_live/tests/test_phase4_api.py            |  83 ++++++++
+ scada_live/tests/test_phase4_injector.py       |  76 +++++++
+ 15 files changed, 1237 insertions(+)
+f38db81 Phase 3: Add Gateway Server and Alert Manager
+ scada_live/scada_ids/__init__.py          |   1 +
+ scada_live/scada_ids/alert_manager.py     | 111 +++++++++++++
+ scada_live/scada_ids/control_server.py    |   2 +
+ scada_live/scada_ids/db_writer.py         |  84 ++++++++++
+ scada_live/scada_ids/gateway_core.py      | 210 +++++++++++++++++++++++
+ scada_live/scada_ids/metrics.py           | 182 ++++++++++++++++++++
+ scada_live/scada_ids/prevention.py        |   2 +
+ scada_live/scada_ids/server.py            | 267 ++++++++++++++++++++++++++++++
+ scada_live/scada_ids/sse_hub.py           |  33 ++++
+ scada_live/scada_ids/static/css/style.css | 183 ++++++++++++++++++++
+ scada_live/scada_ids/static/defender.html | 137 +++++++++++++++
+ scada_live/scada_ids/static/js/app.js     | 259 +++++++++++++++++++++++++++++
+ scada_live/scada_ids/static/js/chart.js   |  14 ++
+ scada_live/scada_ids/streaming_ids.py     | 158 ++++++++++++++++++
+ 14 files changed, 1643 insertions(+)
+1a14d10 Phase 1: Add PolicyEngine v2
+ engines/policy_engine.py | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+64cc6b1 Add local Chart.js asset, scenario auto-selection, and base papers documentation
+ dashboard/static/app.js                      |   4 +
+ dashboard/static/chart.js                    |  14 ++
+ dashboard/templates/index.html               |   2 +-
+ projectdocs/BASE_PAPERS_AND_CONTRIBUTIONS.md | 184 +++++++++++++++++++++++++++
+ 4 files changed, 203 insertions(+), 1 deletion(-)
+4ded567 Initial commit: SCADA Digital Twin & Multi-Evidence Hybrid IDS
+ .gitignore                                |    55 +
+ README.md                                 |    75 +
+ checkpoints/data_split_v1.json            |    68 +
+ checkpoints/lstm_ae_v1.pt                 |   Bin 0 -> 57128 bytes
+ checkpoints/scaler_v1.pkl                 |   Bin 0 -> 682 bytes
+ config/__init__.py                        |     5 +
+ config/parameters.py                      |   109 +
+ config/scenarios.py                       |   355 +
+ dashboard/app.py                          |    77 +
+ dashboard/static/app.js                   |   199 +
+ dashboard/static/style.css                |   278 +
+ dashboard/templates/index.html            |    91 +
+ data/e0_residual_distribution.png         |   Bin 0 -> 134040 bytes
+ data/evaluation_results.csv               | 99001 ++++++++++++++++++++++++++++
+ data/scada_ids.db                         |   Bin 0 -> 25161728 bytes
+ digital_twin/__init__.py                  |     5 +
+ digital_twin/physics_twin.py              |    95 +
+ engines/__init__.py                       |     1 +
+ engines/availability_engine.py            |    40 +
+ engines/fusion_engine.py                  |    80 +
+ engines/physics_engine.py                 |    49 +
+ engines/policy_engine.py                  |    37 +
+ engines/temporal_engine.py                |    55 +
+ evaluation/__init__.py                    |     1 +
+ evaluation/ablation.py                    |    98 +
+ evaluation/metrics.py                     |    83 +
+ evaluation/reporter.py                    |    52 +
+ matlab/attacks/apply_auth_misuse.m        |    93 +
+ matlab/attacks/apply_dos.m                |    69 +
+ matlab/attacks/apply_fdi.m                |    48 +
+ matlab/attacks/apply_replay.m             |    78 +
+ matlab/data/A1_001.csv                    |  1001 +
+ matlab/data/A1_002.csv                    |  1001 +
+ matlab/data/A1_003.csv                    |  1001 +
+ matlab/data/A1_004.csv                    |  1001 +
+ matlab/data/A1_005.csv                    |  1001 +
+ matlab/data/A1_006.csv                    |  1001 +
+ matlab/data/A1_007.csv                    |  1001 +
+ matlab/data/A1_008.csv                    |  1001 +
+ matlab/data/A1_009.csv                    |  1001 +
+ matlab/data/A1_010.csv                    |  1001 +
+ matlab/data/A1_011.csv                    |  1001 +
+ matlab/data/A1_012.csv                    |  1001 +
+ matlab/data/A1_013.csv                    |  1001 +
+ matlab/data/A1_014.csv                    |  1001 +
+ matlab/data/A1_015.csv                    |  1001 +
+ matlab/data/A1_016.csv                    |  1001 +
+ matlab/data/A1_017.csv                    |  1001 +
+ matlab/data/A1_018.csv                    |  1001 +
+ matlab/data/A1_019.csv                    |  1001 +
+ matlab/data/A1_020.csv                    |  1001 +
+ matlab/data/A1_021.csv                    |  1001 +
+ matlab/data/A1_022.csv                    |  1001 +
+ matlab/data/A1_023.csv                    |  1001 +
+ matlab/data/A1_024.csv                    |  1001 +
+ matlab/data/A1_025.csv                    |  1001 +
+ matlab/data/A1_026.csv                    |  1001 +
+ matlab/data/A1_027.csv                    |  1001 +
+ matlab/data/A1_028.csv                    |  1001 +
+ matlab/data/A1_029.csv                    |  1001 +
+ matlab/data/A1_030.csv                    |  1001 +
+ matlab/data/A1_031.csv                    |  1001 +
+ matlab/data/A1_032.csv                    |  1001 +
+ matlab/data/A1_033.csv                    |  1001 +
+ matlab/data/A1_034.csv                    |  1001 +
+ matlab/data/A1_035.csv                    |  1001 +
+ matlab/data/A1_036.csv                    |  1001 +
+ matlab/data/A1_037.csv                    |  1001 +
+ matlab/data/A1_038.csv                    |  1001 +
+ matlab/data/A1_039.csv                    |  1001 +
+ matlab/data/A1_040.csv                    |  1001 +
+ matlab/data/A1_041.csv                    |  1001 +
+ matlab/data/A1_042.csv                    |  1001 +
+ matlab/data/A1_043.csv                    |  1001 +
+ matlab/data/A1_044.csv                    |  1001 +
+ matlab/data/A1_045.csv                    |  1001 +
+ matlab/data/A2_001.csv                    |  1001 +
+ matlab/data/A2_002.csv                    |  1001 +
+ matlab/data/A2_003.csv                    |  1001 +
+ matlab/data/A2_004.csv                    |  1001 +
+ matlab/data/A2_005.csv                    |  1001 +
+ matlab/data/A2_006.csv                    |  1001 +
+ matlab/data/A2_007.csv                    |  1001 +
+ matlab/data/A2_008.csv                    |  1001 +
+ matlab/data/A2_009.csv                    |  1001 +
+ matlab/data/A2_010.csv                    |  1001 +
+ matlab/data/A2_011.csv                    |  1001 +
+ matlab/data/A2_012.csv                    |  1001 +
+ matlab/data/A2_013.csv                    |  1001 +
+ matlab/data/A2_014.csv                    |  1001 +
+ matlab/data/A2_015.csv                    |  1001 +
+ matlab/data/A3_001.csv                    |  1001 +
+ matlab/data/A3_002.csv                    |  1001 +
+ matlab/data/A3_003.csv                    |  1001 +
+ matlab/data/A3_004.csv                    |  1001 +
+ matlab/data/A3_005.csv                    |  1001 +
+ matlab/data/A3_006.csv                    |  1001 +
+ matlab/data/A3_007.csv                    |  1001 +
+ matlab/data/A3_008.csv                    |  1001 +
+ matlab/data/A3_009.csv                    |  1001 +
+ matlab/data/A3_010.csv                    |  1001 +
+ matlab/data/A3_011.csv                    |  1001 +
+ matlab/data/A3_012.csv                    |  1001 +
+ matlab/data/A3_013.csv                    |  1001 +
+ matlab/data/A3_014.csv                    |  1001 +
+ matlab/data/A3_015.csv                    |  1001 +
+ matlab/data/A4_001.csv                    |  1001 +
+ matlab/data/A4_002.csv                    |  1001 +
+ matlab/data/A4_003.csv                    |  1001 +
+ matlab/data/A4_004.csv                    |  1001 +
+ matlab/data/A4_005.csv                    |  1001 +
+ matlab/data/A4_006.csv                    |  1001 +
+ matlab/data/A4_007.csv                    |  1001 +
+ matlab/data/A4_008.csv                    |  1001 +
+ matlab/data/A4_009.csv                    |  1001 +
+ matlab/data/A4_010.csv                    |  1001 +
+ matlab/data/A4_011.csv                    |  1001 +
+ matlab/data/A4_012.csv                    |  1001 +
+ matlab/data/A4_013.csv                    |  1001 +
+ matlab/data/A4_014.csv                    |  1001 +
+ matlab/data/A4_015.csv                    |  1001 +
+ matlab/data/N_001.csv                     |  1001 +
+ matlab/data/N_002.csv                     |  1001 +
+ matlab/data/N_003.csv                     |  1001 +
+ matlab/data/N_004.csv                     |  1001 +
+ matlab/data/N_005.csv                     |  1001 +
+ matlab/data/N_006.csv                     |  1001 +
+ matlab/data/N_007.csv                     |  1001 +
+ matlab/data/N_008.csv                     |  1001 +
+ matlab/data/N_009.csv                     |  1001 +
+ matlab/data/N_010.csv                     |  1001 +
+ matlab/data/N_011.csv                     |  1001 +
+ matlab/data/N_012.csv                     |  1001 +
+ matlab/data/N_013.csv                     |  1001 +
+ matlab/data/N_014.csv                     |  1001 +
+ matlab/data/N_015.csv                     |  1001 +
+ matlab/data/N_016.csv                     |  1001 +
+ matlab/data/N_017.csv                     |  1001 +
+ matlab/data/N_018.csv                     |  1001 +
+ matlab/data/N_019.csv                     |  1001 +
+ matlab/data/N_020.csv                     |  1001 +
+ matlab/data/N_021.csv                     |  1001 +
+ matlab/data/N_022.csv                     |  1001 +
+ matlab/data/N_023.csv                     |  1001 +
+ matlab/data/N_024.csv                     |  1001 +
+ matlab/data/N_025.csv                     |  1001 +
+ matlab/data/N_026.csv                     |  1001 +
+ matlab/data/N_027.csv                     |  1001 +
+ matlab/data/N_028.csv                     |  1001 +
+ matlab/data/N_029.csv                     |  1001 +
+ matlab/data/N_030.csv                     |  1001 +
+ matlab/data/N_031.csv                     |  1001 +
+ matlab/data/N_032.csv                     |  1001 +
+ matlab/data/N_033.csv                     |  1001 +
+ matlab/data/N_034.csv                     |  1001 +
+ matlab/data/N_035.csv                     |  1001 +
+ matlab/data/N_036.csv                     |  1001 +
+ matlab/data/N_037.csv                     |  1001 +
+ matlab/data/N_038.csv                     |  1001 +
+ matlab/data/N_039.csv                     |  1001 +
+ matlab/data/N_040.csv                     |  1001 +
+ matlab/data/N_041.csv                     |  1001 +
+ matlab/data/N_042.csv                     |  1001 +
+ matlab/data/N_043.csv                     |  1001 +
+ matlab/data/N_044.csv                     |  1001 +
+ matlab/data/N_045.csv                     |  1001 +
+ matlab/data/N_046.csv                     |  1001 +
+ matlab/data/N_047.csv                     |  1001 +
+ matlab/data/N_048.csv                     |  1001 +
+ matlab/data/N_049.csv                     |  1001 +
+ matlab/data/N_050.csv                     |  1001 +
+ matlab/data/N_051.csv                     |  1001 +
+ matlab/data/N_052.csv                     |  1001 +
+ matlab/data/N_053.csv                     |  1001 +
+ matlab/data/N_054.csv                     |  1001 +
+ matlab/data/N_055.csv                     |  1001 +
+ matlab/data/N_056.csv                     |  1001 +
+ matlab/data/N_057.csv                     |  1001 +
+ matlab/data/N_058.csv                     |  1001 +
+ matlab/data/N_059.csv                     |  1001 +
+ matlab/data/N_060.csv                     |  1001 +
+ matlab/data/attack_scenarios.csv          |    91 +
+ matlab/run_all_scenarios.m                |   289 +
+ matlab/run_single_scenario.m              |   220 +
+ matlab/scada_params.m                     |    43 +
+ matlab/scada_simulink_guide.m             |   153 +
+ models/__init__.py                        |     1 +
+ models/lstm_autoencoder.py                |    63 +
+ models/preprocessor.py                    |    84 +
+ models/trainer.py                         |   109 +
+ plan                                      |   883 +
+ projectdocs/ARCHITECTURE.md               |    63 +
+ projectdocs/DATASET_DOCUMENTATION.md      |   254 +
+ projectdocs/FORMULAS_REFERENCE.md         |   385 +
+ projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md |    37 +
+ projectdocs/README.md                     |    75 +
+ reports/ablation_results.md               |    12 +
+ reports/roc_curve.png                     |   Bin 0 -> 35908 bytes
+ requirements.txt                          |   Bin 0 -> 314 bytes
+ scripts/import_matlab_csv.py              |   239 +
+ scripts/run_ablation.py                   |    32 +
+ scripts/run_e0_validation.py              |   203 +
+ scripts/run_evaluation.py                 |   195 +
+ scripts/train_lstm.py                     |   126 +
+ scripts/validate_matlab_vs_python.py      |   216 +
+ simulator/__init__.py                     |     5 +
+ simulator/controller.py                   |   169 +
+ simulator/noise.py                        |    51 +
+ simulator/process_simulator.py            |   162 +
+ simulator/pump.py                         |    88 +
+ simulator/scenario_runner.py              |    81 +
+ simulator/tank.py                         |    72 +
+ simulator/valve.py                        |    98 +
+ storage/__init__.py                       |     5 +
+ storage/sqlite_client.py                  |   370 +
+ tests/test_controller.py                  |   105 +
+ tests/test_engines.py                     |    61 +
+ tests/test_fusion.py                      |    32 +
+ tests/test_pump.py                        |    90 +
+ tests/test_simulator.py                   |   152 +
+ tests/test_tank.py                        |   106 +
+ tests/test_twin.py                        |   139 +
+ tests/test_valve.py                       |   110 +
+ walk                                      |   109 +
+ 224 files changed, 257125 insertions(+)

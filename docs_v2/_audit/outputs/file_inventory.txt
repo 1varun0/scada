@@ -1,0 +1,421 @@
+=== root files (9 files) ===
+    71 lines  .gitignore
+    75 lines  README.md
+    25 lines  phase3b_summary.md
+    72 lines  phase4_plan.md
+   883 lines  plan
+    14 lines  requirements-lock.txt
+    14 lines  requirements.txt
+   421 lines  run_demo.py
+   109 lines  walk
+Total in root files: 1684 lines
+
+=== simulator/ (8 files) ===
+     5 lines  simulator/__init__.py
+   169 lines  simulator/controller.py
+    53 lines  simulator/noise.py
+   162 lines  simulator/process_simulator.py
+    88 lines  simulator/pump.py
+    81 lines  simulator/scenario_runner.py
+    72 lines  simulator/tank.py
+    98 lines  simulator/valve.py
+Total in simulator/: 728 lines
+
+=== config/ (3 files) ===
+     5 lines  config/__init__.py
+   109 lines  config/parameters.py
+   355 lines  config/scenarios.py
+Total in config/: 469 lines
+
+=== digital_twin/ (2 files) ===
+     5 lines  digital_twin/__init__.py
+    95 lines  digital_twin/physics_twin.py
+Total in digital_twin/: 100 lines
+
+=== engines/ (6 files) ===
+     1 lines  engines/__init__.py
+    40 lines  engines/availability_engine.py
+    80 lines  engines/fusion_engine.py
+    49 lines  engines/physics_engine.py
+    65 lines  engines/policy_engine.py
+    55 lines  engines/temporal_engine.py
+Total in engines/: 290 lines
+
+=== models/ (4 files) ===
+     1 lines  models/__init__.py
+    63 lines  models/lstm_autoencoder.py
+    84 lines  models/preprocessor.py
+   109 lines  models/trainer.py
+Total in models/: 257 lines
+
+=== evaluation/ (4 files) ===
+     1 lines  evaluation/__init__.py
+    98 lines  evaluation/ablation.py
+    83 lines  evaluation/metrics.py
+    52 lines  evaluation/reporter.py
+Total in evaluation/: 234 lines
+
+=== scripts/ (6 files) ===
+   239 lines  scripts/import_matlab_csv.py
+    32 lines  scripts/run_ablation.py
+   203 lines  scripts/run_e0_validation.py
+   195 lines  scripts/run_evaluation.py
+   126 lines  scripts/train_lstm.py
+   216 lines  scripts/validate_matlab_vs_python.py
+Total in scripts/: 1011 lines
+
+=== matlab/ (159 files) ===
+    93 lines  matlab/attacks/apply_auth_misuse.m
+    69 lines  matlab/attacks/apply_dos.m
+    48 lines  matlab/attacks/apply_fdi.m
+    78 lines  matlab/attacks/apply_replay.m
+  1001 lines  matlab/data/A1_001.csv
+  1001 lines  matlab/data/A1_002.csv
+  1001 lines  matlab/data/A1_003.csv
+  1001 lines  matlab/data/A1_004.csv
+  1001 lines  matlab/data/A1_005.csv
+  1001 lines  matlab/data/A1_006.csv
+  1001 lines  matlab/data/A1_007.csv
+  1001 lines  matlab/data/A1_008.csv
+  1001 lines  matlab/data/A1_009.csv
+  1001 lines  matlab/data/A1_010.csv
+  1001 lines  matlab/data/A1_011.csv
+  1001 lines  matlab/data/A1_012.csv
+  1001 lines  matlab/data/A1_013.csv
+  1001 lines  matlab/data/A1_014.csv
+  1001 lines  matlab/data/A1_015.csv
+  1001 lines  matlab/data/A1_016.csv
+  1001 lines  matlab/data/A1_017.csv
+  1001 lines  matlab/data/A1_018.csv
+  1001 lines  matlab/data/A1_019.csv
+  1001 lines  matlab/data/A1_020.csv
+  1001 lines  matlab/data/A1_021.csv
+  1001 lines  matlab/data/A1_022.csv
+  1001 lines  matlab/data/A1_023.csv
+  1001 lines  matlab/data/A1_024.csv
+  1001 lines  matlab/data/A1_025.csv
+  1001 lines  matlab/data/A1_026.csv
+  1001 lines  matlab/data/A1_027.csv
+  1001 lines  matlab/data/A1_028.csv
+  1001 lines  matlab/data/A1_029.csv
+  1001 lines  matlab/data/A1_030.csv
+  1001 lines  matlab/data/A1_031.csv
+  1001 lines  matlab/data/A1_032.csv
+  1001 lines  matlab/data/A1_033.csv
+  1001 lines  matlab/data/A1_034.csv
+  1001 lines  matlab/data/A1_035.csv
+  1001 lines  matlab/data/A1_036.csv
+  1001 lines  matlab/data/A1_037.csv
+  1001 lines  matlab/data/A1_038.csv
+  1001 lines  matlab/data/A1_039.csv
+  1001 lines  matlab/data/A1_040.csv
+  1001 lines  matlab/data/A1_041.csv
+  1001 lines  matlab/data/A1_042.csv
+  1001 lines  matlab/data/A1_043.csv
+  1001 lines  matlab/data/A1_044.csv
+  1001 lines  matlab/data/A1_045.csv
+  1001 lines  matlab/data/A2_001.csv
+  1001 lines  matlab/data/A2_002.csv
+  1001 lines  matlab/data/A2_003.csv
+  1001 lines  matlab/data/A2_004.csv
+  1001 lines  matlab/data/A2_005.csv
+  1001 lines  matlab/data/A2_006.csv
+  1001 lines  matlab/data/A2_007.csv
+  1001 lines  matlab/data/A2_008.csv
+  1001 lines  matlab/data/A2_009.csv
+  1001 lines  matlab/data/A2_010.csv
+  1001 lines  matlab/data/A2_011.csv
+  1001 lines  matlab/data/A2_012.csv
+  1001 lines  matlab/data/A2_013.csv
+  1001 lines  matlab/data/A2_014.csv
+  1001 lines  matlab/data/A2_015.csv
+  1001 lines  matlab/data/A3_001.csv
+  1001 lines  matlab/data/A3_002.csv
+  1001 lines  matlab/data/A3_003.csv
+  1001 lines  matlab/data/A3_004.csv
+  1001 lines  matlab/data/A3_005.csv
+  1001 lines  matlab/data/A3_006.csv
+  1001 lines  matlab/data/A3_007.csv
+  1001 lines  matlab/data/A3_008.csv
+  1001 lines  matlab/data/A3_009.csv
+  1001 lines  matlab/data/A3_010.csv
+  1001 lines  matlab/data/A3_011.csv
+  1001 lines  matlab/data/A3_012.csv
+  1001 lines  matlab/data/A3_013.csv
+  1001 lines  matlab/data/A3_014.csv
+  1001 lines  matlab/data/A3_015.csv
+  1001 lines  matlab/data/A4_001.csv
+  1001 lines  matlab/data/A4_002.csv
+  1001 lines  matlab/data/A4_003.csv
+  1001 lines  matlab/data/A4_004.csv
+  1001 lines  matlab/data/A4_005.csv
+  1001 lines  matlab/data/A4_006.csv
+  1001 lines  matlab/data/A4_007.csv
+  1001 lines  matlab/data/A4_008.csv
+  1001 lines  matlab/data/A4_009.csv
+  1001 lines  matlab/data/A4_010.csv
+  1001 lines  matlab/data/A4_011.csv
+  1001 lines  matlab/data/A4_012.csv
+  1001 lines  matlab/data/A4_013.csv
+  1001 lines  matlab/data/A4_014.csv
+  1001 lines  matlab/data/A4_015.csv
+  1001 lines  matlab/data/N_001.csv
+  1001 lines  matlab/data/N_002.csv
+  1001 lines  matlab/data/N_003.csv
+  1001 lines  matlab/data/N_004.csv
+  1001 lines  matlab/data/N_005.csv
+  1001 lines  matlab/data/N_006.csv
+  1001 lines  matlab/data/N_007.csv
+  1001 lines  matlab/data/N_008.csv
+  1001 lines  matlab/data/N_009.csv
+  1001 lines  matlab/data/N_010.csv
+  1001 lines  matlab/data/N_011.csv
+  1001 lines  matlab/data/N_012.csv
+  1001 lines  matlab/data/N_013.csv
+  1001 lines  matlab/data/N_014.csv
+  1001 lines  matlab/data/N_015.csv
+  1001 lines  matlab/data/N_016.csv
+  1001 lines  matlab/data/N_017.csv
+  1001 lines  matlab/data/N_018.csv
+  1001 lines  matlab/data/N_019.csv
+  1001 lines  matlab/data/N_020.csv
+  1001 lines  matlab/data/N_021.csv
+  1001 lines  matlab/data/N_022.csv
+  1001 lines  matlab/data/N_023.csv
+  1001 lines  matlab/data/N_024.csv
+  1001 lines  matlab/data/N_025.csv
+  1001 lines  matlab/data/N_026.csv
+  1001 lines  matlab/data/N_027.csv
+  1001 lines  matlab/data/N_028.csv
+  1001 lines  matlab/data/N_029.csv
+  1001 lines  matlab/data/N_030.csv
+  1001 lines  matlab/data/N_031.csv
+  1001 lines  matlab/data/N_032.csv
+  1001 lines  matlab/data/N_033.csv
+  1001 lines  matlab/data/N_034.csv
+  1001 lines  matlab/data/N_035.csv
+  1001 lines  matlab/data/N_036.csv
+  1001 lines  matlab/data/N_037.csv
+  1001 lines  matlab/data/N_038.csv
+  1001 lines  matlab/data/N_039.csv
+  1001 lines  matlab/data/N_040.csv
+  1001 lines  matlab/data/N_041.csv
+  1001 lines  matlab/data/N_042.csv
+  1001 lines  matlab/data/N_043.csv
+  1001 lines  matlab/data/N_044.csv
+  1001 lines  matlab/data/N_045.csv
+  1001 lines  matlab/data/N_046.csv
+  1001 lines  matlab/data/N_047.csv
+  1001 lines  matlab/data/N_048.csv
+  1001 lines  matlab/data/N_049.csv
+  1001 lines  matlab/data/N_050.csv
+  1001 lines  matlab/data/N_051.csv
+  1001 lines  matlab/data/N_052.csv
+  1001 lines  matlab/data/N_053.csv
+  1001 lines  matlab/data/N_054.csv
+  1001 lines  matlab/data/N_055.csv
+  1001 lines  matlab/data/N_056.csv
+  1001 lines  matlab/data/N_057.csv
+  1001 lines  matlab/data/N_058.csv
+  1001 lines  matlab/data/N_059.csv
+  1001 lines  matlab/data/N_060.csv
+    91 lines  matlab/data/attack_scenarios.csv
+   289 lines  matlab/run_all_scenarios.m
+   220 lines  matlab/run_single_scenario.m
+    43 lines  matlab/scada_params.m
+   153 lines  matlab/scada_simulink_guide.m
+Total in matlab/: 151234 lines
+
+=== checkpoints/ (3 files) ===
+    68 lines  checkpoints/data_split_v1.json
+   361 lines (latin-1)  checkpoints/lstm_ae_v1.pt
+     2 lines (latin-1)  checkpoints/scaler_v1.pkl
+Total in checkpoints/: 431 lines
+
+=== data/ (5 files) ===
+     8 lines  data/auth_misuse_ab_results.csv
+   929 lines (latin-1)  data/e0_residual_distribution.png
+ 99001 lines  data/evaluation_results.csv
+   241 lines  data/full_evaluation_results.csv
+280547 lines (latin-1)  data/scada_ids.db
+Total in data/: 380726 lines
+
+=== dashboard/ (5 files) ===
+    77 lines  dashboard/app.py
+   203 lines  dashboard/static/app.js
+    14 lines  dashboard/static/chart.js
+   278 lines  dashboard/static/style.css
+    91 lines  dashboard/templates/index.html
+Total in dashboard/: 663 lines
+
+=== scada_live/ (root/config) (4 files) ===
+     1 lines  scada_live/__init__.py
+   110 lines  scada_live/config.yaml
+     2 lines  scada_live/run_all.py
+    29 lines  scada_live/tools/watch_sse.py
+Total in scada_live/ (root/config): 142 lines
+
+=== scada_live/common/ (4 files) ===
+     1 lines  scada_live/common/__init__.py
+    26 lines  scada_live/common/config_loader.py
+    56 lines  scada_live/common/packets.py
+    52 lines  scada_live/common/transport.py
+Total in scada_live/common/: 135 lines
+
+=== scada_live/plant_sim/ (4 files) ===
+     1 lines  scada_live/plant_sim/__init__.py
+    71 lines  scada_live/plant_sim/gateway_client.py
+   121 lines  scada_live/plant_sim/plant.py
+    83 lines  scada_live/plant_sim/server.py
+Total in scada_live/plant_sim/: 276 lines
+
+=== scada_live/attacker_wire/ (3 files) ===
+     1 lines  scada_live/attacker_wire/__init__.py
+   130 lines  scada_live/attacker_wire/injector.py
+     1 lines  scada_live/attacker_wire/server.py
+Total in scada_live/attacker_wire/: 132 lines
+
+=== scada_live/scada_ids/ (14 files) ===
+     1 lines  scada_live/scada_ids/__init__.py
+   113 lines  scada_live/scada_ids/alert_manager.py
+     2 lines  scada_live/scada_ids/control_server.py
+    84 lines  scada_live/scada_ids/db_writer.py
+   501 lines  scada_live/scada_ids/gateway_core.py
+   182 lines  scada_live/scada_ids/metrics.py
+     2 lines  scada_live/scada_ids/prevention.py
+   411 lines  scada_live/scada_ids/server.py
+    33 lines  scada_live/scada_ids/sse_hub.py
+   271 lines  scada_live/scada_ids/static/css/style.css
+   156 lines  scada_live/scada_ids/static/defender.html
+   327 lines  scada_live/scada_ids/static/js/app.js
+    14 lines  scada_live/scada_ids/static/js/chart.js
+   305 lines  scada_live/scada_ids/streaming_ids.py
+Total in scada_live/scada_ids/: 2402 lines
+
+=== scada_live/tests/ (16 files) ===
+     1 lines  scada_live/tests/__init__.py
+   209 lines  scada_live/tests/test_api_command_validation.py
+   128 lines  scada_live/tests/test_gateway_safety_rule.py
+    96 lines  scada_live/tests/test_phase0_imports.py
+   112 lines  scada_live/tests/test_phase1_plant.py
+   262 lines  scada_live/tests/test_phase2_equivalence.py
+   273 lines  scada_live/tests/test_phase3a_gateway.py
+    81 lines  scada_live/tests/test_phase3b_alert_metrics.py
+    57 lines  scada_live/tests/test_phase3b_metrics.py
+   132 lines  scada_live/tests/test_phase4_api.py
+    76 lines  scada_live/tests/test_phase4_injector.py
+   560 lines  scada_live/tests/test_phase6a_prevention.py
+   487 lines  scada_live/tests/test_phase6b_command_filtering.py
+   101 lines  scada_live/tests/test_phase7_auto_demo.py
+    70 lines  scada_live/tests/test_phase7_evaluation.py
+   241 lines  scada_live/tests/test_tamper_consistency_check.py
+Total in scada_live/tests/: 2886 lines
+
+=== experiments/ (68 files) ===
+    82 lines  experiments/README.md
+    64 lines  experiments/check_a3_001.py
+    38 lines  experiments/check_a3_batch.py
+    56 lines  experiments/check_a3_batch_eval.py
+    81 lines  experiments/check_a3_gap.py
+     6 lines  experiments/check_a4_cmds.py
+    29 lines  experiments/check_a4_levels.py
+    15 lines  experiments/check_a4_missed.py
+   201 lines  experiments/check_normals.py
+    37 lines  experiments/check_policy_v2.py
+    32 lines  experiments/check_residual.py
+    27 lines  experiments/check_trend.py
+    41 lines  experiments/check_trend_all.py
+    22 lines  experiments/check_trend_no_noise.py
+    93 lines  experiments/compute_a3_mechanism_detailed.py
+    85 lines  experiments/compute_fresh_latency.py
+   187 lines  experiments/compute_latch_all10.py
+   127 lines  experiments/compute_metrics.py
+    11 lines  experiments/debug_a4.py
+    75 lines  experiments/inspect_tick0_baseline.py
+    37 lines  experiments/lstm_dist.py
+    18 lines  experiments/measure_twin.py
+    18 lines  experiments/metrics_normal.py
+     7 lines  experiments/print_a4_rows.py
+    75 lines  experiments/print_ab_per_seed.py
+    64 lines  experiments/recompute_all60_residuals.py
+   164 lines  experiments/reconcile_a3_fp.py
+   265 lines (latin-1)  experiments/residual.png
+  2641 lines (latin-1)  experiments/results/ab_comparison_figure.png
+    81 lines  experiments/results/ab_comparison_results.csv
+    14 lines (latin-1)  experiments/results/ab_comparison_summary.txt
+   111 lines  experiments/results/ab_per_seed_output.txt
+    21 lines  experiments/results/check_a3_gap.txt
+    73 lines  experiments/results/check_normals_output.txt
+    26 lines  experiments/results/compute_a3_mechanism_detailed.txt
+    26 lines  experiments/results/compute_fresh_latency.txt
+    47 lines  experiments/results/compute_latch_output.txt
+    26 lines  experiments/results/compute_metrics_output.txt
+    20 lines  experiments/results/constant_bias_sweep_output.txt
+     7 lines  experiments/results/constant_bias_sweep_results.csv
+    95 lines  experiments/results/gateway_rule_validation.txt
+    25 lines  experiments/results/handback_verification_output.txt
+    18 lines  experiments/results/inspect_tick0_baseline.txt
+    40 lines  experiments/results/mismatch_sensitivity_output.txt
+   161 lines  experiments/results/mismatch_sensitivity_results.csv
+    19 lines  experiments/results/recompute_all60_residuals.txt
+    45 lines  experiments/results/reconcile_a3_fp.txt
+     5 lines  experiments/results/run_2x2_grid.txt
+   213 lines  experiments/results/run_comparison_output.txt
+    15 lines  experiments/results/run_soak_tick0.txt
+    35 lines  experiments/results/soak_comparison_output.txt
+    41 lines  experiments/results/soak_comparison_results.csv
+    27 lines  experiments/results/test_aligned_loop.txt
+    70 lines  experiments/run_2x2_grid.py
+   114 lines  experiments/run_attacks_live.py
+   299 lines  experiments/run_auth_misuse_ab.py
+    83 lines  experiments/run_checks.py
+   577 lines  experiments/run_comparison.py
+   138 lines  experiments/run_constant_bias_sweep.py
+   500 lines  experiments/run_full_evaluation.py
+    55 lines  experiments/run_handback_check.py
+   243 lines  experiments/run_mismatch_sensitivity.py
+    31 lines  experiments/run_soak.py
+   119 lines  experiments/run_soak_comparison.py
+    42 lines  experiments/run_soak_tick0.py
+    52 lines  experiments/test_aligned_loop.py
+    90 lines  experiments/test_dos_takeover_hole.py
+   336 lines  experiments/validate_gateway_rule.py
+Total in experiments/: 8538 lines
+
+=== tests/ (8 files) ===
+   105 lines  tests/test_controller.py
+    84 lines  tests/test_engines.py
+    32 lines  tests/test_fusion.py
+    90 lines  tests/test_pump.py
+   152 lines  tests/test_simulator.py
+   106 lines  tests/test_tank.py
+   139 lines  tests/test_twin.py
+   110 lines  tests/test_valve.py
+Total in tests/: 818 lines
+
+=== projectdocs/ (12 files) ===
+    63 lines  projectdocs/ARCHITECTURE.md
+   184 lines  projectdocs/BASE_PAPERS_AND_CONTRIBUTIONS.md
+   254 lines  projectdocs/DATASET_DOCUMENTATION.md
+   385 lines  projectdocs/FORMULAS_REFERENCE.md
+   199 lines  projectdocs/PROJECT_REVIEW_CHEAT_SHEET.md
+   301 lines  projectdocs/Phase3_Plan.md
+   203 lines  projectdocs/Phase4_Plan.md
+   128 lines  projectdocs/Phase6a_Implementation_Plan.md
+   476 lines  projectdocs/Phase6b_Implementation_Plan.md
+   143 lines  projectdocs/Phase7_Implementation_Plan.md
+    75 lines  projectdocs/README.md
+   325 lines  projectdocs/SCADA_Hybrid_IDS_Plan.md
+Total in projectdocs/: 2736 lines
+
+=== other/ (6 files) ===
+    12 lines  reports/ablation_results.md
+    50 lines  reports/full_evaluation_report.md
+   276 lines (latin-1)  reports/roc_curve.png
+     5 lines  storage/__init__.py
+   370 lines  storage/sqlite_client.py
+   176 lines  temporrr/imp prog
+Total in other/: 889 lines
+
+TOTAL TRACKED FILES: 353
+TOTAL TEXT LINES: 556781
