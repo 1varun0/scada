@@ -56,10 +56,13 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__attacker_wire.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__scada_ids.md`.
 
+- [x] Phase 1: File note `docs_v2/_audit/notes/tests__batch_suite.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/tests__live_suite.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/experiments__registry.md`.
+- [x] Phase 1: Both test suites executed; outputs saved to `pytest_batch_output.txt` (66 passed in 1.86s) and `pytest_live_output.txt` (116 passed in 314.58s).
+
 ## Next Tasks
-- [ ] Phase 1: Review and document tests/ (root tests/ and scada_live/tests/).
-- [ ] Phase 1: Review experiments/ (scripts, results, and findings).
-- [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
+- [ ] Phase 1: Compile `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
 - [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
