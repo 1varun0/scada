@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 2 - Documentation Writing
-- Active Task: 15_REVIEW_QA_PREP.md
+- Active Task: 16_GLOSSARY.md
 - Context usage: Normal
 
 ## Tasks Done
@@ -83,7 +83,7 @@
 - [x] Phase 2: `12_RUNBOOK_AND_DEMO_GUIDE.md` (Setup, CLI runners, run_demo.py flags: --soak, --auto, --speed, UI walkthrough, troubleshooting)
 - [x] Phase 2: `13_THREAT_MODEL.md` (STRIDE/MITRE ATT&CK for ICS threat model, threat agents, attack taxonomy, detection assumptions, prevention boundaries)
 - [x] Phase 2: `14_PROJECT_HISTORY_AND_DECISIONS.md` (Reconstructed project timeline, git log archaeology, architectural phases, design pivot rationales)
-- [ ] Phase 2: `15_REVIEW_QA_PREP.md` (25 hardest technical review / audit questions with empirical citations)
+- [x] Phase 2: `15_REVIEW_QA_PREP.md` (25 hardest technical review / audit questions with empirical citations)
 - [ ] Phase 2: `16_GLOSSARY.md` (Standardized terminology, physical units, mathematical notation, abbreviations)
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
