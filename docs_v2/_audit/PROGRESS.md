@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: Completed all 6 files in scripts/; moving to matlab/
+- Active Task: matlab/attacks/apply_replay.m next
 - Context usage: Normal
 
 ## Tasks Done
@@ -40,9 +40,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__run_evaluation.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__train_lstm.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__validate_matlab_vs_python.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_fdi.m.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_fdi.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_replay.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_dos.m.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_auth_misuse.m.md`
