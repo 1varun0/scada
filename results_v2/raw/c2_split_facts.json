@@ -1,0 +1,88 @@
+{
+  "split_counts": {
+    "train_normal": 42,
+    "val_normal": 9,
+    "test_normal": 9,
+    "total_normal": 60
+  },
+  "eval_csv_counts": {
+    "total_rows": 99000,
+    "total_scenarios": 99,
+    "normal_scenarios": 9,
+    "attack_scenarios": 90
+  },
+  "coverage_check": {
+    "test_normal_matches_eval": true,
+    "train_in_eval": [],
+    "val_in_eval": [],
+    "all_attack_in_eval": true
+  },
+  "split_ids": {
+    "train_normal_ids": [
+      "N_041",
+      "N_005",
+      "N_044",
+      "N_020",
+      "N_035",
+      "N_059",
+      "N_026",
+      "N_057",
+      "N_016",
+      "N_028",
+      "N_010",
+      "N_031",
+      "N_027",
+      "N_017",
+      "N_025",
+      "N_056",
+      "N_012",
+      "N_033",
+      "N_054",
+      "N_042",
+      "N_038",
+      "N_030",
+      "N_045",
+      "N_002",
+      "N_022",
+      "N_003",
+      "N_048",
+      "N_040",
+      "N_036",
+      "N_024",
+      "N_050",
+      "N_011",
+      "N_023",
+      "N_019",
+      "N_060",
+      "N_021",
+      "N_008",
+      "N_043",
+      "N_015",
+      "N_029",
+      "N_052",
+      "N_039"
+    ],
+    "val_normal_ids": [
+      "N_058",
+      "N_047",
+      "N_051",
+      "N_032",
+      "N_004",
+      "N_053",
+      "N_018",
+      "N_009",
+      "N_007"
+    ],
+    "test_normal_ids": [
+      "N_001",
+      "N_006",
+      "N_037",
+      "N_046",
+      "N_014",
+      "N_055",
+      "N_034",
+      "N_049",
+      "N_013"
+    ]
+  }
+}

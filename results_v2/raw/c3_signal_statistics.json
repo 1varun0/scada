@@ -1,0 +1,57 @@
+[
+  {
+    "scenario_group": "Auth Misuse (A4, N=15)",
+    "row_count": 15000,
+    "min_level": 0.3891,
+    "mean_level": 1.0385,
+    "max_level": 2.1043,
+    "mean_q_in": 0.001985,
+    "mean_q_out": 0.002016,
+    "pump_on_fraction": 0.3921,
+    "attack_fraction": 0.101
+  },
+  {
+    "scenario_group": "DoS (A3, N=15)",
+    "row_count": 15000,
+    "min_level": 0.789,
+    "mean_level": 0.9609,
+    "max_level": 1.2131,
+    "mean_q_in": 0.001646,
+    "mean_q_out": 0.001819,
+    "pump_on_fraction": 0.3243,
+    "attack_fraction": 0.069
+  },
+  {
+    "scenario_group": "FDI (A1, N=45)",
+    "row_count": 45000,
+    "min_level": 0.7833,
+    "mean_level": 0.9873,
+    "max_level": 1.4113,
+    "mean_q_in": 0.002001,
+    "mean_q_out": 0.001964,
+    "pump_on_fraction": 0.3954,
+    "attack_fraction": 0.1832
+  },
+  {
+    "scenario_group": "Normal (N=60)",
+    "row_count": 60000,
+    "min_level": 0.4897,
+    "mean_level": 1.0541,
+    "max_level": 1.7125,
+    "mean_q_in": 0.002703,
+    "mean_q_out": 0.00204,
+    "pump_on_fraction": 0.5369,
+    "attack_fraction": 0.0
+  },
+  {
+    "scenario_group": "Replay (A2, N=15)",
+    "row_count": 15000,
+    "min_level": 0.7893,
+    "mean_level": 0.96,
+    "max_level": 1.2099,
+    "mean_q_in": 0.002023,
+    "mean_q_out": 0.001964,
+    "pump_on_fraction": 0.3999,
+    "attack_fraction": 0.066
+  }
+]

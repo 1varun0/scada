@@ -1,0 +1,1661 @@
+{
+  "schemas": {
+    "scada_telemetry": [
+      {
+        "cid": 0,
+        "name": "scenario_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "sequence_id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 2
+      },
+      {
+        "cid": 2,
+        "name": "simulation_time_s",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "source_time_s",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "data_age_ms",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "packet_received",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "communication_status",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "operating_condition",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "tank_level_setpoint",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "tank_level_observed",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "q_in",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "q_out",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "pump_command",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "pump_state",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "valve_command",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "valve_state",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "control_command",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "user_id",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 18,
+        "name": "user_role",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 19,
+        "name": "is_authenticated",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 20,
+        "name": "is_authorized",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 21,
+        "name": "attack_type",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'None'",
+        "pk": 0
+      },
+      {
+        "cid": 22,
+        "name": "attack_parameter",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 23,
+        "name": "ground_truth",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "0",
+        "pk": 0
+      },
+      {
+        "cid": 24,
+        "name": "replay_source_sequence_id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "attack_scenarios": [
+      {
+        "cid": 0,
+        "name": "scenario_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 1,
+        "name": "attack_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 2,
+        "name": "attack_type",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "attack_start_time_s",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "attack_end_time_s",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "attack_parameter_type",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "attack_parameter_value",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "random_seed",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "description",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "operating_condition",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "initial_tank_level",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "experiment_runs": [
+      {
+        "cid": 0,
+        "name": "experiment_id",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "model_version",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "feature_version",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "threshold_version",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "fusion_version",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "training_scenario_ids",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "validation_scenario_ids",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "test_scenario_ids",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "hyperparameters",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "thresholds",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "fusion_weights",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "created_at",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ],
+    "evaluation_results": [
+      {
+        "cid": 0,
+        "name": "experiment_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "scenario_id",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 2
+      },
+      {
+        "cid": 2,
+        "name": "sequence_id",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 3
+      },
+      {
+        "cid": 3,
+        "name": "simulation_time_s",
+        "type": "REAL",
+        "notnull": 1,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "h_twin",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "physics_residual",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "S_p",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "lstm_reconstruction_error",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "S_l",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "S_c",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "S_a",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "S_hybrid",
+        "type": "REAL",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "predicted_anomaly",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "ground_truth",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": null,
+        "pk": 0
+      }
+    ]
+  },
+  "row_counts": {
+    "scada_telemetry": 150000,
+    "attack_scenarios": 90,
+    "experiment_runs": 0,
+    "evaluation_results": 0
+  },
+  "telemetry_stats": {
+    "total_rows": 150000,
+    "total_scenarios": 150,
+    "min_sequence_id": 0,
+    "max_sequence_id": 999,
+    "min_sim_time_s": 0.0,
+    "max_sim_time_s": 999.0,
+    "dropped_packets": 1035,
+    "received_packets": 148965,
+    "min_data_age_ms": 0,
+    "avg_data_age_ms": 482.1666666666667,
+    "max_data_age_ms": 200000,
+    "attack_ticks": 11785,
+    "normal_ticks": 138215
+  },
+  "scenario_groups": [
+    {
+      "attack_type": "Auth_Misuse",
+      "operating_condition": "Misuse_Condition",
+      "count": 15,
+      "min_start_s": 200.0,
+      "max_start_s": 200.0,
+      "min_end_s": 300.0,
+      "max_end_s": 300.0,
+      "avg_duration_s": 100.0,
+      "min_initial_tank_level": 0.4,
+      "max_initial_tank_level": 2.1
+    },
+    {
+      "attack_type": "DoS",
+      "operating_condition": "Steady_State",
+      "count": 15,
+      "min_start_s": 350.0,
+      "max_start_s": 350.0,
+      "min_end_s": 370.0,
+      "max_end_s": 470.0,
+      "avg_duration_s": 68.0,
+      "min_initial_tank_level": 1.0,
+      "max_initial_tank_level": 1.0
+    },
+    {
+      "attack_type": "FDI",
+      "operating_condition": "Steady_State",
+      "count": 45,
+      "min_start_s": 300.0,
+      "max_start_s": 300.0,
+      "min_end_s": 500.0,
+      "max_end_s": 500.0,
+      "avg_duration_s": 200.0,
+      "min_initial_tank_level": 1.0,
+      "max_initial_tank_level": 1.0
+    },
+    {
+      "attack_type": "Replay",
+      "operating_condition": "Steady_State",
+      "count": 15,
+      "min_start_s": 400.0,
+      "max_start_s": 400.0,
+      "min_end_s": 430.0,
+      "max_end_s": 500.0,
+      "avg_duration_s": 65.0,
+      "min_initial_tank_level": 1.0,
+      "max_initial_tank_level": 1.0
+    }
+  ],
+  "all_attack_scenarios": [
+    {
+      "scenario_id": "A1_001",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42201
+    },
+    {
+      "scenario_id": "A1_002",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42202
+    },
+    {
+      "scenario_id": "A1_003",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42203
+    },
+    {
+      "scenario_id": "A1_004",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42204
+    },
+    {
+      "scenario_id": "A1_005",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42205
+    },
+    {
+      "scenario_id": "A1_006",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42206
+    },
+    {
+      "scenario_id": "A1_007",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42207
+    },
+    {
+      "scenario_id": "A1_008",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42208
+    },
+    {
+      "scenario_id": "A1_009",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42209
+    },
+    {
+      "scenario_id": "A1_010",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.05,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42210
+    },
+    {
+      "scenario_id": "A1_011",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42211
+    },
+    {
+      "scenario_id": "A1_012",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42212
+    },
+    {
+      "scenario_id": "A1_013",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42213
+    },
+    {
+      "scenario_id": "A1_014",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42214
+    },
+    {
+      "scenario_id": "A1_015",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42215
+    },
+    {
+      "scenario_id": "A1_016",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42216
+    },
+    {
+      "scenario_id": "A1_017",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42217
+    },
+    {
+      "scenario_id": "A1_018",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42218
+    },
+    {
+      "scenario_id": "A1_019",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42219
+    },
+    {
+      "scenario_id": "A1_020",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42220
+    },
+    {
+      "scenario_id": "A1_021",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42221
+    },
+    {
+      "scenario_id": "A1_022",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42222
+    },
+    {
+      "scenario_id": "A1_023",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42223
+    },
+    {
+      "scenario_id": "A1_024",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42224
+    },
+    {
+      "scenario_id": "A1_025",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42225
+    },
+    {
+      "scenario_id": "A1_026",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42226
+    },
+    {
+      "scenario_id": "A1_027",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42227
+    },
+    {
+      "scenario_id": "A1_028",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42228
+    },
+    {
+      "scenario_id": "A1_029",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42229
+    },
+    {
+      "scenario_id": "A1_030",
+      "attack_type": "FDI",
+      "param_type": "bias",
+      "param_value": 0.2,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42230
+    },
+    {
+      "scenario_id": "A1_031",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42231
+    },
+    {
+      "scenario_id": "A1_032",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42232
+    },
+    {
+      "scenario_id": "A1_033",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42233
+    },
+    {
+      "scenario_id": "A1_034",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42234
+    },
+    {
+      "scenario_id": "A1_035",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42235
+    },
+    {
+      "scenario_id": "A1_036",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42236
+    },
+    {
+      "scenario_id": "A1_037",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42237
+    },
+    {
+      "scenario_id": "A1_038",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42238
+    },
+    {
+      "scenario_id": "A1_039",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42239
+    },
+    {
+      "scenario_id": "A1_040",
+      "attack_type": "FDI",
+      "param_type": "scale",
+      "param_value": 1.1,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42240
+    },
+    {
+      "scenario_id": "A1_041",
+      "attack_type": "FDI",
+      "param_type": "intermittent",
+      "param_value": 0.15,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42241
+    },
+    {
+      "scenario_id": "A1_042",
+      "attack_type": "FDI",
+      "param_type": "intermittent",
+      "param_value": 0.15,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42242
+    },
+    {
+      "scenario_id": "A1_043",
+      "attack_type": "FDI",
+      "param_type": "intermittent",
+      "param_value": 0.15,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42243
+    },
+    {
+      "scenario_id": "A1_044",
+      "attack_type": "FDI",
+      "param_type": "intermittent",
+      "param_value": 0.15,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42244
+    },
+    {
+      "scenario_id": "A1_045",
+      "attack_type": "FDI",
+      "param_type": "intermittent",
+      "param_value": 0.15,
+      "start_s": 300.0,
+      "end_s": 500.0,
+      "duration_s": 200.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42245
+    },
+    {
+      "scenario_id": "A2_001",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 30.0,
+      "start_s": 400.0,
+      "end_s": 430.0,
+      "duration_s": 30.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42246
+    },
+    {
+      "scenario_id": "A2_002",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 40.0,
+      "start_s": 400.0,
+      "end_s": 440.0,
+      "duration_s": 40.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42247
+    },
+    {
+      "scenario_id": "A2_003",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 50.0,
+      "start_s": 400.0,
+      "end_s": 450.0,
+      "duration_s": 50.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42248
+    },
+    {
+      "scenario_id": "A2_004",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 60.0,
+      "start_s": 400.0,
+      "end_s": 460.0,
+      "duration_s": 60.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42249
+    },
+    {
+      "scenario_id": "A2_005",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 70.0,
+      "start_s": 400.0,
+      "end_s": 470.0,
+      "duration_s": 70.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42250
+    },
+    {
+      "scenario_id": "A2_006",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 80.0,
+      "start_s": 400.0,
+      "end_s": 480.0,
+      "duration_s": 80.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42251
+    },
+    {
+      "scenario_id": "A2_007",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 90.0,
+      "start_s": 400.0,
+      "end_s": 490.0,
+      "duration_s": 90.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42252
+    },
+    {
+      "scenario_id": "A2_008",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 100.0,
+      "start_s": 400.0,
+      "end_s": 500.0,
+      "duration_s": 100.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42253
+    },
+    {
+      "scenario_id": "A2_009",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 35.0,
+      "start_s": 400.0,
+      "end_s": 435.0,
+      "duration_s": 35.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42254
+    },
+    {
+      "scenario_id": "A2_010",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 45.0,
+      "start_s": 400.0,
+      "end_s": 445.0,
+      "duration_s": 45.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42255
+    },
+    {
+      "scenario_id": "A2_011",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 55.0,
+      "start_s": 400.0,
+      "end_s": 455.0,
+      "duration_s": 55.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42256
+    },
+    {
+      "scenario_id": "A2_012",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 65.0,
+      "start_s": 400.0,
+      "end_s": 465.0,
+      "duration_s": 65.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42257
+    },
+    {
+      "scenario_id": "A2_013",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 75.0,
+      "start_s": 400.0,
+      "end_s": 475.0,
+      "duration_s": 75.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42258
+    },
+    {
+      "scenario_id": "A2_014",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 85.0,
+      "start_s": 400.0,
+      "end_s": 485.0,
+      "duration_s": 85.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42259
+    },
+    {
+      "scenario_id": "A2_015",
+      "attack_type": "Replay",
+      "param_type": "replay",
+      "param_value": 95.0,
+      "start_s": 400.0,
+      "end_s": 495.0,
+      "duration_s": 95.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42260
+    },
+    {
+      "scenario_id": "A3_001",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 20.0,
+      "start_s": 350.0,
+      "end_s": 370.0,
+      "duration_s": 20.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42261
+    },
+    {
+      "scenario_id": "A3_002",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 30.0,
+      "start_s": 350.0,
+      "end_s": 380.0,
+      "duration_s": 30.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42262
+    },
+    {
+      "scenario_id": "A3_003",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 40.0,
+      "start_s": 350.0,
+      "end_s": 390.0,
+      "duration_s": 40.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42263
+    },
+    {
+      "scenario_id": "A3_004",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 50.0,
+      "start_s": 350.0,
+      "end_s": 400.0,
+      "duration_s": 50.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42264
+    },
+    {
+      "scenario_id": "A3_005",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 60.0,
+      "start_s": 350.0,
+      "end_s": 410.0,
+      "duration_s": 60.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42265
+    },
+    {
+      "scenario_id": "A3_006",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 70.0,
+      "start_s": 350.0,
+      "end_s": 420.0,
+      "duration_s": 70.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42266
+    },
+    {
+      "scenario_id": "A3_007",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 80.0,
+      "start_s": 350.0,
+      "end_s": 430.0,
+      "duration_s": 80.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42267
+    },
+    {
+      "scenario_id": "A3_008",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 90.0,
+      "start_s": 350.0,
+      "end_s": 440.0,
+      "duration_s": 90.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42268
+    },
+    {
+      "scenario_id": "A3_009",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 100.0,
+      "start_s": 350.0,
+      "end_s": 450.0,
+      "duration_s": 100.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42269
+    },
+    {
+      "scenario_id": "A3_010",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 110.0,
+      "start_s": 350.0,
+      "end_s": 460.0,
+      "duration_s": 110.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42270
+    },
+    {
+      "scenario_id": "A3_011",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 120.0,
+      "start_s": 350.0,
+      "end_s": 470.0,
+      "duration_s": 120.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42271
+    },
+    {
+      "scenario_id": "A3_012",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 25.0,
+      "start_s": 350.0,
+      "end_s": 375.0,
+      "duration_s": 25.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42272
+    },
+    {
+      "scenario_id": "A3_013",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 45.0,
+      "start_s": 350.0,
+      "end_s": 395.0,
+      "duration_s": 45.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42273
+    },
+    {
+      "scenario_id": "A3_014",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 75.0,
+      "start_s": 350.0,
+      "end_s": 425.0,
+      "duration_s": 75.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42274
+    },
+    {
+      "scenario_id": "A3_015",
+      "attack_type": "DoS",
+      "param_type": "dos_duration",
+      "param_value": 105.0,
+      "start_s": 350.0,
+      "end_s": 455.0,
+      "duration_s": 105.0,
+      "initial_level": 1.0,
+      "operating_condition": "Steady_State",
+      "seed": 42275
+    },
+    {
+      "scenario_id": "A4_001",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 80.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42276
+    },
+    {
+      "scenario_id": "A4_002",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 90.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42277
+    },
+    {
+      "scenario_id": "A4_003",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 100.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42278
+    },
+    {
+      "scenario_id": "A4_004",
+      "attack_type": "Auth_Misuse",
+      "param_type": "pump_on_at_high",
+      "param_value": 1.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 2.1,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42279
+    },
+    {
+      "scenario_id": "A4_005",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 70.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42280
+    },
+    {
+      "scenario_id": "A4_006",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 95.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42281
+    },
+    {
+      "scenario_id": "A4_007",
+      "attack_type": "Auth_Misuse",
+      "param_type": "pump_on_at_high",
+      "param_value": 1.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 2.1,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42282
+    },
+    {
+      "scenario_id": "A4_008",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 85.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42283
+    },
+    {
+      "scenario_id": "A4_009",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 75.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42284
+    },
+    {
+      "scenario_id": "A4_010",
+      "attack_type": "Auth_Misuse",
+      "param_type": "pump_on_at_high",
+      "param_value": 1.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 2.1,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42285
+    },
+    {
+      "scenario_id": "A4_011",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 60.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42286
+    },
+    {
+      "scenario_id": "A4_012",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 100.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42287
+    },
+    {
+      "scenario_id": "A4_013",
+      "attack_type": "Auth_Misuse",
+      "param_type": "pump_on_at_high",
+      "param_value": 1.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 2.1,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42288
+    },
+    {
+      "scenario_id": "A4_014",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 80.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42289
+    },
+    {
+      "scenario_id": "A4_015",
+      "attack_type": "Auth_Misuse",
+      "param_type": "valve_open_at_low",
+      "param_value": 90.0,
+      "start_s": 200.0,
+      "end_s": 300.0,
+      "duration_s": 100.0,
+      "initial_level": 0.4,
+      "operating_condition": "Misuse_Condition",
+      "seed": 42290
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 # Progress Tracker: SCADA Hybrid IDS Results Reproduction (results_v2)
 
 ## Current Status
-- Phase: Phase B Complete (Test Suites Executed & Determinism Verified)
-- Active Task: Phase C (Dataset Facts & Statistics)
+- Phase: Phase C Complete (Dataset Facts & Statistics Recorded)
+- Active Task: Phase D1 (Batch Evaluation Reproduction - Stop Point 2)
 - Context Usage: Normal
 
 ## Tasks Done
@@ -15,10 +15,14 @@
 - [x] B1. Executed `python -m pytest tests -v --durations=20` (66 passed in 4.04s) and `python -m pytest scada_live/tests -v --durations=20` (116 passed in 257.28s) in sandbox. Raw verbatim logs and JSON sidecars saved to `results_v2/raw/b1_pytest_*`.
 - [x] B1. Generated summary table `results_v2/tables/t01_test_suites_summary.md` and parsed record `results_v2/raw/parsed_test_suites_run1.json`.
 - [x] B2. Re-executed both test suites for determinism (Core: 66 passed in 2.79s, Live: 116 passed in 257.71s). Generated audit comparison in `results_v2/_audit/determinism.md` confirming 100% item-level determinism (182/182 identical outcomes).
+- [x] C. Executed read-only queries against sandbox DB and `data_split_v1.json` via `results_v2/scripts/query_dataset_facts.py`. Saved raw JSON dumps (`c1_database_facts.json`, `c2_split_facts.json`, `c3_signal_statistics.json`) and generated markdown tables:
+  - `t02_database_schema_and_counts.md`: PRAGMA schemas and table inventory.
+  - `t03_attack_scenarios_breakdown.md`: Threat profiles, windows, and telemetry ingress totals (150k rows, 1,035 dropped packets).
+  - `t04_dataset_split_and_coverage.md`: Partition verification (42 train, 9 val, 9 test normal, 90 test attacks; 0 leakage).
+  - `t05_signal_statistics_by_scenario_type.md`: Min/mean/max water levels, flow rates, and pump duty cycles per group.
 
 ## Active / Next Tasks
-- [ ] C. Execute read-only queries against sandbox DB and data split to produce raw JSON and tables T02-T05 (`results_v2/scripts/query_dataset_facts.py`).
-- [ ] D1. Run `python -m scripts.run_evaluation` in sandbox, compare output against committed `data/evaluation_results.csv`, generate table T06, and reach Stop Point 2.
+- [ ] D1. Run `python -m scripts.run_evaluation` in sandbox copy, compare output against committed `data/evaluation_results.csv`, generate table T06, and reach Stop Point 2.
 
 ## Blockers
-- None. Proceeding through Phase C to Stop Point 2 (Phase D1).
+- None. Proceeding to Phase D1.
