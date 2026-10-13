@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: Source file analysis (config/scenarios.py next)
+- Active Task: Completed config/ folder; moving to digital_twin/
 - Context usage: Normal
 
 ## Tasks Done
@@ -20,10 +20,11 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__tank.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__valve.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/config__parameters.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/config__scenarios.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/config__scenarios.py.md`
-- [ ] Phase 1: Proceed through digital_twin/, engines/, models/, evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
+- [ ] Phase 1: File note `docs_v2/_audit/notes/digital_twin__physics_twin.py.md`
+- [ ] Phase 1: Proceed through engines/, models/, evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
 - [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
