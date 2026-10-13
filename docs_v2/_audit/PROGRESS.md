@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: Source file analysis starting with simulator/
+- Active Task: Source file analysis (simulator/noise.py next)
 - Context usage: Normal
 
 ## Tasks Done
@@ -11,10 +11,10 @@
 - [x] Phase 0: Saved `git ls-files` grouped by folder with line counts to `docs_v2/_audit/outputs/file_inventory.txt`.
 - [x] Phase 0: Created `docs_v2/_audit/existing_docs.md` with first heading and last commit for all 18 existing doc files.
 - [x] Phase 0: Created `docs_v2/_audit/UNVERIFIED.md`.
-- [x] Phase 1: Database read-only queries saved to `docs_v2/_audit/outputs/query_db.py` and `docs_v2/_audit/outputs/db_queries_output.txt`. Confirmed schemas, 150 scenarios in telemetry (60 N, 45 A1, 15 A2, 15 A3, 15 A4), 1000 ticks per scenario, 0 rows in sqlite evaluation_results, verified `data/evaluation_results.csv` contains 99 scenarios (45 A1, 15 A2, 15 A3, 15 A4, 9 held-out test N) exactly matching `checkpoints/data_split_v1.json`.
+- [x] Phase 1: Database read-only queries saved to `docs_v2/_audit/outputs/query_db.py` and `docs_v2/_audit/outputs/db_queries_output.txt`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/simulator__controller.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__controller.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__noise.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__process_simulator.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__pump.py.md`
