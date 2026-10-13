@@ -46,11 +46,13 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__attacks__apply_auth_misuse.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__run_single_scenario.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__run_all_scenarios.m.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_params.m.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_simulink_guide.m.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_params.m.md`
-- [ ] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_simulink_guide.m.md`
-- [ ] Phase 1: Proceed through dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
+- [ ] Phase 1: File note `docs_v2/_audit/notes/dashboard__app.py.md`
+- [ ] Phase 1: File notes for dashboard templates/static files
+- [ ] Phase 1: Proceed through scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
 - [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
