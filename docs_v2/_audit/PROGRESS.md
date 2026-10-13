@@ -1,8 +1,8 @@
 # Progress Tracker: SCADA Hybrid IDS Documentation Audit (docs_v2)
 
 ## Current Status
-- Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: matlab/scada_params.m next
+- Phase: Phase 2 - Documentation Writing
+- Active Task: 05_API_AND_PACKET_REFERENCE.md
 - Context usage: Normal
 
 ## Tasks Done
@@ -72,8 +72,9 @@
 - [x] Phase 2: `02_DATASET_DOCUMENTATION_V2.md` (Schema from PRAGMA, scenario taxonomy, data splits, artifacts)
 - [x] Stop point 3 reached: 02_DATASET_DOCUMENTATION_V2.md finished.
 - [x] Phase 2: `03_FORMULAS_REFERENCE_V2.md` (Continuous and discrete ODEs, engine mathematics, bounds, metrics)
-- [ ] Phase 2: `04_CODEBASE_MAP.md`
-- [ ] Phase 2: Follow sequential order through 05 to 16.
+- [x] Phase 2: `04_CODEBASE_MAP.md` (Directory tree, component role, entry points, stubs vs active)
+- [ ] Phase 2: `05_API_AND_PACKET_REFERENCE.md` (All 21 Flask routes, packet schemas, SSE streams, truth channel)
+- [ ] Phase 2: Follow sequential order through 06 to 16.
 - [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
 
 ## Blockers
