@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: Source file analysis (simulator/tank.py next)
+- Active Task: Source file analysis (simulator/valve.py next)
 - Context usage: Normal
 
 ## Tasks Done
@@ -17,9 +17,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__process_simulator.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__pump.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/simulator__scenario_runner.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/simulator__tank.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__tank.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/simulator__valve.py.md`
 - [ ] Phase 1: Proceed through config/, digital_twin/, engines/, models/, evaluation/, storage/, scripts/, matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
