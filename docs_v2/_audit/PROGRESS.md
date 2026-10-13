@@ -1,8 +1,8 @@
 # Progress Tracker: SCADA Hybrid IDS Documentation Audit (docs_v2)
 
 ## Current Status
-- Phase: Phase 2 - Documentation Writing
-- Active Task: 16_GLOSSARY.md
+- Phase: Phase 3 - Self-Audit & Final Verification
+- Active Task: Phase 3 Verification Scripts & Final Report
 - Context usage: Normal
 
 ## Tasks Done
@@ -84,8 +84,11 @@
 - [x] Phase 2: `13_THREAT_MODEL.md` (STRIDE/MITRE ATT&CK for ICS threat model, threat agents, attack taxonomy, detection assumptions, prevention boundaries)
 - [x] Phase 2: `14_PROJECT_HISTORY_AND_DECISIONS.md` (Reconstructed project timeline, git log archaeology, architectural phases, design pivot rationales)
 - [x] Phase 2: `15_REVIEW_QA_PREP.md` (25 hardest technical review / audit questions with empirical citations)
-- [ ] Phase 2: `16_GLOSSARY.md` (Standardized terminology, physical units, mathematical notation, abbreviations)
-- [ ] Phase 3: Self-audit (`check_docs.py`, spot checks, hash verification).
+- [x] Phase 2: `16_GLOSSARY.md` (Standardized terminology, physical units, mathematical notation, abbreviations)
+- [ ] Phase 3: Run `check_docs.py` (markdown links, file paths, route definitions, config keys, mermaid blocks)
+- [ ] Phase 3: Run `spot_checks.py` auditing 30 numerical claims directly against source data/code
+- [ ] Phase 3: Verify bit-for-bit SHA-256 equivalence between `hashes_before.txt` and `hashes_after.txt`
+- [ ] Phase 3: Publish `docs_v2/_audit/FINAL_REPORT.md` and sign off
 
 ## Blockers
 - None.
