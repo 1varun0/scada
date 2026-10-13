@@ -1,0 +1,15 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "tests",
+    "-q"
+  ],
+  "command_str": "python -m pytest tests -q",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T18:24:59+0530",
+  "duration_s": 2.9818,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/a2_sandbox_pytest_tests_q.log"
+}

@@ -1,0 +1,12 @@
+python: 3.12.6
+platform: Windows-11-10.0.26200-SP0
+cpu_model: Intel64 Family 6 Model 165 Stepping 2, GenuineIntel
+cpu_cores_physical: 4
+cpu_cores_logical: 8
+ram_gb: 15.84
+gpu_available: True
+gpu_device: NVIDIA GeForce GTX 1650
+torch: 2.5.1+cu121
+numpy: 2.3.3
+pandas: 2.3.2
+scikit-learn: 1.7.2
