@@ -49,13 +49,19 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_params.m.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/matlab__scada_simulink_guide.m.md`.
 
-- [x] Phase 1: File note `docs_v2/_audit/notes/dashboard__app.py.md`.
-- [x] Phase 1: File note `docs_v2/_audit/notes/dashboard__ui_assets.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__config.yaml.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/run_demo.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__common.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__plant_sim.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__attacker_wire.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scada_live__scada_ids.md`.
 
 ## Next Tasks
-- [ ] Phase 1: Proceed through scada_live/ (`config.yaml`, `run_demo.py`, `common/`, `plant_sim/`, `attacker_wire/`, `scada_ids/`, `tools/`).
-- [ ] Phase 1: Proceed through tests/ and scada_live/tests/.
-- [ ] Phase 1: Proceed through experiments/.
+- [ ] Phase 1: Review and document tests/ (root tests/ and scada_live/tests/).
+- [ ] Phase 1: Review experiments/ (scripts, results, and findings).
+- [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
+- [ ] Phase 1: Address all "Leads to VERIFY" items.
+- [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
 - [ ] Phase 1: Address all "Leads to VERIFY" items.
 - [ ] Stop point 1: STOP and wait for user after Phase 1 completion.
