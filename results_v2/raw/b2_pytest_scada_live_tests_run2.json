@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "scada_live/tests",
+    "-v",
+    "--durations=20"
+  ],
+  "command_str": "python -m pytest scada_live/tests -v --durations=20",
+  "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+  "start_time": "2026-10-13T21:12:11+0530",
+  "duration_s": 257.7065,
+  "exit_code": 0,
+  "log_file": "results_v2/raw/b2_pytest_scada_live_tests_run2.log"
+}

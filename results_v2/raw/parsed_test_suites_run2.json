@@ -1,0 +1,1221 @@
+{
+  "batch": {
+    "meta": {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "tests",
+        "-v",
+        "--durations=20"
+      ],
+      "command_str": "python -m pytest tests -v --durations=20",
+      "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+      "start_time": "2026-10-13T21:12:01+0530",
+      "duration_s": 2.7851,
+      "exit_code": 0,
+      "log_file": "results_v2/raw/b2_pytest_tests_run2.log"
+    },
+    "results": {
+      "tests": [
+        {
+          "test_id": "tests/test_controller.py::TestController::test_pump_on_below_threshold",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_pump_off_above_threshold",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_hysteresis_hold_in_deadband",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_failsafe_on_dos",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_failsafe_exits_when_dos_ends",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_setpoint_update",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_override_command",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_controller.py::TestController::test_reset",
+          "file": "tests/test_controller.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_engines.py::test_physics_engine",
+          "file": "tests/test_engines.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_engines.py::test_policy_engine",
+          "file": "tests/test_engines.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_engines.py::test_availability_engine",
+          "file": "tests/test_engines.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_engines.py::test_scaler_transform_equals_manual_minmax",
+          "file": "tests/test_engines.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_fusion.py::test_fusion_engine",
+          "file": "tests/test_fusion.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_fusion.py::test_fusion_engine_normalization",
+          "file": "tests/test_fusion.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_initial_off",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_initial_on",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_flow_rate_on",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_flow_rate_off",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_response_delay",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_immediate_if_no_change",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_command_tracking",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_reset",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_pump.py::TestPump::test_rapid_toggle",
+          "file": "tests/test_pump.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_produces_correct_number_of_records",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_record_has_required_fields",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_sequence_id_increments",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_simulation_time_increments",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_normal_ground_truth",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_deterministic_replay",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_different_seeds_produce_different_noise",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_tank_level_changes",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_internal_fields_present",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_simulator.py::TestProcessSimulator::test_normal_comms",
+          "file": "tests/test_simulator.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_initial_level",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_default_initial_level",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_mass_balance_fill",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_mass_balance_drain",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_mass_balance_steady",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_clamp_upper",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_clamp_lower",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_initial_level_clamped",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_multiple_steps",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_reset",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_tank.py::TestTank::test_properties",
+          "file": "tests/test_tank.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_initial_level",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_step_with_inflow",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_step_with_outflow",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_residual_zero_when_aligned",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_residual_positive_when_observed_higher",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_residual_negative_when_observed_lower",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_independence_from_observed",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_reinitialization",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_twin_tracks_tank_physics",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_bounds_clamping",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_twin.py::TestPhysicsTwin::test_drift_over_many_steps",
+          "file": "tests/test_twin.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_initial_position",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_at_100_pct",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_at_50_pct",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_at_zero_pct",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_at_zero_level",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_negative_level",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_outflow_sqrt_dependency",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_slew_rate_limiting",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_slew_reaches_target",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_position_bounds",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "tests/test_valve.py::TestValve::test_reset",
+          "file": "tests/test_valve.py",
+          "outcome": "PASSED"
+        }
+      ],
+      "by_file": {
+        "tests/test_controller.py": {
+          "total": 8,
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_engines.py": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_fusion.py": {
+          "total": 2,
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_pump.py": {
+          "total": 9,
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_simulator.py": {
+          "total": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_tank.py": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_twin.py": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "tests/test_valve.py": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "durations": [
+        {
+          "duration_s": 1.08,
+          "stage": "call",
+          "test_id": "tests/test_engines.py::test_scaler_transform_equals_manual_minmax"
+        }
+      ],
+      "total_collected": 66,
+      "total_passed": 66,
+      "total_failed": 0,
+      "total_skipped": 0,
+      "summary_info": {
+        "raw_summary": "66 passed in 1.83s"
+      }
+    }
+  },
+  "live": {
+    "meta": {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "scada_live/tests",
+        "-v",
+        "--durations=20"
+      ],
+      "command_str": "python -m pytest scada_live/tests -v --durations=20",
+      "cwd": "C:\\Users\\varun\\AppData\\Local\\Temp\\p1_sandbox",
+      "start_time": "2026-10-13T21:12:11+0530",
+      "duration_s": 257.7065,
+      "exit_code": 0,
+      "log_file": "results_v2/raw/b2_pytest_scada_live_tests_run2.log"
+    },
+    "results": {
+      "tests": [
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_non_json_request",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_malformed_json_request",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_non_dict_json_request",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_missing_required_fields",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_wrong_field_types",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_out_of_range_values",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_valid_commands_and_default_hold",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_unauthenticated_hold_cap",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_authenticated_hold_bearer_and_api_key",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_wrong_secret_capped",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_missing_config_secret_fails_closed",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_api_command_validation.py::test_actor_role_does_not_bypass_cap",
+          "file": "scada_live/tests/test_api_command_validation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_controller_attributes_exist",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_normal_operating_envelope",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am1_high_level_pump_on_blocked",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am2_valve_tampering_blocked",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am3_legitimate_gateway_command_allowed",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am4_in_deadband_toggle_allowed_blindspot",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am5_in_band_hold_dropped_on_envelope_crossing",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_gateway_safety_rule.py::test_am6_pump_off_dropped_on_lower_envelope_crossing",
+          "file": "scada_live/tests/test_gateway_safety_rule.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_import_packets",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_import_config_loader",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_import_transport",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_import_stubs",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_config_loads",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_telemetry_packet_roundtrip",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_telemetry_strip_truth",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_command_packet_roundtrip",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_config_prevention_block",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase0_imports.py::test_streaming_ids_twin_estimate_and_policy_flag",
+          "file": "scada_live/tests/test_phase0_imports.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_step_produces_valid_packet",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_standalone_level_rises_from_low",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_deterministic_replay",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_matches_process_simulator",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_overflow_detection",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_apply_command",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase1_plant.py::test_liveplant_reset",
+          "file": "scada_live/tests/test_phase1_plant.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[N_001]",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A1_001]",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A2_001]",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A3_001]",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A4_001]",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_performance_and_soak",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_policy_streaming_parity_synthetic",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_run_switch",
+          "file": "scada_live/tests/test_phase2_equivalence.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_gateway_parity",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_validation",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_liveplant_through_gateway",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_sse_hub",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_sense_failure",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_watchdog_synthetic_packet",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_watchdog_time_scale",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_concurrency",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_soak_30min",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_gateway_core_policy_v2_and_equivalence_v1",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_dos_dropped_packets_finite_lstm_scores",
+          "file": "scada_live/tests/test_phase3a_gateway.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3b_alert_metrics.py::test_state_machine",
+          "file": "scada_live/tests/test_phase3b_alert_metrics.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3b_alert_metrics.py::test_latch_and_ack",
+          "file": "scada_live/tests/test_phase3b_alert_metrics.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3b_alert_metrics.py::test_attribution",
+          "file": "scada_live/tests/test_phase3b_alert_metrics.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase3b_metrics.py::test_metrics_correctness",
+          "file": "scada_live/tests/test_phase3b_metrics.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_config_route",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_state_route_empty",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_history_route_empty",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_demo_gating",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_demo_gating_enabled",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_stream_no_truth",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_index_route_serves_defender_ui",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_mode_toggle_api",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_api.py::test_demo_attack_wire_tamper",
+          "file": "scada_live/tests/test_phase4_api.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_injector.py::test_injector_fdi",
+          "file": "scada_live/tests/test_phase4_injector.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_injector.py::test_injector_replay",
+          "file": "scada_live/tests/test_phase4_injector.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_injector.py::test_injector_dos",
+          "file": "scada_live/tests/test_phase4_injector.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase4_injector.py::test_injector_auth_misuse",
+          "file": "scada_live/tests/test_phase4_injector.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_gateway_mode",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_handback_rules",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_mode_independence[False]",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_mode_independence[True]",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_twin_control_stability",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_dos_recovery_no_false_takeover",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_live_dos_60s_reseed",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_dos_followed_by_fdi_step_refusal",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_gap_suppression_timeout_recovery",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_gateway_core_dos_gap_rule_explicit",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_gap_free_equivalence_rule_on_off",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_batch_replay_all_15_a3_scenarios",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_harness_simulation_determinism_in_memory",
+          "file": "scada_live/tests/test_phase6a_prevention.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_evaluate_function_valid_commands",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_evaluate_function_invalid_commands",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_evaluate_function_boundary_cases",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_evaluate_function_strict_attribute_validation",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_mode_toggle_api",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_ingress_block_prevention_mode",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_ingress_would_block_monitor_mode",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_continuous_enforcement_prevention_drops_hold",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_continuous_enforcement_monitor_allows_hold",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_hold_expiry_natural",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_controller_state_sync_on_drop",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_monitor_prevention_event_invariance",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am5_filling_prevention_zero_overflows",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am5_filling_monitor_overflows",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am6_draining_prevention_zero_dry_runs",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am6_draining_monitor_dry_runs",
+          "file": "scada_live/tests/test_phase6b_command_filtering.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_auto_demo.py::test_coordinator_init",
+          "file": "scada_live/tests/test_phase7_auto_demo.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_auto_demo.py::test_coordinator_sleep_sim_interrupt",
+          "file": "scada_live/tests/test_phase7_auto_demo.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_auto_demo.py::test_coordinator_print_summary",
+          "file": "scada_live/tests/test_phase7_auto_demo.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_auto_demo.py::test_coordinator_fast_execution",
+          "file": "scada_live/tests/test_phase7_auto_demo.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_scenario_metadata_integrity",
+          "file": "scada_live/tests/test_phase7_evaluation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_run_single_simulation_norm",
+          "file": "scada_live/tests/test_phase7_evaluation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_run_single_simulation_am1_prevention",
+          "file": "scada_live/tests/test_phase7_evaluation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_execute_benchmark_fast_smoke",
+          "file": "scada_live/tests/test_phase7_evaluation.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_legitimate_turn_off_no_false_alarm",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_30min_soak_zero_wire_tamper_alerts",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_am3_wire_tamper_detection_delay",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_am3_attribution_and_event",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_am3_identical_physical_harm_monitor_vs_prevention",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        },
+        {
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_am4_in_deadband_toggle_empirical",
+          "file": "scada_live/tests/test_tamper_consistency_check.py",
+          "outcome": "PASSED"
+        }
+      ],
+      "by_file": {
+        "scada_live/tests/test_api_command_validation.py": {
+          "total": 12,
+          "passed": 12,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_gateway_safety_rule.py": {
+          "total": 8,
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase0_imports.py": {
+          "total": 10,
+          "passed": 10,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase1_plant.py": {
+          "total": 7,
+          "passed": 7,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase2_equivalence.py": {
+          "total": 8,
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase3a_gateway.py": {
+          "total": 11,
+          "passed": 11,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase3b_alert_metrics.py": {
+          "total": 3,
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase3b_metrics.py": {
+          "total": 1,
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase4_api.py": {
+          "total": 9,
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase4_injector.py": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase6a_prevention.py": {
+          "total": 13,
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase6b_command_filtering.py": {
+          "total": 16,
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase7_auto_demo.py": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_phase7_evaluation.py": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0,
+          "skipped": 0
+        },
+        "scada_live/tests/test_tamper_consistency_check.py": {
+          "total": 6,
+          "passed": 6,
+          "failed": 0,
+          "skipped": 0
+        }
+      },
+      "durations": [
+        {
+          "duration_s": 60.36,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_batch_replay_all_15_a3_scenarios"
+        },
+        {
+          "duration_s": 40.64,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_execute_benchmark_fast_smoke"
+        },
+        {
+          "duration_s": 33.95,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am6_draining_monitor_dry_runs"
+        },
+        {
+          "duration_s": 27.16,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am5_filling_monitor_overflows"
+        },
+        {
+          "duration_s": 17.72,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_gap_free_equivalence_rule_on_off"
+        },
+        {
+          "duration_s": 11.82,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am6_draining_prevention_zero_dry_runs"
+        },
+        {
+          "duration_s": 9.95,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6b_command_filtering.py::test_am5_filling_prevention_zero_overflows"
+        },
+        {
+          "duration_s": 5.35,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_am3_identical_physical_harm_monitor_vs_prevention"
+        },
+        {
+          "duration_s": 4.19,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_twin_control_stability"
+        },
+        {
+          "duration_s": 4.13,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase3a_gateway.py::test_soak_30min"
+        },
+        {
+          "duration_s": 3.99,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_performance_and_soak"
+        },
+        {
+          "duration_s": 3.53,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_tamper_consistency_check.py::test_30min_soak_zero_wire_tamper_alerts"
+        },
+        {
+          "duration_s": 3.03,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A4_001]"
+        },
+        {
+          "duration_s": 3.01,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A1_001]"
+        },
+        {
+          "duration_s": 2.95,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[N_001]"
+        },
+        {
+          "duration_s": 2.91,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A3_001]"
+        },
+        {
+          "duration_s": 2.91,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_streaming_equals_batch[A2_001]"
+        },
+        {
+          "duration_s": 2.47,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase6a_prevention.py::test_dos_recovery_no_false_takeover"
+        },
+        {
+          "duration_s": 2.38,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase7_evaluation.py::test_run_single_simulation_am1_prevention"
+        },
+        {
+          "duration_s": 2.0,
+          "stage": "call",
+          "test_id": "scada_live/tests/test_phase2_equivalence.py::test_run_switch"
+        }
+      ],
+      "total_collected": 116,
+      "total_passed": 116,
+      "total_failed": 0,
+      "total_skipped": 0,
+      "summary_info": {
+        "raw_summary": "116 passed in 256.24s (0:04:16)"
+      }
+    }
+  }
+}
