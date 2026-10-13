@@ -2,7 +2,7 @@
 
 ## Current Status
 - Phase: Phase 1 - Source File Analysis & Verification
-- Active Task: scripts/train_lstm.py next
+- Active Task: scripts/validate_matlab_vs_python.py next
 - Context usage: Normal
 
 ## Tasks Done
@@ -38,9 +38,9 @@
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__run_ablation.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__run_e0_validation.py.md`.
 - [x] Phase 1: File note `docs_v2/_audit/notes/scripts__run_evaluation.py.md`.
+- [x] Phase 1: File note `docs_v2/_audit/notes/scripts__train_lstm.py.md`.
 
 ## Next Tasks
-- [ ] Phase 1: File note `docs_v2/_audit/notes/scripts__train_lstm.py.md`
 - [ ] Phase 1: File note `docs_v2/_audit/notes/scripts__validate_matlab_vs_python.py.md`
 - [ ] Phase 1: Proceed through matlab/, dashboard/, scada_live/, tests/, scada_live/tests/, experiments/.
 - [ ] Phase 1: Read existing docs vs code, produce `docs_v2/DOC_VS_CODE_DISCREPANCIES.md`.
